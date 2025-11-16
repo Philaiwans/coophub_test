@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoopHub - Teacher</title>
+
+    <!-- Flaticon Icons -->
+    <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/uicons-regular-rounded/css/uicons-regular-rounded.css">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: "Prompt", Arial, sans-serif;
+            background-color: #ffffff;
+        }
+
+        /* Navbar */
+        .navbar {
+            background-color: #2f80ed;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar-title {
+            font-size: 28px;
+            font-weight: bold;
+            font-family: "Comic Sans MS", cursive;
+        }
+
+        .navbar-icons {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .navbar-icons img,
+        .profile-img {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            cursor: pointer;
+        }
+
+        .profile-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: white;
+            border: 2px solid #2f80ed;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #2f80ed;
+            cursor: pointer;
+            font-size: 20px;
+        }
+
+        /* Dropdown */
+        .profile-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 50px;
+            right: 0;
+            width: 170px;
+            background: white;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+            box-shadow: 0px 2px 8px rgba(0,0,0,0.15);
+            display: none;
+            z-index: 100;
+        }
+
+        .dropdown-menu a {
+            display: block;
+            padding: 12px;
+            font-size: 14px;
+            text-decoration: none;
+            color: black;
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        .dropdown-menu a:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-menu a:hover {
+            background-color: #f2f2f2;
+        }
+
+        /* Post Cards */
+        .section-title {
+            padding: 20px;
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .card {
+            width: 90%;
+            margin: 10px auto;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .card-info {
+            font-size: 15px;
+        }
+
+        .card-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            color: white;
+            font-size: 14px;
+        }
+
+        .approve { background: #28a745; }
+        .reject { background: #d9534f; }
+
+    </style>
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <div class="navbar">
+        <div class="navbar-title">CoopHub</div>
+
+        <div class="navbar-icons">
+            <img src="https://img.icons8.com/ios-filled/50/ffffff/appointment-reminders.png"/>
+            <img src="https://img.icons8.com/ios-filled/50/ffffff/edit.png"/>
+            <img src="https://img.icons8.com/ios-filled/50/ffffff/delete.png"/>
+
+            <div class="profile-container">
+
+                {% if user_obj.profile_image %}
+                    <img class="profile-img" src="{{ user_obj.profile_image.url }}" id="profileBtn">
+                {% else %}
+                    <div class="profile-icon" id="profileBtn">
+                        <i class="fi fi-rr-user"></i>
+                    </div>
+                {% endif %}
+
+                <div class="dropdown-menu" id="dropdownMenu">
+                    <a href="#">Community</a>
+                    <a href="#">Major chat</a>
+                    <a href="{% url 'profile' %}">My profile</a>
+                    <a href="#">แดชบอร์ด</a>
+                    <a href="#">ดูรายชื่อสมาชิก</a>
+                    <a href="#">บันทึกกิจกรรม</a>
+                    <a href="{% url 'logout' %}">ออกจากระบบ</a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Page Title -->
+    <div class="section-title">โพสต์รออนุมัติ</div>
+
+    <!-- Post List -->
+    {% for p in posts %}
+    <div class="card">
+        <div class="card-info">
+            <b>{{ p.company }}</b><br>
+            ตำแหน่ง: {{ p.position }}<br>
+            ผู้โพสต์: {{ p.owner.first_name }} {{ p.owner.last_name }}
+        </div>
+
+        <div class="card-buttons">
+            <a href="{% url 'approve_post' p.id %}" class="btn approve">ยืนยัน</a>
+            <a href="{% url 'reject_post' p.id %}" class="btn reject">ไม่ผ่าน</a>
+        </div>
+    </div>
+    {% empty %}
+    <p style="text-align:center; color:#888;">ไม่มีโพสต์รออนุมัติ</p>
+    {% endfor %}
+
+    <!-- Dropdown Script -->
+    <script>
+        const profileBtn = document.getElementById("profileBtn");
+        const dropdownMenu = document.getElementById("dropdownMenu");
+
+        profileBtn.onclick = () => {
+            dropdownMenu.style.display =
+                dropdownMenu.style.display === "block" ? "none" : "block";
+        };
+
+        document.addEventListener("click", function(event) {
+            if (!profileBtn.contains(event.target) &&
+                !dropdownMenu.contains(event.target)) {
+                dropdownMenu.style.display = "none";
+            }
+        });
+    </script>
+
+</body>
+</html>

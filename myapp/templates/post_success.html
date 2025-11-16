@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>สำเร็จ!</title>
+<style>
+    body { font-family: Prompt, sans-serif; background: #0006; }
+    .popup {
+        width: 300px; padding: 20px; background: white;
+        margin: 100px auto; border-radius: 12px;
+        text-align: center;
+    }
+    .btn { margin-top: 15px; padding: 10px; background: #2f80ed; color: white;
+        border-radius: 8px; text-decoration: none; display: inline-block; }
+</style>
+</head>
+
+<body>
+    <div class="popup">
+        <h2>เสร็จสิ้น!</h2>
+        <p>ระบบส่งโพสต์ของคุณให้อาจารย์ตรวจสอบแล้ว</p>
+        <a href="{% url 'student_home' %}" class="btn">กลับหน้าแรก</a>
+    </div>
+</body>
+</html>

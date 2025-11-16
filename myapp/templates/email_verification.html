@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>ยืนยันอีเมลของคุณ</title>
+    <style>
+        body {
+            background-color: #1e1f22;
+            font-family: Arial, sans-serif;
+            color: #ddd;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 480px;
+            margin: 40px auto;
+            background-color: #2b2d31;
+            padding: 30px;
+            border-radius: 12px;
+        }
+        h2 {
+            color: #ffffff;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        p {
+            color: #cccccc;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+        .info-box {
+            background-color: #1e1f22;
+            padding: 15px;
+            border-left: 4px solid #5865f2;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        .button {
+            display: block;
+            width: 100%;
+            text-align: center;
+            background-color: #5865f2;
+            color: #fff !important;
+            padding: 14px 0;
+            border-radius: 8px;
+            font-weight: bold;
+            text-decoration: none;
+            margin-top: 25px;
+            font-size: 16px;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #777;
+            font-size: 13px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>สวัสดี {{ user.username }} 👋</h2>
+        <p>มีคนพยายามสมัครบัญชี CoopHub ด้วยอีเมลนี้</p>
+        <p>หากเป็นคุณ โปรดยืนยันบัญชีเพื่อเริ่มต้นใช้งานระบบ</p>
+
+        <div class="info-box">
+            <p><strong>บัญชี:</strong> {{ user.email }}</p>
+            <p><strong>ชื่อผู้ใช้:</strong> {{ user.username }}</p>
+        </div>
+
+        <a class="button" href="http://{{ domain }}{% url 'activate' uidb64=uid token=token %}">
+            ยืนยันบัญชีของฉัน
+        </a>
+
+        <p class="footer">
+            หากคุณไม่ได้ทำรายการนี้ กรุณาเพิกเฉยต่ออีเมลนี้
+        </p>
+    </div>
+</body>
+</html>

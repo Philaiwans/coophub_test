@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>เพิ่มงานสหกิจ</title>
+<style>
+    body { font-family: Prompt, sans-serif; background: #fff; margin: 0; }
+    .container { width: 90%; margin: 20px auto; }
+    .title { font-size: 26px; font-weight: bold; padding: 10px 0; }
+    .input-box { margin-bottom: 10px; }
+    input, textarea, select {
+        width: 100%; padding: 10px; border-radius: 8px;
+        border: 1px solid #ccc; font-size: 16px;
+    }
+    .post-btn {
+        width: 100%; padding: 12px; background: #2f80ed;
+        color: white; border-radius: 10px; border: none;
+        font-size: 20px; cursor: pointer; margin-top: 20px;
+    }
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<h2 class="title">เพิ่มงานสหกิจ</h2>
+
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <div class="input-box">
+        <label>รูปบริษัท</label>
+        <input type="file" name="image">
+    </div>
+
+    <div class="input-box"><label>ชื่อบริษัท</label>
+        <input type="text" name="company" required>
+    </div>
+
+    <div class="input-box"><label>จังหวัด</label>
+        <input type="text" name="province" required>
+    </div>
+
+    <div class="input-box"><label>เบี้ยเลี้ยง</label>
+        <input type="text" name="salary" required>
+    </div>
+
+    <div class="input-box"><label>ตำแหน่งที่ได้รับ</label>
+        <input type="text" name="position" required>
+    </div>
+
+    <div class="input-box"><label>เวลาทำงาน</label>
+        <input type="text" name="work_time" required>
+    </div>
+
+    <div class="input-box"><label>ระยะเวลาฝึกงาน</label>
+        <input type="text" name="internship_period" required>
+    </div>
+
+    <div class="input-box"><label>ที่ตั้งบริษัท</label>
+        <textarea name="location"></textarea>
+    </div>
+
+    <div class="input-box"><label>ทักษะที่ใช้</label>
+        <textarea name="skills"></textarea>
+    </div>
+
+    <div class="input-box"><label>เกรดขั้นต่ำ</label>
+        <input type="text" name="grade">
+    </div>
+
+    <div class="input-box"><label>ช่องทางติดต่อ</label>
+        <input type="text" name="contact">
+    </div>
+
+    <div class="input-box"><label>ประเภทงาน</label>
+        <input type="text" name="type_of_work">
+    </div>
+
+    <div class="input-box"><label>รายละเอียดเพิ่มเติม</label>
+        <textarea name="description"></textarea>
+    </div>
+
+    <button class="post-btn">โพสต์</button>
+</form>
+
+</div>
+</body>
+</html>

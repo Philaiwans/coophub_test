@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>สมัครสมาชิก | CoopHub</title>
+  <style>
+    body { background-color: #f4f4f4; font-family: "Prompt", sans-serif;
+      display: flex; justify-content: center; align-items: center; height: 100vh; }
+    .container { background: white; padding: 40px; border-radius: 20px;
+      box-shadow: 0px 2px 10px rgba(0,0,0,0.15); width: 400px; }
+    h2 { text-align: center; font-family: "Comic Sans MS"; }
+    input, select { width: 100%; padding: 10px; margin: 10px 0; border-radius: 8px; border: 1px solid #ddd; }
+    button { width: 100%; padding: 10px; background: #007bff; color: white; border: none; border-radius: 8px; }
+    a { color: #007bff; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>สมัครสมาชิก CoopHub</h2>
+    <form method="post">
+      {% csrf_token %}
+      <input type="text" name="first_name" placeholder="ชื่อจริง" required>
+      <input type="text" name="last_name" placeholder="นามสกุล" required>
+      <input type="email" name="email" placeholder="Email" required>
+      <input type="text" name="username" placeholder="Username" required>
+
+      <select name="role" required>
+        <option value="">เลือกบทบาท</option>
+        <option value="student">นักศึกษา</option>
+        <option value="teacher">อาจารย์</option>
+      </select>
+
+      <!-- 🔥 เพิ่มคณะตรงนี้ -->
+      <select name="faculty" id="faculty" required>
+        <option value="">เลือกคณะ</option>
+        <option value="คณะวิทยาศาสตร์">คณะวิทยาศาสตร์</option>
+        <option value="คณะเกษตรศาสตร์">คณะเกษตรศาสตร์</option>
+        <option value="คณะวิศวกรรมศาสตร์">คณะวิศวกรรมศาสตร์</option>
+        <option value="คณะศิลปศาสตร์">คณะศิลปศาสตร์</option>
+        <option value="คณะบริหารศาสตร์">คณะบริหารศาสตร์</option>
+        <option value="คณะนิติศาสตร์">คณะนิติศาสตร์</option>
+        <option value="คณะรัฐศาสตร์">คณะรัฐศาสตร์</option>
+        <option value="คณะศึกษาศาสตร์">คณะศึกษาศาสตร์</option>
+        <option value="คณะเภสัชศาสตร์">คณะเภสัชศาสตร์</option>
+        <option value="คณะพยาบาลศาสตร์">คณะพยาบาลศาสตร์</option>
+        <option value="วิทยาลัยแพทยศาสตร์และการสาธารณสุข">
+            วิทยาลัยแพทยศาสตร์และการสาธารณสุข
+        </option>
+      </select>
+
+      <!-- 🔥 เพิ่มสาขาตรงนี้ -->
+      <select name="major" id="major" required>
+        <option value="">เลือกสาขา</option>
+      </select>
+
+      <input type="text" name="student_id" placeholder="รหัสนักศึกษา (ถ้ามี)">
+      <input type="password" name="password" placeholder="รหัสผ่าน" required>
+      <input type="password" name="confirm" placeholder="ยืนยันรหัสผ่าน" required>
+
+      <button type="submit">สมัครเป็นสมาชิก</button>
+    </form>
+
+    <p style="text-align:center;">
+      <a href="{% url 'login' %}">กลับไปหน้าเข้าสู่ระบบ</a>
+    </p>
+
+    {% for msg in messages %}
+      <p style="color:red;">{{ msg }}</p>
+    {% endfor %}
+  </div>
+
+  <!-- 🔥 script ต้องอยู่ใน <body> -->
+  <script>
+    const majorData = {
+      "คณะวิทยาศาสตร์": [
+        "ฟิสิกส์ชีวการแพทย์", "ชีววิทยา", "จุลชีววิทยา", "เคมี",
+        "วิทยาการข้อมูลและนวัตกรรมซอฟต์แวร์",
+        "เทคโนโลยีสารสนเทศและการสื่อสาร",
+        "คณิตศาสตร์", "อาชีวอนามัยและความปลอดภัย",
+        "วิทยาศาสตร์สิ่งแวดล้อม",
+        "เทคโนโลยียางและพอลิเมอร์",
+        "นวัตกรรมเทคโนโลยีวัสดุ"
+      ],
+      "คณะเกษตรศาสตร์": ["เกษตรศาสตร์", "เทคโนโลยีการอาหาร", "เกษตรวิศว์อัจฉริยะ"],
+      "คณะวิศวกรรมศาสตร์": [
+        "วิศวกรรมเครื่องกล","วิศวกรรมอุตสาหการ","วิศวกรรมเคมี",
+        "วิศวกรรมโยธา","วิศวกรรมไฟฟ้า","วิศวกรรมสิ่งแวดล้อม",
+        "วิศวกรรมเมคคาทรอนิกส์และระบบอัตโนมัติ",
+        "วิศวกรรมปัญญาประดิษฐ์และการสั่งการ"
+      ],
+      "คณะศิลปศาสตร์": [
+        "ภาษาอังกฤษและการสื่อสาร","การจัดการการท่องเที่ยวและการบริการ",
+        "นวัตกรรมการพัฒนาสังคม","ภาษาจีนและการสื่อสาร",
+        "ภาษาไทยและการสื่อสาร","ภาษาญี่ปุ่นและการสื่อสาร",
+        "นิเทศศาสตร์","ภาษาอังกฤษเพื่อธุรกิจในยุคดิจิทัล","ประวัติศาสตร์"
+      ],
+      "คณะบริหารศาสตร์": [
+        "การจัดการธุรกิจ","การตลาด","การเงินและการลงทุน",
+        "นวัตกรรมการจัดการโรงแรมและการบริการ",
+        "การจัดการธุรกิจระหว่างประเทศ","บัญชี",
+        "การจัดการโลจิสติกส์และโซ่อุปทาน"
+      ],
+      "คณะนิติศาสตร์": ["นิติศาสตร์"],
+      "คณะรัฐศาสตร์": ["การปกครอง","รัฐประศาสนศาสตร์"],
+      "คณะศึกษาศาสตร์": ["ศึกษาศาสตร์"],
+      "คณะเภสัชศาสตร์": ["เภสัชศาสตร์"],
+      "คณะพยาบาลศาสตร์": ["พยาบาลศาสตร์"],
+      "วิทยาลัยแพทยศาสตร์และการสาธารณสุข": [
+        "แพทยศาสตร์","อนามัยสิ่งแวดล้อม","สาธารณสุขศาสตร์"
+      ]
+    };
+
+    document.getElementById("faculty").addEventListener("change", function () {
+        const majorSelect = document.getElementById("major");
+        const faculty = this.value;
+
+        majorSelect.innerHTML = '<option value="">เลือกสาขา</option>';
+
+        if (majorData[faculty]) {
+            majorData[faculty].forEach(m => {
+                const opt = document.createElement("option");
+                opt.value = m;
+                opt.textContent = m;
+                majorSelect.appendChild(opt);
+            });
+        }
+    });
+  </script>
+
+</body>
+</html>

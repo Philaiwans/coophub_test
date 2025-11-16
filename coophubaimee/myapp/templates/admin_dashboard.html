@@ -1,0 +1,29 @@
+<h2>จัดการอาจารย์ที่รออนุมัติ</h2>
+<table border="1">
+    <tr>
+        <th>ชื่อผู้ใช้</th>
+        <th>อีเมล</th>
+        <th>สถานะ</th>
+        <th>ดำเนินการ</th>
+    </tr>
+    {% if pending_teachers %}
+        {% for teacher in pending_teachers %}
+            <tr>
+                <td>{{ teacher.username }}</td>
+                <td>{{ teacher.email }}</td>
+                <td>
+                    {% if teacher.approved %}
+                        ✅ อนุมัติแล้ว
+                    {% else %}
+                        ⏳ รออนุมัติ
+                    {% endif %}
+                </td>
+                <td><a href="?approve={{ teacher.id }}">อนุมัติ</a></td>
+            </tr>
+        {% endfor %}
+    {% else %}
+        <tr><td colspan="4">ไม่มีอาจารย์ที่รออนุมัติ</td></tr>
+    {% endif %}
+</table>
+
+<a href="{% url 'logout' %}">ออกจากระบบ</a>

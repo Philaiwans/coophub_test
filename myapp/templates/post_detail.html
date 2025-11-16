@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>{{ post.company }}</title>
+<style>
+    body { font-family: Prompt; padding: 20px; }
+    .comment-box { margin-top:20px; }
+    .comment { background:#eee; padding:10px; margin:5px 0; border-radius:8px; }
+</style>
+</head>
+
+<body>
+
+<h1>{{ post.company }}</h1>
+
+{% if post.image %}
+<img src="{{ post.image.url }}" width="300">
+{% endif %}
+
+<p><b>ตำแหน่ง:</b> {{ post.position }}</p>
+<p><b>จังหวัด:</b> {{ post.province }}</p>
+<p><b>รายละเอียด:</b> {{ post.description }}</p>
+
+
+<h2>ความคิดเห็น</h2>
+
+{% for c in comments %}
+<div class="comment">
+    <b>{{ c.user.username }}</b><br>
+    {{ c.text }}<br>
+    <small>{{ c.created_at }}</small>
+</div>
+{% endfor %}
+
+<form method="POST" action="{% url 'add_comment' post.id %}">
+    {% csrf_token %}
+    <textarea name="comment" required></textarea>
+    <button>ส่งความคิดเห็น</button>
+</form>
+
+</body>
+</html>

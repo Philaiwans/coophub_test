@@ -1,0 +1,305 @@
+# myapp/views.py
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.sites.shortcuts import get_current_site
+from django.template.loader import render_to_string
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_str
+from django.core.mail import EmailMessage
+from django.urls import reverse
+from django.contrib.auth.decorators import login_required
+import re
+
+from .models import CustomUser
+from .tokens import account_activation_token
+
+
+def home_redirect(request):
+    return redirect('login')
+
+
+def register(request):
+    if request.method == 'POST':
+        first_name = request.POST['first_name'].strip()
+        last_name = request.POST['last_name'].strip()
+        email = request.POST['email'].strip()
+        username = request.POST['username'].strip()
+        password = request.POST['password']
+        confirm = request.POST['confirm']
+        role = request.POST['role']
+        student_id = request.POST.get('student_id', '').strip()
+        faculty = request.POST.get('faculty', '').strip()
+        major = request.POST.get('major', '').strip()
+
+        if password != confirm:
+            messages.error(request, 'รหัสผ่านไม่ตรงกัน')
+            return redirect('register')
+
+        if role == 'student' and not re.match(r'.+@ubu\.ac\.th$', email, re.IGNORECASE):
+            messages.error(request, 'กรุณาใช้อีเมลมหาวิทยาลัย (@ubu.ac.th)')
+            return redirect('register')
+
+        if CustomUser.objects.filter(username=username).exists():
+            messages.error(request, 'ชื่อผู้ใช้นี้ถูกใช้แล้ว')
+            return redirect('register')
+
+        if CustomUser.objects.filter(email=email).exists():
+            messages.error(request, 'อีเมลนี้ถูกใช้ไปแล้ว')
+            return redirect('register')
+
+        # สร้างผู้ใช้ใหม่
+        user = CustomUser.objects.create_user(
+            username=username,
+            email=email,
+            password=password,
+            role=role,
+            student_id=student_id,
+            faculty=faculty,
+            major=major,
+            first_name=first_name,
+            last_name=last_name,
+            is_active=False,
+        )
+
+        # การอนุมัติอาจารย์
+        if role == 'teacher':
+            user.approved = False
+        else:
+            user.approved = True
+
+        user.save()
+
+        # =============== ส่งอีเมลยืนยัน ===============
+        current_site = get_current_site(request)
+        mail_subject = 'ยืนยันอีเมลเพื่อเปิดใช้งานบัญชี CoopHub'
+
+        message = render_to_string('email_verification.html', {
+            'user': user,
+            'domain': current_site.domain,
+            'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+            'token': account_activation_token.make_token(user),
+        })
+
+        email_message = EmailMessage(
+            mail_subject,
+            message,
+            to=[email]
+        )
+        email_message.content_subtype = "html"  # ส่ง HTML email
+        email_message.send()
+        # ==============================================
+
+        messages.success(request, 'สมัครสำเร็จ! กรุณาตรวจอีเมลเพื่อยืนยันบัญชีก่อนเข้าสู่ระบบ')
+        return redirect('login')
+
+    return render(request, 'register.html')
+
+
+def activate(request, uidb64, token):
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = CustomUser.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, CustomUser.DoesNotExist):
+        user = None
+
+    if user is not None and account_activation_token.check_token(user, token):
+        user.is_active = True
+        user.save()
+        messages.success(request, 'ยืนยันอีเมลเรียบร้อยแล้ว! กรุณาเข้าสู่ระบบ')
+        return redirect('login')
+    else:
+        messages.error(request, 'ลิงก์ยืนยันไม่ถูกต้องหรือหมดอายุ')
+        return redirect('register')
+
+
+def login_view(request):
+    if request.method == 'POST':
+        username = request.POST['username'].strip()
+        password = request.POST['password']
+
+        if username == 'admin007' and password == 'admin007x':
+            user = authenticate(request, username=username, password=password)
+            if user is None:
+                messages.error(request, 'ยังไม่มีผู้ใช้ admin007 ในฐานข้อมูล กรุณาสร้าง superuser ก่อน')
+                return redirect('login')
+            login(request, user)
+            return redirect('admin_dashboard')
+
+        user = authenticate(request, username=username, password=password)
+        if user is None:
+            messages.error(request, 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง')
+            return redirect('login')
+
+        if not user.is_active:
+            messages.error(request, 'บัญชียังไม่ถูกยืนยันอีเมล')
+            return redirect('login')
+
+        if user.role == 'teacher' and not user.approved:
+            messages.error(request, 'บัญชีอาจารย์กำลังรอการอนุมัติจากแอดมิน')
+            return redirect('login')
+
+        login(request, user)
+
+        if user.role == 'student':
+            return redirect('student_home')
+        elif user.role == 'teacher':
+            return redirect('teacher_home')
+        else:
+            return redirect('admin_dashboard')
+
+    return render(request, 'login.html')
+
+
+@login_required
+def logout_view(request):
+    logout(request)
+    return redirect('login')
+
+
+@login_required
+def student_home(request):
+    if request.user.role != 'student':
+        return redirect('login')
+    return render(request, 'student_home.html', {'user_obj': request.user})
+
+
+@login_required
+def teacher_home(request):
+    if request.user.role != 'teacher':
+        return redirect('login')
+    return render(request, 'teacher_home.html', {'user_obj': request.user})
+
+
+@login_required
+def admin_dashboard(request):
+    if request.user.role != 'admin' and request.user.username != 'admin007':
+        return redirect('login')
+
+    pending_teachers = CustomUser.objects.filter(role='teacher', approved=False, is_active=True)
+
+    approve_id = request.GET.get('approve')
+    if approve_id:
+        try:
+            t = CustomUser.objects.get(id=approve_id, role='teacher')
+            t.approved = True
+            t.save()
+            messages.success(request, f'อนุมัติ {t.username} แล้ว')
+            return redirect('admin_dashboard')
+        except CustomUser.DoesNotExist:
+            messages.error(request, 'ไม่พบผู้ใช้อาจารย์ที่ต้องการอนุมัติ')
+
+    return render(request, 'admin_dashboard.html', {'pending_teachers': pending_teachers})
+
+
+@login_required
+def profile_view(request):
+    return render(request, 'profile.html', {'user': request.user})
+
+
+@login_required
+def edit_profile(request):
+    user = request.user
+
+    if request.method == "POST":
+        user.username = request.POST.get("username")
+        user.email = request.POST.get("email")
+        user.student_id = request.POST.get("student_id")
+        user.faculty = request.POST.get("faculty")
+        user.major = request.POST.get("major")
+
+        # การอัปโหลดรูปภาพ
+        if request.FILES.get('profile_image'):
+            user.profile_image = request.FILES['profile_image']
+
+        user.save()
+        messages.success(request, "อัปเดตข้อมูลเรียบร้อยแล้ว")
+        return redirect('profile')
+
+    return render(request, "edit_profile.html", {"user": user})
+
+
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from .models import CoopPost, Comment, CustomUser
+
+
+@login_required
+def student_home(request):
+    return render(request, 'student_home.html', {"user_obj": request.user})
+
+
+@login_required
+def create_post(request):
+    if request.method == "POST":
+        post = CoopPost(
+            owner=request.user,
+            company=request.POST.get('company'),
+            province=request.POST.get('province'),
+            salary=request.POST.get('salary'),
+            position=request.POST.get('position'),
+            work_time=request.POST.get('work_time'),
+            internship_period=request.POST.get('internship_period'),
+            location=request.POST.get('location'),
+            skills=request.POST.get('skills'),
+            grade=request.POST.get('grade'),
+            contact=request.POST.get('contact'),
+            type_of_work=request.POST.get('type_of_work'),
+            description=request.POST.get('description'),
+        )
+
+        if request.FILES.get('image'):
+            post.image = request.FILES['image']
+
+        post.save()
+        return redirect('post_success')
+
+    return render(request, 'post_create.html')
+
+
+def post_success(request):
+    return render(request, 'post_success.html')
+
+
+@login_required
+def teacher_home(request):
+    posts = CoopPost.objects.filter(
+        owner__major=request.user.major,
+        status='pending'
+    )
+    return render(request, 'teacher_home.html', {"posts": posts})
+
+
+@login_required
+def approve_post(request, post_id):
+    post = CoopPost.objects.get(id=post_id)
+    post.status = "approved"
+    post.save()
+    return redirect('teacher_home')
+
+
+@login_required
+def reject_post(request, post_id):
+    post = CoopPost.objects.get(id=post_id)
+    post.status = "rejected"
+    post.save()
+    return redirect('teacher_home')
+
+
+@login_required
+def post_detail(request, post_id):
+    post = CoopPost.objects.get(id=post_id)
+    comments = Comment.objects.filter(post=post)
+    return render(request, 'post_detail.html', {"post": post, "comments": comments})
+
+
+@login_required
+def add_comment(request, post_id):
+    if request.method == "POST":
+        Comment.objects.create(
+            post_id=post_id,
+            user=request.user,
+            text=request.POST.get("comment")
+        )
+    return redirect('post_detail', post_id=post_id)
