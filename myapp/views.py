@@ -36,9 +36,9 @@ def register(request):
             messages.error(request, 'รหัสผ่านไม่ตรงกัน')
             return redirect('register')
 
-        if role == 'student' and not re.match(r'.+@ubu\.ac\.th$', email, re.IGNORECASE):
-            messages.error(request, 'กรุณาใช้อีเมลมหาวิทยาลัย (@ubu.ac.th)')
-            return redirect('register')
+        #if role == 'student' and not re.match(r'.+@ubu\.ac\.th$', email, re.IGNORECASE):
+           # messages.error(request, 'กรุณาใช้อีเมลมหาวิทยาลัย (@ubu.ac.th)')
+            #return redirect('register')
 
         if CustomUser.objects.filter(username=username).exists():
             messages.error(request, 'ชื่อผู้ใช้นี้ถูกใช้แล้ว')
@@ -227,7 +227,19 @@ from .models import CoopPost, Comment, CustomUser
 
 @login_required
 def student_home(request):
-    return render(request, 'student_home.html', {"user_obj": request.user})
+    if request.user.role != 'student':
+        return redirect('login')
+
+    # ดึงโพสต์ที่ "อนุมัติแล้ว" และสาขาตรงกัน
+    posts = CoopPost.objects.filter(
+        status="approved"
+    ).order_by('-created_at')
+
+
+    return render(request, 'student_home.html', {
+        "user_obj": request.user,
+        "posts": posts,
+    })
 
 
 @login_required
