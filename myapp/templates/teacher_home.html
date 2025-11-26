@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CoopHub - Teacher</title>
+    <title>CoopHub - Student Home</title>
 
-    <!-- Flaticon Icons -->
     <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/uicons-regular-rounded/css/uicons-regular-rounded.css">
 
     <style>
@@ -15,7 +14,6 @@
             background-color: #ffffff;
         }
 
-        /* Navbar */
         .navbar {
             background-color: #2f80ed;
             color: white;
@@ -29,6 +27,7 @@
             font-size: 28px;
             font-weight: bold;
             font-family: "Comic Sans MS", cursive;
+            cursor: pointer;
         }
 
         .navbar-icons {
@@ -60,12 +59,7 @@
             font-size: 20px;
         }
 
-        /* Dropdown */
-        .profile-container {
-            position: relative;
-            display: inline-block;
-        }
-
+        .profile-container { position: relative; display: inline-block; }
         .dropdown-menu {
             position: absolute;
             top: 50px;
@@ -88,74 +82,31 @@
             border-bottom: 1px solid #e5e5e5;
         }
 
-        .dropdown-menu a:last-child {
-            border-bottom: none;
-        }
-
-        .dropdown-menu a:hover {
-            background-color: #f2f2f2;
-        }
-
-        /* Post Cards */
-        .section-title {
-            padding: 20px;
-            font-size: 22px;
-            font-weight: bold;
-        }
-
-        .card {
-            width: 90%;
-            margin: 10px auto;
-            padding: 15px;
-            background: #f5f5f5;
-            border-radius: 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .card-info {
-            font-size: 15px;
-        }
-
-        .card-buttons {
-            display: flex;
-            gap: 10px;
-        }
-
-        .btn {
-            padding: 8px 16px;
-            border-radius: 8px;
-            text-decoration: none;
-            color: white;
-            font-size: 14px;
-        }
-
-        .approve { background: #28a745; }
-        .reject { background: #d9534f; }
-
+        .dropdown-menu a:last-child { border-bottom: none; }
+        .dropdown-menu a:hover { background:#f2f2f2; }
     </style>
 </head>
 
 <body>
 
-    <!-- Navbar -->
+    <!-- Navigation Bar -->
     <div class="navbar">
-        <div class="navbar-title">CoopHub</div>
+        <div class="navbar-title" onclick="window.location.href='{% url 'student_home' %}'">CoopHub</div>
 
         <div class="navbar-icons">
-            <img src="https://img.icons8.com/ios-filled/50/ffffff/appointment-reminders.png"/>
-            <img src="https://img.icons8.com/ios-filled/50/ffffff/edit.png"/>
-            <img src="https://img.icons8.com/ios-filled/50/ffffff/delete.png"/>
+            <img src="https://img.icons8.com/ios-filled/50/ffffff/appointment-reminders.png">
+
+            <a href="{% url 'create_post' %}">
+                <img src="https://img.icons8.com/ios-filled/50/ffffff/edit.png">
+            </a>
+
+            <img src="https://img.icons8.com/ios-filled/50/ffffff/delete.png">
 
             <div class="profile-container">
-
                 {% if user_obj.profile_image %}
                     <img class="profile-img" src="{{ user_obj.profile_image.url }}" id="profileBtn">
                 {% else %}
-                    <div class="profile-icon" id="profileBtn">
-                        <i class="fi fi-rr-user"></i>
-                    </div>
+                    <div class="profile-icon" id="profileBtn"><i class="fi fi-rr-user"></i></div>
                 {% endif %}
 
                 <div class="dropdown-menu" id="dropdownMenu">
@@ -168,41 +119,77 @@
                     <a href="#">บันทึกกิจกรรม</a>
                     <a href="{% url 'logout' %}">ออกจากระบบ</a>
                 </div>
-
             </div>
         </div>
     </div>
 
-    <!-- Page Title -->
-    <div class="section-title">โพสต์รออนุมัติ</div>
 
-    <!-- Post List -->
-    {% for p in posts %}
-    <div class="card">
-        <div class="card-info">
-            <b>{{ p.company }}</b><br>
-            ตำแหน่ง: {{ p.position }}<br>
-            ผู้โพสต์: {{ p.owner.first_name }} {{ p.owner.last_name }}
-        </div>
+    <div style="padding: 30px;">
 
-        <div class="card-buttons">
-            <a href="{% url 'approve_post' p.id %}" class="btn approve">ยืนยัน</a>
-            <a href="{% url 'reject_post' p.id %}" class="btn reject">ไม่ผ่าน</a>
+        <!-- Search bar (อันนี้ถูกต้อง) -->
+        <form method="GET" style="display:flex; justify-content:center; margin-bottom:25px;">
+            <input type="text" name="search" value="{{ search }}"
+                placeholder="กรอกคำค้นหา"
+                style="width:60%; padding:12px; border-radius:20px; border:1px solid #ccc; font-size:16px;">
+            <button style="padding:12px 25px; background:#2f80ed; color:white;
+            border:none; border-radius:20px; margin-left:10px;">ค้นหา</button>
+        </form>
+
+        <!-- Feed -->
+        <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:25px; padding:0 20px;">
+
+            {% for p in posts %}
+            <div style="
+                background:white;
+                border:1px solid #e0e0e0;
+                border-radius:20px;
+                padding:20px;
+                display:flex;
+                gap:20px;
+                box-shadow:0 2px 6px rgba(0,0,0,0.08);
+            ">
+                <div style="flex:1;">
+                    <h3 style="margin:0; font-size:22px; font-weight:bold;">{{ p.company }}</h3>
+
+                    <p style="margin:4px 0;">จังหวัด: {{ p.province }}</p>
+                    <p style="margin:4px 0;">เบี้ยเลี้ยง: {{ p.salary }} บาท</p>
+                    <p style="margin:4px 0;">ตำแหน่งที่ได้รับ: {{ p.position }}</p>
+
+                    <p style="margin:4px 0;">
+                        ผู้โพสต์: {{ p.owner.first_name }} {{ p.owner.last_name }} ({{ p.owner.student_id }})
+                    </p>
+
+                    <p style="margin:4px 0; color:gray;">
+                        วันที่โพสต์: {{ p.created_at|date:"d/m/Y" }}
+                    </p>
+
+                    <a href="{% url 'post_detail' p.id %}">
+                        <img src="https://img.icons8.com/ios-filled/50/000000/bookmark-ribbon.png" width="26">
+                    </a>
+                </div>
+
+                {% if p.image %}
+                <img src="{{ p.image.url }}"
+                     style="width:140px; height:140px; object-fit:cover; border-radius:15px;">
+                {% endif %}
+            </div>
+
+            {% empty %}
+            <p style="grid-column:1/3; text-align:center; margin-top:80px; font-size:22px;">
+                ยังไม่มีข้อมูลสถานที่ฝึกงาน
+            </p>
+            {% endfor %}
+
         </div>
     </div>
-    {% empty %}
-    <p style="text-align:center; color:#888;">ไม่มีโพสต์รออนุมัติ</p>
-    {% endfor %}
 
-    <!-- Dropdown Script -->
     <script>
         const profileBtn = document.getElementById("profileBtn");
         const dropdownMenu = document.getElementById("dropdownMenu");
 
-        profileBtn.onclick = () => {
+        profileBtn.onclick = () =>
             dropdownMenu.style.display =
-                dropdownMenu.style.display === "block" ? "none" : "block";
-        };
+            dropdownMenu.style.display === "block" ? "none" : "block";
 
         document.addEventListener("click", function(event) {
             if (!profileBtn.contains(event.target) &&

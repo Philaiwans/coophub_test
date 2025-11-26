@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoopHub - Manage Teachers</title>
+
+    <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/uicons-regular-rounded/css/uicons-regular-rounded.css">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: "Prompt", Arial, sans-serif;
+            background-color: #ffffff;
+        }
+
+        .navbar {
+            background-color: #2f80ed;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar-title {
+            font-size: 28px;
+            font-weight: bold;
+            font-family: "Comic Sans MS", cursive;
+            cursor: pointer;
+        }
+
+        .navbar-icons {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .navbar-icons img,
+        .profile-img {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            cursor: pointer;
+        }
+
+        .button-active {
+            padding: 12px 28px;
+            background: #2f80ed;
+            color: white;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            margin: 30px;
+            border: none;
+        }
+
+        .card {
+            width: 85%;
+            background: #f7f7f7;
+            margin: 20px auto;
+            padding: 20px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .teacher-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .teacher-info img {
+            width: 110px;
+            height: 110px;
+            border-radius: 12px;
+            object-fit: cover;
+        }
+
+        .approve-btn {
+            padding: 10px 28px;
+            background: white;
+            border-radius: 10px;
+            border: 2px solid #ddd;
+            font-size: 18px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <div class="navbar">
+        <div class="navbar-title">CoopHub</div>
+
+        <div class="navbar-icons">
+            <img src="https://img.icons8.com/ios-filled/50/ffffff/appointment-reminders.png">
+            <img src="https://img.icons8.com/ios-filled/50/ffffff/edit.png">
+            <img src="https://img.icons8.com/ios-filled/50/ffffff/delete.png">
+
+            {% if user_obj.profile_image %}
+                <img class="profile-img" src="{{ user_obj.profile_image.url }}">
+            {% else %}
+                <img class="profile-img" src="https://img.icons8.com/ios-filled/50/ffffff/user.png">
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- ปุ่มหัวข้อ -->
+    <button class="button-active">คำขอเข้าร่วม</button>
+
+    <!-- รายการอาจารย์ -->
+    {% if pending_teachers %}
+        {% for t in pending_teachers %}
+            <div class="card">
+                <div class="teacher-info">
+                    <img src="https://i.pinimg.com/736x/d5/43/69/d5436948ad2d0773fefc07a94e36f1a9.jpg">
+
+                    <div>
+                        <h3 style="margin:0;">อาจารย์ {{ t.first_name }} {{ t.last_name }}</h3>
+                        <p style="margin:5px 0;">{{ t.email }}</p>
+                    </div>
+                </div>
+
+                <a href="?approve={{ t.id }}">
+                    <button class="approve-btn">อนุมัติ</button>
+                </a>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p style="text-align:center; margin-top:50px; font-size:20px;">
+            ไม่มีอาจารย์ที่รออนุมัติ
+        </p>
+    {% endif %}
+
+</body>
+</html>

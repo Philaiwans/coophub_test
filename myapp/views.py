@@ -176,7 +176,14 @@ def admin_dashboard(request):
     if request.user.role != 'admin' and request.user.username != 'admin007':
         return redirect('login')
 
-    pending_teachers = CustomUser.objects.filter(role='teacher', approved=False, is_active=True)
+    # -----------------------------
+    # 1) ฟีเจอร์อนุมัติอาจารย์
+    # -----------------------------
+    pending_teachers = CustomUser.objects.filter(
+        role='teacher',
+        approved=False,
+        is_active=True
+    )
 
     approve_id = request.GET.get('approve')
     if approve_id:
@@ -184,12 +191,40 @@ def admin_dashboard(request):
             t = CustomUser.objects.get(id=approve_id, role='teacher')
             t.approved = True
             t.save()
-            messages.success(request, f'อนุมัติ {t.username} แล้ว')
+            messages.success(request, f"อนุมัติ {t.first_name} {t.last_name} สำเร็จ")
             return redirect('admin_dashboard')
         except CustomUser.DoesNotExist:
-            messages.error(request, 'ไม่พบผู้ใช้อาจารย์ที่ต้องการอนุมัติ')
+            messages.error(request, "ไม่พบอาจารย์")
 
-    return render(request, 'admin_dashboard.html', {'pending_teachers': pending_teachers})
+    # -----------------------------
+    # 2) ดึงโพสต์ทั้งหมดเพื่อแสดงในฟีด
+    # -----------------------------
+    search = request.GET.get("search", "").strip()
+
+    posts = CoopPost.objects.filter(status="approved")
+
+    if search:
+        posts = posts.filter(
+            Q(company__icontains=search) |
+            Q(position__icontains=search) |
+            Q(province__icontains=search) |
+            Q(owner__first_name__icontains=search) |
+            Q(owner__last_name__icontains=search)
+        )
+
+    posts = posts.order_by('-created_at')
+
+    # -----------------------------
+    # ส่งไปยัง Template
+    # -----------------------------
+    return render(request, 'admin_dashboard.html', {
+        "user_obj": request.user,
+        "posts": posts,
+        "pending_teachers": pending_teachers,
+        "search": search,
+    })
+
+
 
 
 @login_required
@@ -254,6 +289,9 @@ def student_home(request):
     })
 
 
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+
 @login_required
 def create_post(request):
     if request.method == "POST":
@@ -273,13 +311,23 @@ def create_post(request):
             description=request.POST.get('description'),
         )
 
+        # อัปโหลดรูป
         if request.FILES.get('image'):
             post.image = request.FILES['image']
 
-        post.save()
-        return redirect('post_success')
+        # ตรวจบทบาท → ตั้งสถานะโพสต์
+        if request.user.role == 'teacher' or request.user.username == 'admin007':
+            post.status = "approved"   # อาจารย์ และ admin007 → ไม่ต้องตรวจ
+        else:
+            post.status = "pending"    # นักศึกษา → ต้องรอตรวจสอบ
+
+        post.save()   # ⭐ ต้องมี save()
+
+        # เมื่อโพสต์เสร็จ → redirect
+        return redirect("post_success")   # หรือ 'student_home' / 'teacher_home'
 
     return render(request, 'post_create.html')
+
 
 
 def post_success(request):
@@ -288,11 +336,31 @@ def post_success(request):
 
 @login_required
 def teacher_home(request):
-    posts = CoopPost.objects.filter(
-        owner__major=request.user.major,
-        status='pending'
-    )
-    return render(request, 'teacher_home.html', {"posts": posts})
+    if request.user.role != 'teacher':
+        return redirect('login')
+
+    search = request.GET.get("search", "").strip()
+
+    # อาจารย์เห็นทุกโพสต์ที่ status = approved เหมือนนักศึกษา
+    posts = CoopPost.objects.filter(status="approved")
+
+    if search:
+        posts = posts.filter(
+            Q(company__icontains=search) |
+            Q(position__icontains=search) |
+            Q(province__icontains=search) |
+            Q(owner__first_name__icontains=search) |
+            Q(owner__last_name__icontains=search)
+        )
+
+    posts = posts.order_by('-created_at')
+
+    return render(request, 'teacher_home.html', {
+        "user_obj": request.user,
+        "posts": posts,
+        "search": search,
+    })
+
 
 
 @login_required
@@ -350,3 +418,21 @@ def post_review_detail(request, post_id):
     post = get_object_or_404(CoopPost, id=post_id)
 
     return render(request, 'post_review_detail.html', {"post": post})
+
+@login_required
+def Teacher_approval(request):
+    if request.user.username != 'admin007' and request.user.role != 'admin':
+        return redirect('login')
+
+    pending_teachers = CustomUser.objects.filter(role='teacher', approved=False)
+
+    approve_id = request.GET.get('approve')
+    if approve_id:
+        t = CustomUser.objects.get(id=approve_id)
+        t.approved = True
+        t.save()
+        return redirect('Teacher_approval')
+
+    return render(request, 'teacher_approval.html', {
+        'pending_teachers': pending_teachers
+    })
