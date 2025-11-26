@@ -10,7 +10,7 @@ from django.core.mail import EmailMessage
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 import re
-
+from django.db.models import Q
 from .models import CustomUser
 from .tokens import account_activation_token
 
@@ -225,20 +225,32 @@ from django.contrib import messages
 from .models import CoopPost, Comment, CustomUser
 
 
+from django.db.models import Q   # 👈 เพิ่มบรรทัดนี้ด้านบนของ views.py
+
 @login_required
 def student_home(request):
     if request.user.role != 'student':
         return redirect('login')
 
-    # ดึงโพสต์ที่ "อนุมัติแล้ว" และสาขาตรงกัน
-    posts = CoopPost.objects.filter(
-        status="approved"
-    ).order_by('-created_at')
+    search = request.GET.get("search", "").strip()
 
+    posts = CoopPost.objects.filter(status="approved")
+
+    if search:
+        posts = posts.filter(
+            Q(company__icontains=search) |
+            Q(position__icontains=search) |
+            Q(province__icontains=search) |
+            Q(owner__first_name__icontains=search) |
+            Q(owner__last_name__icontains=search)
+        )
+
+    posts = posts.order_by('-created_at')
 
     return render(request, 'student_home.html', {
         "user_obj": request.user,
         "posts": posts,
+        "search": search,
     })
 
 
