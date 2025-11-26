@@ -321,7 +321,7 @@ def create_post(request):
         else:
             post.status = "pending"    # นักศึกษา → ต้องรอตรวจสอบ
 
-        post.save()   # ⭐ ต้องมี save()
+        post.save()   #  ต้องมี save()
 
         # เมื่อโพสต์เสร็จ → redirect
         return redirect("post_success")   # หรือ 'student_home' / 'teacher_home'
@@ -431,8 +431,67 @@ def Teacher_approval(request):
         t = CustomUser.objects.get(id=approve_id)
         t.approved = True
         t.save()
-        return redirect('Teacher_approval')
+        return redirect('teacher_approval')
+
 
     return render(request, 'teacher_approval.html', {
         'pending_teachers': pending_teachers
     })
+
+@login_required
+def delete_post(request, post_id):
+    post = get_object_or_404(CoopPost, id=post_id)
+
+    # อนุญาตเฉพาะอาจารย์หรือแอดมิน
+    if request.user.role not in ['teacher', 'admin'] and request.user.username != 'admin007':
+        return redirect('login')
+
+    post.status = "deleted"
+    post.save()
+
+    messages.success(request, "ลบโพสต์แล้ว (เก็บในถังขยะ)")
+    return redirect('admin_dashboard' if request.user.role == 'admin' else 'teacher_home')
+
+@login_required
+def trash_bin(request):
+    if request.user.role not in ['teacher', 'admin'] and request.user.username != 'admin007':
+        return redirect('login')
+
+    posts = CoopPost.objects.filter(status='deleted')
+
+    return render(request, 'trash_bin.html', {
+        "posts": posts,
+        "user_obj": request.user
+    })
+
+
+@login_required
+def restore_post(request, post_id):
+    post = get_object_or_404(CoopPost, id=post_id)
+    post.status = "approved"
+    post.save()
+    messages.success(request, "กู้คืนโพสต์สำเร็จ")
+    return redirect('trash_bin')
+
+
+@login_required
+def trash_bin(request):
+    if request.user.role not in ['teacher', 'admin'] and request.user.username != 'admin007':
+        return redirect('login')
+
+    deleted_posts = CoopPost.objects.filter(status="deleted").order_by('-created_at')
+
+    return render(request, "trash_bin.html", {
+        "posts": deleted_posts,
+        "user_obj": request.user,
+    })
+
+
+@login_required
+def restore_post(request, post_id):
+    post = get_object_or_404(CoopPost, id=post_id)
+    post.status = "approved"   # ⭐ กู้คืน
+    post.save()
+
+    messages.success(request, "กู้คืนโพสต์สำเร็จ")
+    return redirect('trash_bin')

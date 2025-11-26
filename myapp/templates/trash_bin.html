@@ -1,0 +1,14 @@
+<h2>โพสต์ที่ลบไว้</h2>
+
+{% for p in posts %}
+<div style="background:white; padding:20px; border-radius:20px; margin-bottom:20px;">
+    <h3>{{ p.company }}</h3>
+    <p>จังหวัด: {{ p.province }}</p>
+
+    <a href="{% url 'restore_post' p.id %}">
+        <img src="https://img.icons8.com/ios-filled/50/000000/restore.png" width="30">
+    </a>
+</div>
+{% empty %}
+<p>ยังไม่มีโพสต์ที่ถูกลบ</p>
+{% endfor %}

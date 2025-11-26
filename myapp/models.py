@@ -40,13 +40,14 @@ class CoopPost(models.Model):
 
     description = models.TextField()
     image = models.ImageField(upload_to='post_images/', blank=True, null=True)
-
+    
     status = models.CharField(
         max_length=20,
         choices=[
             ('pending', 'รออนุมัติ'),
             ('approved', 'ผ่าน'),
-            ('rejected', 'ไม่ผ่าน')
+            ('rejected', 'ไม่ผ่าน'),
+            ('deleted', 'ลบแล้ว'),
         ],
         default='pending'
     )

@@ -40,5 +40,10 @@ urlpatterns = [
 
     # Teacher approval page (fix)
     path('teacher-approval/', views.Teacher_approval, name='teacher_approval'),
+    path('post/delete/<int:post_id>/', views.delete_post, name='delete_post'),
+    path('trash/', views.trash_bin, name='trash_bin'),
+    path('post/restore/<int:post_id>/', views.restore_post, name='restore_post'),
+    path('trash/', views.trash_bin, name='trash_bin'),
+    path('post/restore/<int:post_id>/', views.restore_post, name='restore_post'),
 
 ]
