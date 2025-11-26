@@ -23,7 +23,7 @@ urlpatterns = [
       # โปรไฟล์
     path('profile/', views.profile_view, name='profile'),
     path('profile/edit/', views.edit_profile, name='edit_profile'),
-
+    
     # ระบบโพสต์
     path('post/create/', views.create_post, name='create_post'),
     path('post/success/', views.post_success, name='post_success'),
@@ -34,4 +34,10 @@ urlpatterns = [
 
     # ความคิดเห็น
     path('comment/add/<int:post_id>/', views.add_comment, name='add_comment'),
+
+    # หน้าแสดงโพสต์รออนุมัติ 
+    path('post/approval/', views.post_approval_list, name='post_approval_list'),
+#หน้าแสดงรายละเอียด (รุ่นสำหรับอาจารย์อนุมัติ) ==========
+path('post/review/<int:post_id>/', views.post_review_detail, name='post_review_detail'),
+
 ]

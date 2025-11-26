@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>ตรวจสอบโพสต์</title>
+<style>
+    body { font-family: Prompt; padding: 20px; }
+    .btn-approve {
+        padding: 10px 20px; background: #28a745; color: white;
+        border-radius: 8px; text-decoration: none;
+    }
+    .btn-reject {
+        padding: 10px 20px; background: #d9534f; color: white;
+        border-radius: 8px; text-decoration: none;
+    }
+</style>
+</head>
+
+<body>
+
+<h1>{{ post.company }}</h1>
+
+{% if post.image %}
+<img src="{{ post.image.url }}" width="500">
+{% endif %}
+
+<p><b>ตำแหน่ง:</b> {{ post.position }}</p>
+<p><b>จังหวัด:</b> {{ post.province }}</p>
+<p><b>เบี้ยเลี้ยง:</b> {{ post.salary }}</p>
+<p><b>เวลาทำงาน:</b> {{ post.work_time }}</p>
+<p><b>รายละเอียด:</b> {{ post.description }}</p>
+
+<br><br>
+
+<a href="{% url 'approve_post' post.id %}" class="btn-approve">ยืนยัน</a>
+<a href="{% url 'reject_post' post.id %}" class="btn-reject">แก้ไข/ไม่ผ่าน</a>
+
+</body>
+</html>

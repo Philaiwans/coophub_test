@@ -327,3 +327,26 @@ def add_comment(request, post_id):
             text=request.POST.get("comment")
         )
     return redirect('post_detail', post_id=post_id)
+
+
+@login_required
+def post_approval_list(request):
+    if request.user.role != 'teacher':
+        return redirect('login')
+
+    posts = CoopPost.objects.filter(
+        owner__major=request.user.major,
+        status='pending'
+    ).order_by('-created_at')
+
+    return render(request, 'post_approval_list.html', {"posts": posts})
+
+
+@login_required
+def post_review_detail(request, post_id):
+    if request.user.role != 'teacher':
+        return redirect('login')
+
+    post = get_object_or_404(CoopPost, id=post_id)
+
+    return render(request, 'post_review_detail.html', {"post": post})

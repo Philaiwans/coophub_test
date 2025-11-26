@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>โพสต์รออนุมัติ</title>
+<style>
+    body { font-family: Prompt; }
+    .card {
+        width: 90%; margin: 15px auto; padding: 15px;
+        background: #f3f3f3; border-radius: 12px;
+        display: flex; justify-content: space-between;
+    }
+    .btn {
+        padding: 8px 15px; background: #2f80ed; color: white;
+        border-radius: 8px; text-decoration: none;
+    }
+</style>
+</head>
+<body>
+
+<h2 style="padding:20px;">โพสต์รออนุมัติ</h2>
+
+{% for p in posts %}
+<div class="card">
+    <div>
+        <b>{{ p.company }}</b><br>
+        ผู้โพสต์: {{ p.owner.first_name }} {{ p.owner.last_name }}
+    </div>
+
+    <a href="{% url 'post_review_detail' p.id %}" class="btn">ดูรายละเอียด</a>
+</div>
+{% empty %}
+<p style="text-align:center;">ไม่มีโพสต์รออนุมัติ</p>
+{% endfor %}
+
+</body>
+</html>
