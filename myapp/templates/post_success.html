@@ -4,22 +4,52 @@
 <meta charset="UTF-8">
 <title>สำเร็จ!</title>
 <style>
-    body { font-family: Prompt, sans-serif; background: #0006; }
-    .popup {
-        width: 300px; padding: 20px; background: white;
-        margin: 100px auto; border-radius: 12px;
-        text-align: center;
+    body { 
+        font-family: Prompt, sans-serif; 
+        background: #0006; 
     }
-    .btn { margin-top: 15px; padding: 10px; background: #2f80ed; color: white;
-        border-radius: 8px; text-decoration: none; display: inline-block; }
+
+    .popup {
+        width: 300px; 
+        padding: 20px; 
+        background: white;
+        margin: 120px auto; 
+        border-radius: 12px;
+        text-align: center;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    .btn { 
+        margin-top: 15px; 
+        padding: 10px; 
+        background: #2f80ed; 
+        color: white;
+        border-radius: 8px; 
+        text-decoration: none; 
+        display: inline-block; 
+        font-size: 16px;
+        width: 80%;
+    }
 </style>
 </head>
 
 <body>
     <div class="popup">
         <h2>เสร็จสิ้น!</h2>
-        <p>ระบบส่งโพสต์ของคุณให้อาจารย์ตรวจสอบแล้ว</p>
-        <a href="{% url 'student_home' %}" class="btn">กลับหน้าแรก</a>
+
+        {% if user.role == 'student' %}
+            <p>ระบบส่งโพสต์ของคุณให้อาจารย์ตรวจสอบแล้ว</p>
+            <a href="{% url 'student_home' %}" class="btn">กลับหน้าแรก</a>
+
+        {% elif user.role == 'teacher' %}
+            <p>โพสต์ของคุณถูกเผยแพร่เรียบร้อยแล้ว</p>
+            <a href="{% url 'teacher_home' %}" class="btn">กลับหน้าแรก</a>
+
+        {% else %}
+            <p>บันทึกข้อมูลเรียบร้อยแล้ว</p>
+            <a href="{% url 'admin_dashboard' %}" class="btn">กลับหน้าแรก</a>
+
+        {% endif %}
     </div>
 </body>
 </html>

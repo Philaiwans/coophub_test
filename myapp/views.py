@@ -13,7 +13,9 @@ import re
 from django.db.models import Q
 from .models import CustomUser
 from .tokens import account_activation_token
-
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect
+from .models import CoopPost
 
 def home_redirect(request):
     return redirect('login')
@@ -292,46 +294,89 @@ def student_home(request):
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 
+
+# ---------- รายชื่อจังหวัด 77 จังหวัด + ต่างประเทศ ----------
+PROVINCES = [
+    "กรุงเทพมหานคร","กระบี่","กาญจนบุรี","กาฬสินธุ์","กำแพงเพชร","ขอนแก่น",
+    "จันทบุรี","ฉะเชิงเทรา","ชลบุรี","ชัยนาท","ชัยภูมิ","ชุมพร","เชียงราย","เชียงใหม่",
+    "ตรัง","ตราด","ตาก","นครนายก","นครปฐม","นครพนม","นครราชสีมา","นครศรีธรรมราช",
+    "นครสวรรค์","นนทบุรี","นราธิวาส","น่าน","บึงกาฬ","บุรีรัมย์","ปทุมธานี","ประจวบคีรีขันธ์",
+    "ปราจีนบุรี","ปัตตานี","พระนครศรีอยุธยา","พะเยา","พังงา","พัทลุง","พิจิตร","พิษณุโลก",
+    "เพชรบุรี","เพชรบูรณ์","แพร่","ภูเก็ต","มหาสารคาม","มุกดาหาร","ยะลา","ยโสธร","ร้อยเอ็ด",
+    "ระนอง","ระยอง","ราชบุรี","ลพบุรี","ลำปาง","ลำพูน","เลย","ศรีสะเกษ","สกลนคร","สงขลา",
+    "สตูล","สมุทรปราการ","สมุทรสงคราม","สมุทรสาคร","สระบุรี","สระแก้ว","สุพรรณบุรี",
+    "สุราษฎร์ธานี","สุรินทร์","สุโขทัย","หนองคาย","หนองบัวลำภู","อ่างทอง","อุดรธานี",
+    "อุตรดิตถ์","อุทัยธานี","อุบลราชธานี",
+    "ต่างประเทศ",
+]
+
+
+# ---------- ฟังก์ชันสร้างโพสต์ ----------
 @login_required
 def create_post(request):
+
     if request.method == "POST":
+
+        # 1) รวมเวลาทำงาน เช่น "จันทร์-ศุกร์ 09:00 - 17:00"
+        work_time = f"{request.POST.get('work_day')} {request.POST.get('time_start')} - {request.POST.get('time_end')}"
+
+        # 2) รวมช่วงฝึกงาน
+        internship_period = f"{request.POST.get('start_date')} ถึง {request.POST.get('end_date')}"
+
+        # 3) เบี้ยเลี้ยง
+        salary_type = request.POST.get('salary_type')       # ไม่มี / มี / ตามตกลง
+        salary_amount = request.POST.get('salary_amount')   # จำนวนเงิน (ถ้าเลือก "มี")
+
+        if salary_type == "มี":
+            salary = f"{salary_amount} บาท"
+        else:
+            salary = salary_type
+
+        # 4) รับ optional fields
+        portfolio = request.POST.get("portfolio") or ""
+        extra_link = request.POST.get("extra_link") or ""
+
+        # 5) สร้างโพสต์
         post = CoopPost(
             owner=request.user,
             company=request.POST.get('company'),
             province=request.POST.get('province'),
-            salary=request.POST.get('salary'),
+            salary=salary,
             position=request.POST.get('position'),
-            work_time=request.POST.get('work_time'),
-            internship_period=request.POST.get('internship_period'),
+            work_time=work_time,
+            internship_period=internship_period,
             location=request.POST.get('location'),
             skills=request.POST.get('skills'),
             grade=request.POST.get('grade'),
             contact=request.POST.get('contact'),
             type_of_work=request.POST.get('type_of_work'),
             description=request.POST.get('description'),
+
+            # optional fields
+            portfolio=portfolio,
+            extra_link=extra_link,
         )
 
-        # อัปโหลดรูป
+        # 6) ไฟล์ Optional
         if request.FILES.get('image'):
             post.image = request.FILES['image']
 
-        # ตรวจบทบาท → ตั้งสถานะโพสต์
+        if request.FILES.get('extra_file'):
+            post.extra_file = request.FILES['extra_file']
+
+        # 7) สถานะโพสต์
         if request.user.role == 'teacher' or request.user.username == 'admin007':
-            post.status = "approved"   # อาจารย์ และ admin007 → ไม่ต้องตรวจ
+            post.status = "approved"
         else:
-            post.status = "pending"    # นักศึกษา → ต้องรอตรวจสอบ
+            post.status = "pending"
 
-        post.save()   #  ต้องมี save()
+        post.save()
+        return redirect("post_success")
 
-        # เมื่อโพสต์เสร็จ → redirect
-        return redirect("post_success")   # หรือ 'student_home' / 'teacher_home'
-
-    return render(request, 'post_create.html')
-
-
-
-def post_success(request):
-    return render(request, 'post_success.html')
+    # 8) GET → ส่งรายชื่อจังหวัดเข้าไป
+    return render(request, 'post_create.html', {
+        "provinces": PROVINCES
+    })
 
 
 @login_required
@@ -495,3 +540,8 @@ def restore_post(request, post_id):
 
     messages.success(request, "กู้คืนโพสต์สำเร็จ")
     return redirect('trash_bin')
+
+# ---------- หน้าหลังจากโพสต์สำเร็จ ----------
+@login_required
+def post_success(request):
+    return render(request, 'post_success.html')

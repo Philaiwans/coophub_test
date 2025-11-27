@@ -3,87 +3,314 @@
 <head>
 <meta charset="UTF-8">
 <title>เพิ่มงานสหกิจ</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap">
+
 <style>
-    body { font-family: Prompt, sans-serif; background: #fff; margin: 0; }
-    .container { width: 90%; margin: 20px auto; }
-    .title { font-size: 26px; font-weight: bold; padding: 10px 0; }
-    .input-box { margin-bottom: 10px; }
-    input, textarea, select {
-        width: 100%; padding: 10px; border-radius: 8px;
-        border: 1px solid #ccc; font-size: 16px;
+    body {
+        font-family: "Prompt", sans-serif;
+        margin: 0;
+        background: #f4f8ff;
     }
+
+    /* ================= NAVBAR ================= */
+    .navbar {
+        background-color: #2f80ed;
+        color: white;
+        padding: 15px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .navbar-title {
+        font-size: 28px;
+        font-weight: bold;
+        font-family: "Comic Sans MS", cursive;
+        cursor: pointer;
+    }
+
+    .navbar-icons {
+        display: flex;
+        gap: 20px;
+        align-items: center;
+    }
+
+    .navbar-icons img {
+        width: 30px;
+        height: 30px;
+        cursor: pointer;
+    }
+
+    /* ================= CONTENT ================= */
+    .container {
+        width: 90%;
+        margin: 30px auto;
+        background: white;
+        padding: 30px;
+        border-radius: 20px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    }
+
+    .title {
+        font-size: 30px;
+        font-weight: 600;
+        color: #2f80ed;
+        text-align: center;
+        margin-bottom: 10px;
+    }
+
+    .note {
+        text-align: center;
+        color: #666;
+        margin-bottom: 30px;
+    }
+
+    /* Layout */
+    .layout-grid {
+        display: grid;
+        grid-template-columns: 260px 1fr;
+        gap: 25px;
+    }
+
+    /* กล่องรูป */
+    .image-box {
+        background: #f5f7fb;
+        border-radius: 18px;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        border: 2px dashed #b7c7e2;
+        text-align: center;
+    }
+
+    .image-box img {
+        width: 90px;
+        opacity: .7;
+        margin-bottom: 10px;
+    }
+
+    /* ฟอร์มด้านขวา */
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px;
+    }
+
+    .input-box label {
+        font-weight: 600;
+        font-size: 15px;
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    input, select, textarea {
+        width: 100%;
+        padding: 11px;
+        border-radius: 10px;
+        border: 1px solid #d9dce5;
+        font-size: 15px;
+        background: #ffffff;
+    }
+
+    textarea {
+        height: 90px;
+    }
+
+    /* กล่องรายละเอียด */
+    .desc-area {
+        margin-top: 30px;
+        padding: 20px;
+        background: #f5f7fb;
+        border-radius: 15px;
+    }
+
+    /* ปุ่มโพสต์ */
     .post-btn {
-        width: 100%; padding: 12px; background: #2f80ed;
-        color: white; border-radius: 10px; border: none;
-        font-size: 20px; cursor: pointer; margin-top: 20px;
+        width: 300px;
+        display: block;
+        margin: 20px auto;
+        padding: 15px;
+        font-size: 20px;
+        background: #2f80ed;
+        color: white;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: 0.2s;
+    }
+
+    .post-btn:hover {
+        background: #1e6edc;
     }
 </style>
+
+<script>
+function toggleSalaryInput() {
+    let type = document.getElementById("salaryType").value;
+    let box = document.getElementById("salaryAmountBox");
+    box.style.display = (type === "มี") ? "block" : "none";
+}
+</script>
 </head>
 
 <body>
+
+<!-- ================= NAVBAR ================= -->
+<div class="navbar">
+    <div class="navbar-title" onclick="window.location.href='/{% url 'student_home' %}'">
+        CoopHub
+    </div>
+
+    <div class="navbar-icons">
+        <img src="https://img.icons8.com/ios-filled/50/ffffff/appointment-reminders.png">
+
+        <a href="{% url 'create_post' %}">
+            <img src="https://img.icons8.com/ios-filled/50/ffffff/edit.png">
+        </a>
+
+        <img src="https://img.icons8.com/ios-filled/50/ffffff/delete.png">
+    </div>
+</div>
+
+<!-- ================= CONTENT ================= -->
 <div class="container">
 
-<h2 class="title">เพิ่มงานสหกิจ.</h2>
+    <h2 class="title">เพิ่มงานสหกิจ</h2>
+    <p class="note">หมายเหตุ : ก่อนโพสต์กรุณากรอกข้อมูลที่มีเครื่องหมาย * ให้ครบถ้วน</p>
 
-<form method="POST" enctype="multipart/form-data">
-    {% csrf_token %}
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
 
-    <div class="input-box">
-        <label>รูปบริษัท</label>
-        <input type="file" name="image">
-    </div>
+        <div class="layout-grid">
 
-    <div class="input-box"><label>ชื่อบริษัท</label>
-        <input type="text" name="company" required>
-    </div>
+            <!-- รูปภาพ -->
+            <div class="image-box">
+                <img src="https://img.icons8.com/ios/100/add-image.png">
+                <p>รูปหน้าปกโพสต์</p>
+                <small>รองรับไฟล์ .jpg, .png</small><br>
+                <input type="file" name="image">
+            </div>
 
-    <div class="input-box"><label>จังหวัด</label>
-        <input type="text" name="province" required>
-    </div>
+            <!-- ฟอร์ม -->
+            <div class="form-grid">
 
-    <div class="input-box"><label>เบี้ยเลี้ยง</label>
-        <input type="text" name="salary" required>
-    </div>
+                <div class="input-box">
+                    <label>ชื่อบริษัท *</label>
+                    <input type="text" name="company" required>
+                </div>
 
-    <div class="input-box"><label>ตำแหน่งที่ได้รับ</label>
-        <input type="text" name="position" required>
-    </div>
+                <div class="input-box">
+                    <label>จังหวัด *</label>
+                    <select name="province" required>
+                        <option value="">เลือกจังหวัด</option>
+                        {% for p in provinces %}
+                            <option value="{{ p }}">{{ p }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
 
-    <div class="input-box"><label>เวลาทำงาน</label>
-        <input type="text" name="work_time" required>
-    </div>
+                <div class="input-box">
+                    <label>ตำแหน่งที่ได้รับ *</label>
+                    <input type="text" name="position" required>
+                </div>
 
-    <div class="input-box"><label>ระยะเวลาฝึกงาน</label>
-        <input type="text" name="internship_period" required>
-    </div>
+                <div class="input-box">
+                    <label>วันทำงาน *</label>
+                    <select name="work_day" required>
+                        <option>จันทร์ - ศุกร์</option>
+                        <option>จันทร์ - เสาร์</option>
+                    </select>
+                </div>
 
-    <div class="input-box"><label>ที่ตั้งบริษัท</label>
-        <textarea name="location"></textarea>
-    </div>
+                <div class="input-box">
+                    <label>เวลาเริ่มงาน *</label>
+                    <input type="time" name="time_start" required>
+                </div>
 
-    <div class="input-box"><label>ทักษะที่ใช้</label>
-        <textarea name="skills"></textarea>
-    </div>
+                <div class="input-box">
+                    <label>เวลาเลิกงาน *</label>
+                    <input type="time" name="time_end" required>
+                </div>
 
-    <div class="input-box"><label>เกรดขั้นต่ำ</label>
-        <input type="text" name="grade">
-    </div>
+                <div class="input-box">
+                    <label>วันที่เริ่มฝึก *</label>
+                    <input type="date" name="start_date" required>
+                </div>
 
-    <div class="input-box"><label>ช่องทางติดต่อ</label>
-        <input type="text" name="contact">
-    </div>
+                <div class="input-box">
+                    <label>วันที่สิ้นสุด *</label>
+                    <input type="date" name="end_date" required>
+                </div>
 
-    <div class="input-box"><label>ประเภทงาน</label>
-        <input type="text" name="type_of_work">
-    </div>
+                <div class="input-box">
+                    <label>เบี้ยเลี้ยง *</label>
+                    <select name="salary_type" id="salaryType" onchange="toggleSalaryInput()">
+                        <option value="ไม่มี">ไม่มี</option>
+                        <option value="มี">มี (ระบุจำนวน)</option>
+                        <option value="ตามตกลง">ตามตกลง</option>
+                    </select>
+                </div>
 
-    <div class="input-box"><label>รายละเอียดเพิ่มเติม</label>
-        <textarea name="description"></textarea>
-    </div>
+                <div class="input-box" id="salaryAmountBox" style="display:none;">
+                    <label>จำนวนเบี้ยเลี้ยง (บาท)</label>
+                    <input type="number" name="salary_amount" min="0" placeholder="เช่น 300">
+                </div>
 
-    <button class="post-btn">โพสต์</button>
-</form>
+                <div class="input-box">
+                    <label>ทักษะที่ใช้ *</label>
+                    <input type="text" name="skills" placeholder="เช่น HTML, Python" required>
+                </div>
 
+                <div class="input-box">
+                    <label>เกรดขั้นต่ำ</label>
+                    <input type="text" name="grade">
+                </div>
+
+                <div class="input-box">
+                    <label>ช่องทางติดต่อ *</label>
+                    <input type="text" name="contact" placeholder="Email / โทร / Line" required>
+                </div>
+
+                <div class="input-box">
+                    <label>ประเภทการฝึกงาน *</label>
+                    <select name="type_of_work">
+                        <option>On-site</option>
+                        <option>Online</option>
+                        <option>Hybrid</option>
+                    </select>
+                </div>
+
+                <div class="input-box">
+                    <label>ลิงก์ Portfolio</label>
+                    <input type="url" name="portfolio" placeholder="https://...">
+                </div>
+
+                <div class="input-box" style="grid-column: 1 / span 3;">
+                    <label>ที่ตั้งบริษัท *</label>
+                    <textarea name="location" required></textarea>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="desc-area">
+            <label><b>มีอะไรเล่าสู่กันฟังไหม?</b></label>
+            <textarea name="description" placeholder="เพิ่มรายละเอียดเพิ่มเติม"></textarea>
+
+            <br><br>
+            <label>แนบไฟล์เพิ่มเติม</label>
+            <input type="file" name="extra_file">
+
+            <br><br>
+            <label>แนบลิงก์เพิ่มเติม</label>
+            <input type="url" name="extra_link" placeholder="https://...">
+        </div>
+
+        <button class="post-btn">โพสต์</button>
+    </form>
 </div>
+
 </body>
 </html>

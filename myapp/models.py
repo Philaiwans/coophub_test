@@ -25,7 +25,7 @@ class CustomUser(AbstractUser):
 # ---------- โพสต์ ----------
 class CoopPost(models.Model):
     owner = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-
+    salary = models.CharField(max_length=50)
     company = models.CharField(max_length=255)
     province = models.CharField(max_length=255)
     salary = models.CharField(max_length=50)
@@ -37,6 +37,9 @@ class CoopPost(models.Model):
     grade = models.CharField(max_length=20)
     contact = models.CharField(max_length=255)
     type_of_work = models.CharField(max_length=255)
+    portfolio = models.URLField(blank=True, null=True)
+    extra_link = models.URLField(blank=True, null=True)
+    extra_file = models.FileField(upload_to='extra_files/', blank=True, null=True)
 
     description = models.TextField()
     image = models.ImageField(upload_to='post_images/', blank=True, null=True)
@@ -64,3 +67,5 @@ class Comment(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     text = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
+
+
