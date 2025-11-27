@@ -7,9 +7,9 @@
 
 <style>
     body {
-        font-family: "Prompt", sans-serif;
         margin: 0;
-        background: #f4f8ff;
+        font-family: "Prompt", sans-serif;
+        background: #ffffff;
     }
 
     /* ================= NAVBAR ================= */
@@ -41,7 +41,7 @@
         cursor: pointer;
     }
 
-    /* ================= CONTENT ================= */
+    /* ================= FORM CONTAINER ================= */
     .container {
         width: 90%;
         margin: 30px auto;
@@ -52,124 +52,141 @@
     }
 
     .title {
-        font-size: 30px;
-        font-weight: 600;
-        color: #2f80ed;
+        font-size: 28px;
+        font-weight: bold;
         text-align: center;
-        margin-bottom: 10px;
+        color: #2f80ed;
     }
 
     .note {
         text-align: center;
+        font-size: 15px;
         color: #666;
-        margin-bottom: 30px;
+        margin-bottom: 25px;
     }
 
-    /* Layout */
-    .layout-grid {
-        display: grid;
-        grid-template-columns: 260px 1fr;
-        gap: 25px;
+    /* Layout: Upload ซ้าย + Form 2 คอลัมน์ */
+    .form-wrapper {
+        width: 100%;
+        display: flex;
+        gap: 40px;
     }
 
-    /* กล่องรูป */
-    .image-box {
-        background: #f5f7fb;
+    /* กล่องอัปโหลดรูป */
+    .upload-box {
+        width: 320px;
+        height: 380px;
+        border: 2px dashed #cbd5e1;
         border-radius: 18px;
-        padding: 20px;
         display: flex;
         flex-direction: column;
+        justify-content: center;
         align-items: center;
-        border: 2px dashed #b7c7e2;
+        color: #777;
         text-align: center;
+        padding: 20px;
     }
 
-    .image-box img {
+    .upload-box img {
         width: 90px;
-        opacity: .7;
+        opacity: 0.6;
         margin-bottom: 10px;
     }
 
-    /* ฟอร์มด้านขวา */
-    .form-grid {
+    /* ฟอร์ม 2 คอลัมน์ */
+    .form-columns {
+        flex: 1;
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 18px;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px 40px;
     }
 
     .input-box label {
         font-weight: 600;
-        font-size: 15px;
         display: block;
         margin-bottom: 5px;
     }
 
     input, select, textarea {
         width: 100%;
-        padding: 11px;
+        padding: 12px;
         border-radius: 10px;
-        border: 1px solid #d9dce5;
+        border: 1px solid #d4d4d4;
         font-size: 15px;
-        background: #ffffff;
     }
 
     textarea {
-        height: 90px;
+        height: 100px;
     }
 
-    /* กล่องรายละเอียด */
-    .desc-area {
+    /* กล่องข้อความใหญ่ */
+    .big-box {
+        width: 100%;
         margin-top: 30px;
-        padding: 20px;
-        background: #f5f7fb;
-        border-radius: 15px;
+    }
+
+    .big-box textarea {
+        width: 100%;
+        height: 180px;
+        border-radius: 12px;
+        padding: 15px;
     }
 
     /* ปุ่มโพสต์ */
     .post-btn {
         width: 300px;
         display: block;
-        margin: 20px auto;
-        padding: 15px;
+        margin: 30px auto;
+        padding: 14px;
         font-size: 20px;
         background: #2f80ed;
         color: white;
         border: none;
-        border-radius: 12px;
+        border-radius: 15px;
         cursor: pointer;
-        font-weight: 600;
-        transition: 0.2s;
-    }
-
-    .post-btn:hover {
-        background: #1e6edc;
+        font-weight: bold;
     }
 </style>
 
 <script>
-function toggleSalaryInput() {
+function toggleSalary() {
     let type = document.getElementById("salaryType").value;
     let box = document.getElementById("salaryAmountBox");
     box.style.display = (type === "มี") ? "block" : "none";
 }
 </script>
+
 </head>
 
 <body>
 
 <!-- ================= NAVBAR ================= -->
 <div class="navbar">
-    <div class="navbar-title" onclick="window.location.href='/{% url 'student_home' %}'">
-        CoopHub
-    </div>
+
+    {% if user.role == 'student' %}
+        <div class="navbar-title" onclick="window.location.href='{% url 'student_home' %}'">
+            CoopHub
+        </div>
+
+    {% elif user.role == 'teacher' %}
+        <div class="navbar-title" onclick="window.location.href='{% url 'teacher_home' %}'">
+            CoopHub
+        </div>
+
+    {% else %}
+        <div class="navbar-title" onclick="window.location.href='{% url 'admin_dashboard' %}'">
+            CoopHub
+        </div>
+    {% endif %}
+
+</div>
+
 
     <div class="navbar-icons">
         <img src="https://img.icons8.com/ios-filled/50/ffffff/appointment-reminders.png">
-
         <a href="{% url 'create_post' %}">
             <img src="https://img.icons8.com/ios-filled/50/ffffff/edit.png">
         </a>
-
         <img src="https://img.icons8.com/ios-filled/50/ffffff/delete.png">
     </div>
 </div>
@@ -178,23 +195,22 @@ function toggleSalaryInput() {
 <div class="container">
 
     <h2 class="title">เพิ่มงานสหกิจ</h2>
-    <p class="note">หมายเหตุ : ก่อนโพสต์กรุณากรอกข้อมูลที่มีเครื่องหมาย * ให้ครบถ้วน</p>
+    <p class="note">กรุณากรอกข้อมูลที่มีเครื่องหมาย * ให้ครบถ้วน</p>
 
     <form method="POST" enctype="multipart/form-data">
         {% csrf_token %}
 
-        <div class="layout-grid">
+        <div class="form-wrapper">
 
-            <!-- รูปภาพ -->
-            <div class="image-box">
-                <img src="https://img.icons8.com/ios/100/add-image.png">
-                <p>รูปหน้าปกโพสต์</p>
-                <small>รองรับไฟล์ .jpg, .png</small><br>
+            <!-- ============ อัปโหลดรูป ============ -->
+            <div class="upload-box">
+                <img src="https://img.icons8.com/ios-filled/100/camera.png">
+                <p>รูปหน้าปกโพสต์<br>รองรับไฟล์ .jpg/.png</p>
                 <input type="file" name="image">
             </div>
 
-            <!-- ฟอร์ม -->
-            <div class="form-grid">
+            <!-- ============ ฟอร์ม 2 คอลัมน์ ============ -->
+            <div class="form-columns">
 
                 <div class="input-box">
                     <label>ชื่อบริษัท *</label>
@@ -246,10 +262,10 @@ function toggleSalaryInput() {
 
                 <div class="input-box">
                     <label>เบี้ยเลี้ยง *</label>
-                    <select name="salary_type" id="salaryType" onchange="toggleSalaryInput()">
-                        <option value="ไม่มี">ไม่มี</option>
+                    <select name="salary_type" id="salaryType" onchange="toggleSalary()">
+                        <option>ไม่มี</option>
                         <option value="มี">มี (ระบุจำนวน)</option>
-                        <option value="ตามตกลง">ตามตกลง</option>
+                        <option>ตามตกลง</option>
                     </select>
                 </div>
 
@@ -260,7 +276,7 @@ function toggleSalaryInput() {
 
                 <div class="input-box">
                     <label>ทักษะที่ใช้ *</label>
-                    <input type="text" name="skills" placeholder="เช่น HTML, Python" required>
+                    <input type="text" name="skills" placeholder="HTML, Python, Figma">
                 </div>
 
                 <div class="input-box">
@@ -270,7 +286,7 @@ function toggleSalaryInput() {
 
                 <div class="input-box">
                     <label>ช่องทางติดต่อ *</label>
-                    <input type="text" name="contact" placeholder="Email / โทร / Line" required>
+                    <input type="text" name="contact" placeholder="Email / เบอร์โทร / Line" required>
                 </div>
 
                 <div class="input-box">
@@ -287,7 +303,7 @@ function toggleSalaryInput() {
                     <input type="url" name="portfolio" placeholder="https://...">
                 </div>
 
-                <div class="input-box" style="grid-column: 1 / span 3;">
+                <div class="input-box" style="grid-column: 1 / span 2;">
                     <label>ที่ตั้งบริษัท *</label>
                     <textarea name="location" required></textarea>
                 </div>
@@ -295,17 +311,10 @@ function toggleSalaryInput() {
             </div>
         </div>
 
-        <div class="desc-area">
+        <!-- กล่องข้อความใหญ่ -->
+        <div class="big-box">
             <label><b>มีอะไรเล่าสู่กันฟังไหม?</b></label>
-            <textarea name="description" placeholder="เพิ่มรายละเอียดเพิ่มเติม"></textarea>
-
-            <br><br>
-            <label>แนบไฟล์เพิ่มเติม</label>
-            <input type="file" name="extra_file">
-
-            <br><br>
-            <label>แนบลิงก์เพิ่มเติม</label>
-            <input type="url" name="extra_link" placeholder="https://...">
+            <textarea name="description" placeholder="เพิ่มภาพประกอบหรือคำอธิบายเพิ่มเติม..."></textarea>
         </div>
 
         <button class="post-btn">โพสต์</button>

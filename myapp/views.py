@@ -545,3 +545,14 @@ def restore_post(request, post_id):
 @login_required
 def post_success(request):
     return render(request, 'post_success.html')
+
+@login_required
+def restore_post(request, post_id):
+    post = get_object_or_404(CoopPost, id=post_id)
+
+    # คืนสถานะให้เป็น approved (กลับไปโชว์ทุก role)
+    post.status = "approved"
+    post.save()
+
+    messages.success(request, "กู้คืนโพสต์สำเร็จ")
+    return redirect('trash_bin')

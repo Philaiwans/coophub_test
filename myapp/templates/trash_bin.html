@@ -1,14 +1,135 @@
-<h2>โพสต์ที่ลบไว้</h2>
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoopHub - Trash Bin</title>
 
-{% for p in posts %}
-<div style="background:white; padding:20px; border-radius:20px; margin-bottom:20px;">
-    <h3>{{ p.company }}</h3>
-    <p>จังหวัด: {{ p.province }}</p>
+    <style>
+        body {
+            margin: 0;
+            font-family: "Prompt", Arial, sans-serif;
+            background-color: #ffffff;
+        }
 
-    <a href="{% url 'restore_post' p.id %}">
-        <img src="https://img.icons8.com/ios-filled/50/000000/restore.png" width="30">
-    </a>
-</div>
-{% empty %}
-<p>ยังไม่มีโพสต์ที่ถูกลบ</p>
-{% endfor %}
+        /* Navbar */
+        .navbar {
+            background-color: #2f80ed;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar-title {
+            font-size: 28px;
+            font-weight: bold;
+            font-family: "Comic Sans MS", cursive;
+            cursor: pointer;
+        }
+
+        .navbar-icons img {
+            width: 32px;
+            height: 32px;
+            cursor: pointer;
+        }
+
+        .navbar-icons {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        /* Cards */
+        .post-card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 20px;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        }
+
+        .post-image {
+            width: 140px;
+            height: 140px;
+            object-fit: cover;
+            border-radius: 15px;
+        }
+
+        .restore-btn img {
+            width: 26px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <div class="navbar">
+
+        {% if user_obj.role == 'student' %}
+        <div class="navbar-title" onclick="window.location.href='{% url 'student_home' %}'">CoopHub</div>
+
+        {% elif user_obj.role == 'teacher' %}
+        <div class="navbar-title" onclick="window.location.href='{% url 'teacher_home' %}'">CoopHub</div>
+
+        {% else %}
+        <div class="navbar-title" onclick="window.location.href='{% url 'admin_dashboard' %}'">CoopHub</div>
+        {% endif %}
+
+        <div class="navbar-icons">
+            <img src="https://img.icons8.com/ios-filled/50/ffffff/appointment-reminders.png">
+            <a href="{% url 'create_post' %}">
+                <img src="https://img.icons8.com/ios-filled/50/ffffff/edit.png">
+            </a>
+            <img src="https://img.icons8.com/ios-filled/50/ffffff/delete.png">
+        </div>
+    </div>
+
+    <!-- Page Title -->
+    <h2 style="padding: 20px 30px;">โพสต์ที่ลบไว้</h2>
+
+    <!-- Posts Grid -->
+    <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:25px; padding:0 30px 40px;">
+
+        {% for p in posts %}
+        <div class="post-card">
+
+            <div style="flex:1;">
+                <h3 style="margin:0; font-size:22px; font-weight:bold;">{{ p.company }}</h3>
+
+                <p style="margin:4px 0;">จังหวัด: {{ p.province }}</p>
+                <p style="margin:4px 0;">เบี้ยเลี้ยง: {{ p.salary }}</p>
+                <p style="margin:4px 0;">ตำแหน่ง: {{ p.position }}</p>
+
+                <p style="margin:4px 0; color:gray;">
+                    วันที่โพสต์: {{ p.created_at|date:"d/m/Y" }}
+                </p>
+
+                <!-- Restore Button -->
+                <a class="restore-btn" href="{% url 'restore_post' p.id %}">
+                    <img src="https://img.icons8.com/ios-glyphs/30/000000/restore.png">
+                </a>
+            </div>
+
+            {% if p.image %}
+            <img class="post-image" src="{{ p.image.url }}">
+            {% endif %}
+
+        </div>
+
+        {% empty %}
+        <p style="grid-column:1/3; text-align:center; color:gray; font-size:18px; margin-top:30px;">
+            ยังไม่มีโพสต์ที่ถูกลบ
+        </p>
+        {% endfor %}
+
+    </div>
+
+</body>
+</html>
