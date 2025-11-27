@@ -3,41 +3,280 @@
 <head>
 <meta charset="UTF-8">
 <title>{{ post.company }}</title>
+
 <style>
-    body { font-family: Prompt; padding: 20px; }
-    .comment-box { margin-top:20px; }
-    .comment { background:#eee; padding:10px; margin:5px 0; border-radius:8px; }
+    body {
+        font-family: "Prompt", sans-serif;
+        margin: 0;
+        background: #ffffff;
+    }
+
+    /* Navbar */
+    .navbar {
+        background-color: #2f80ed;
+        color: white;
+        padding: 15px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .navbar-title {
+        font-size: 28px;
+        font-weight: bold;
+        font-family: "Comic Sans MS", cursive;
+        cursor: pointer;
+    }
+    .navbar-icons img {
+        width: 32px;
+        height: 32px;
+        cursor: pointer;
+    }
+
+    /* Profile Up Top */
+    .poster-info {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 25px 50px 10px;
+    }
+
+    .poster-img {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    /* Center Title + Image */
+    .title-container {
+        text-align: center;
+        margin-top: 10px;
+    }
+    .post-image {
+        width: 70%;
+        border-radius: 10px;
+        margin-top: 15px;
+    }
+
+    /* Detail Section */
+    .detail-box {
+        width: 70%;
+        margin: 40px auto;
+    }
+
+    h2 { margin-bottom: 5px; }
+
+    /* Comment Chat Box */
+    .chat-container {
+        width: 70%;
+        margin: 30px auto;
+        background: #e6e6e6;
+        padding: 25px;
+        border-radius: 15px;
+    }
+
+    .comment-left, .comment-right {
+        max-width: 70%;
+        padding: 12px 18px;
+        margin-bottom: 15px;
+        border-radius: 18px;
+        display: inline-block;
+        position: relative;
+    }
+
+    .comment-left {
+        background: white;
+        align-self: flex-start;
+        border-bottom-left-radius: 0;
+    }
+
+    .comment-right {
+        background: #f2f2f2;
+        align-self: flex-end;
+        float: right;
+        border-bottom-right-radius: 0;
+    }
+
+    .comment-profile {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    .comment-meta {
+        font-size: 13px;
+        color: gray;
+        margin-bottom: 3px;
+    }
+
+    .comment-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        clear: both;
+        margin-bottom: 15px;
+    }
+
+    .comment-right-row {
+        justify-content: flex-end;
+    }
+
+    /* Comment Form */
+    .comment-form {
+        margin-top: 20px;
+        display: flex;
+        gap: 10px;
+    }
+    .comment-form textarea {
+        flex: 1;
+        border-radius: 20px;
+        padding: 12px;
+        border: 1px solid #bbb;
+        font-size: 16px;
+    }
+    .comment-form button {
+        padding: 12px 20px;
+        border: none;
+        background: #2f80ed;
+        color: white;
+        border-radius: 20px;
+        cursor: pointer;
+    }
+
 </style>
 </head>
-
 <body>
 
-<h1>{{ post.company }}</h1>
+<!-- Navbar -->
+<div class="navbar">
 
-{% if post.image %}
-<img src="{{ post.image.url }}" width="300">
-{% endif %}
+    {% if user_obj.role == 'student' %}
+        <div class="navbar-title" onclick="location.href='{% url 'student_home' %}'">CoopHub</div>
+    {% elif user_obj.role == 'teacher' %}
+        <div class="navbar-title" onclick="location.href='{% url 'teacher_home' %}'">CoopHub</div>
+    {% else %}
+        <div class="navbar-title" onclick="location.href='{% url 'admin_dashboard' %}'">CoopHub</div>
+    {% endif %}
 
-<p><b>ตำแหน่ง:</b> {{ post.position }}</p>
-<p><b>จังหวัด:</b> {{ post.province }}</p>
-<p><b>รายละเอียด:</b> {{ post.description }}</p>
-
-
-<h2>ความคิดเห็น</h2>
-
-{% for c in comments %}
-<div class="comment">
-    <b>{{ c.user.username }}</b><br>
-    {{ c.text }}<br>
-    <small>{{ c.created_at }}</small>
+    <div class="navbar-icons">
+        <img src="https://img.icons8.com/ios-filled/50/ffffff/appointment-reminders.png">
+        <a href="{% url 'create_post' %}">
+            <img src="https://img.icons8.com/ios-filled/50/ffffff/edit.png">
+        </a>
+        <a href="{% url 'trash_bin' %}">
+            <img src="https://img.icons8.com/ios-filled/50/ffffff/delete.png">
+        </a>
+    </div>
 </div>
-{% endfor %}
 
-<form method="POST" action="{% url 'add_comment' post.id %}">
-    {% csrf_token %}
-    <textarea name="comment" required></textarea>
-    <button>ส่งความคิดเห็น</button>
-</form>
+
+<!-- Poster info -->
+<div class="poster-info">
+    {% if post.owner.profile_image %}
+        <img class="poster-img" src="{{ post.owner.profile_image.url }}">
+    {% else %}
+        <img class="poster-img" src="https://img.icons8.com/ios-filled/100/808080/user.png">
+    {% endif %}
+
+    <div>
+        <h3>{{ post.owner.first_name }} {{ post.owner.last_name }} ({{ post.owner.student_id }})</h3>
+        <small>{{ post.created_at|date:"d F Y" }}</small>
+    </div>
+</div>
+
+
+<!-- Title + Image -->
+<div class="title-container">
+    <h1>{{ post.company }}</h1>
+
+    {% if post.image %}
+    <img class="post-image" src="{{ post.image.url }}">
+    {% endif %}
+</div>
+
+
+
+<!-- Detail Section -->
+<div class="detail-box">
+
+    <h2>รายละเอียด</h2>
+
+    <p><b>ชื่อบริษัท :</b> {{ post.company }}</p>
+    <p><b>จังหวัด :</b> {{ post.province }}</p>
+    <p><b>ตำแหน่งที่ได้รับ :</b> {{ post.position }}</p>
+    <p><b>เวลาทำงาน :</b> {{ post.work_time }}</p>
+    <p><b>ระยะเวลาการฝึกงาน :</b> {{ post.internship_period }}</p>
+    <p><b>เบี้ยเลี้ยง :</b> {{ post.salary }}</p>
+    <p><b>ที่ตั้งบริษัท :</b> {{ post.location }}</p>
+    <p><b>ทักษะที่ใช้ :</b> {{ post.skills }}</p>
+    <p><b>เกรดขั้นต่ำ :</b> {{ post.grade }}</p>
+    <p><b>วิธีการสมัคร :</b> {{ post.contact }}</p>
+    <p><b>ประเภทงาน :</b> {{ post.type_of_work }}</p>
+
+    <p style="margin-top:18px;">{{ post.description }}</p>
+</div>
+
+
+
+<!-- Comment Section -->
+<div class="chat-container">
+    <h3 style="margin-bottom:15px;">ความคิดเห็น</h3>
+
+    {% for c in comments %}
+
+        {% if c.user == user_obj %}
+        <!-- ขวา -->
+        <div class="comment-row comment-right-row">
+            <div>
+                <div class="comment-meta">
+                    {{ c.user.first_name }} ({{ c.user.student_id }}) — {{ c.created_at|date:"d F Y" }}
+                </div>
+                <div class="comment-right">
+                    {{ c.text }}
+                </div>
+            </div>
+
+            {% if c.user.profile_image %}
+                <img class="comment-profile" src="{{ c.user.profile_image.url }}">
+            {% else %}
+                <img class="comment-profile" src="https://img.icons8.com/ios-filled/100/808080/user.png">
+            {% endif %}
+        </div>
+
+        {% else %}
+        <!-- ซ้าย -->
+        <div class="comment-row">
+            {% if c.user.profile_image %}
+                <img class="comment-profile" src="{{ c.user.profile_image.url }}">
+            {% else %}
+                <img class="comment-profile" src="https://img.icons8.com/ios-filled/100/808080/user.png">
+            {% endif %}
+
+            <div>
+                <div class="comment-meta">
+                    {{ c.user.first_name }} ({{ c.user.student_id }}) — {{ c.created_at|date:"d F Y" }}
+                </div>
+
+                <div class="comment-left">
+                    {{ c.text }}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+    {% endfor %}
+
+
+    <!-- ส่งคอมเมนต์ -->
+    <form class="comment-form" method="POST" action="{% url 'add_comment' post.id %}">
+        {% csrf_token %}
+        <textarea name="comment" placeholder="แสดงความคิดเห็น..." required></textarea>
+        <button>➤</button>
+    </form>
+
+</div>
 
 </body>
 </html>
+
