@@ -88,8 +88,15 @@
 
 <body>
 
-<div class="navbar" onclick="window.location.href='{% url 'student_home' %}'">
-    CoopHub
+<!-- ✅ Navbar แยกตาม role -->
+<div class="navbar">
+    {% if user.role == 'student' %}
+        <div onclick="window.location.href='{% url 'student_home' %}'">CoopHub</div>
+    {% elif user.role == 'teacher' %}
+        <div onclick="window.location.href='{% url 'teacher_home' %}'">CoopHub</div>
+    {% else %}
+        <div onclick="window.location.href='{% url 'admin_dashboard' %}'">CoopHub</div>
+    {% endif %}
 </div>
 
 <div class="container">
@@ -101,9 +108,18 @@
         <!-- Upload Profile -->
         <div class="profile-upload">
             <label for="profileInput">
-                <div class="circle-upload">
-                    📷 <br> อัพโหลดรูปโปรไฟล์ <br>
-                    <small>ไฟล์ .jpg .png</small>
+                <div class="circle-upload"
+                     style="
+                        {% if user.profile_image %}
+                            background-image: url('{{ user.profile_image.url }}');
+                            background-size: cover;
+                            background-position: center;
+                        {% endif %}
+                     ">
+                    {% if not user.profile_image %}
+                        📷 <br> อัพโหลดรูปโปรไฟล์ <br>
+                        <small>ไฟล์ .jpg .png</small>
+                    {% endif %}
                 </div>
             </label>
             <input id="profileInput" type="file" name="profile_image" style="display: none;">
@@ -124,11 +140,14 @@
         <label>สาขา</label>
         <input type="text" name="major" value="{{ user.major }}">
 
-        <label>รหัสนักศึกษา</label>
-        <input type="text" name="student_id" value="{{ user.student_id }}">
+        {% if user.role == 'student' %}
+            <label>รหัสนักศึกษา</label>
+            <input type="text" name="student_id" value="{{ user.student_id }}">
+        {% endif %}
 
-        <label>อีเมล</label>
-        <input type="email" name="email" value="{{ user.email }}">
+        <!-- อีเมล แค่แสดงอย่างเดียว ไม่ให้แก้ -->
+        <label>อีเมล (ไม่สามารถแก้ไขได้)</label>
+        <input type="email" value="{{ user.email }}" disabled>
 
         <button class="btn-save" type="submit">บันทึก</button>
     </form>

@@ -71,24 +71,42 @@
 
 <body>
 
-<div class="navbar" onclick="window.location.href='{% url 'student_home' %}'">
-    CoopHub
+<!-- ✅ Navbar แยกตาม role -->
+<div class="navbar">
+    {% if user.role == 'student' %}
+        <div onclick="window.location.href='{% url 'student_home' %}'">CoopHub</div>
+    {% elif user.role == 'teacher' %}
+        <div onclick="window.location.href='{% url 'teacher_home' %}'">CoopHub</div>
+    {% else %}
+        <div onclick="window.location.href='{% url 'admin_dashboard' %}'">CoopHub</div>
+    {% endif %}
 </div>
 
 <div class="container">
     <h2>โปรไฟล์ของฉัน</h2>
 
     <img class="profile-pic"
-     src="{% if user.profile_image %}{{ user.profile_image.url }}{% else %}https://i.imgur.com/Z0ZGuTX.png{% endif %}">
+         src="{% if user.profile_image %}{{ user.profile_image.url }}{% else %}https://i.imgur.com/Z0ZGuTX.png{% endif %}">
 
     <div class="info">
         <p><strong>ชื่อจริง:</strong> {{ user.first_name }}</p>
         <p><strong>นามสกุล:</strong> {{ user.last_name }}</p>
         <p><strong>Username:</strong> {{ user.username }}</p>
-        <p><strong>Email:</strong> {{ user.email }}</p>
+
+        <!-- อีเมล แสดงอย่างเดียว + ปุ่มเปลี่ยนรหัสผ่าน -->
+        <p>
+            <strong>Email:</strong> {{ user.email }}
+            <a href="{% url 'password_reset' %}" class="edit-btn" style="margin-left: 10px; margin-top: 0;">
+                เปลี่ยนรหัสผ่าน
+            </a>
+        </p>
+
         <p><strong>คณะ:</strong> {{ user.faculty }}</p>
         <p><strong>สาขา:</strong> {{ user.major }}</p>
-        <p><strong>รหัสนักศึกษา:</strong> {{ user.student_id }}</p>
+
+        {% if user.role == 'student' %}
+            <p><strong>รหัสนักศึกษา:</strong> {{ user.student_id }}</p>
+        {% endif %}
 
         <a href="{% url 'edit_profile' %}" class="edit-btn">แก้ไขข้อมูล</a>
     </div>

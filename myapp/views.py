@@ -234,32 +234,42 @@ def profile_view(request):
     return render(request, 'profile.html', {'user': request.user})
 
 
+# myapp/views.py
 @login_required
 def edit_profile(request):
     user = request.user
 
     if request.method == "POST":
-        user.username = request.POST.get("username")
-        user.email = request.POST.get("email")
-        user.student_id = request.POST.get("student_id")
-        user.faculty = request.POST.get("faculty")
-        user.major = request.POST.get("major")
+        # อนุญาตให้แก้ไขพวกข้อมูลทั่วไป
+        user.username = request.POST.get("username", user.username).strip()
+        user.first_name = request.POST.get("first_name", user.first_name).strip()
+        user.last_name = request.POST.get("last_name", user.last_name).strip()
+        user.faculty = request.POST.get("faculty", user.faculty).strip()
+        user.major = request.POST.get("major", user.major).strip()
 
-        # การอัปโหลดรูปภาพ
-        if request.FILES.get('profile_image'):
-            user.profile_image = request.FILES['profile_image']
+        # เฉพาะ student เท่านั้นที่มีรหัสนักศึกษา
+        if user.role == "student":
+            user.student_id = request.POST.get("student_id", user.student_id).strip()
+
+        # ❌ ไม่อนุญาตให้แก้ email จากหน้านี้ (จะใช้ระบบเปลี่ยนรหัสผ่านแทน)
+        # ข้าม user.email ไปเลย
+
+        # อัปโหลดรูปโปรไฟล์
+        if request.FILES.get("profile_image"):
+            user.profile_image = request.FILES["profile_image"]
 
         user.save()
         messages.success(request, "อัปเดตข้อมูลเรียบร้อยแล้ว")
-        return redirect('profile')
+        return redirect("profile")
 
     return render(request, "edit_profile.html", {"user": user})
+
 
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import CoopPost, Comment, CustomUser
+from .models import CoopPost, Comment, CustomUser, CoopPostImage
 
 
 from django.db.models import Q   # 👈 เพิ่มบรรทัดนี้ด้านบนของ views.py
@@ -327,56 +337,73 @@ def create_post(request):
         salary_type = request.POST.get('salary_type')       # ไม่มี / มี / ตามตกลง
         salary_amount = request.POST.get('salary_amount')   # จำนวนเงิน (ถ้าเลือก "มี")
 
-        if salary_type == "มี":
+        if salary_type == "มี" and salary_amount:
             salary = f"{salary_amount} บาท"
         else:
             salary = salary_type
 
-        # 4) รับ optional fields
-        portfolio = request.POST.get("portfolio") or ""
-        extra_link = request.POST.get("extra_link") or ""
+        # 4) ดึง “หลายตำแหน่ง” จากฟอร์ม
+        positions_list = request.POST.getlist('positions[]')    # ['Frontend', 'Backend', ...]
+        positions_list = [p.strip() for p in positions_list if p.strip()]
+        positions_str = ", ".join(positions_list)               # 'Frontend, Backend'
 
-        # 5) สร้างโพสต์
+        # 5) ข้อมูลอื่น ๆ
+        portfolio = request.POST.get("portfolio") or ""
+        extra_link = request.POST.get("extra_link") or ""   # (ถ้าจะใช้ในอนาคต)
+        checkin_location = request.POST.get("checkin_location") or ""
+
+        # 6) สร้าง object CoopPost (แต่ยังไม่ save รูปประกอบหลายรูป)
         post = CoopPost(
             owner=request.user,
             company=request.POST.get('company'),
             province=request.POST.get('province'),
             salary=salary,
-            position=request.POST.get('position'),
+            position=positions_str,
             work_time=work_time,
             internship_period=internship_period,
             location=request.POST.get('location'),
+            checkin_location=checkin_location,
             skills=request.POST.get('skills'),
             grade=request.POST.get('grade'),
             contact=request.POST.get('contact'),
             type_of_work=request.POST.get('type_of_work'),
             description=request.POST.get('description'),
-
-            # optional fields
             portfolio=portfolio,
             extra_link=extra_link,
         )
 
-        # 6) ไฟล์ Optional
+        # 7) ไฟล์เดี่ยว (ปก, ไฟล์แนบ, วิดีโอ)
         if request.FILES.get('image'):
             post.image = request.FILES['image']
 
         if request.FILES.get('extra_file'):
             post.extra_file = request.FILES['extra_file']
 
-        # 7) สถานะโพสต์
+        if request.FILES.get('extra_video'):
+            post.video = request.FILES['extra_video']
+
+        # 8) สถานะโพสต์
         if request.user.role == 'teacher' or request.user.username == 'admin007':
             post.status = "approved"
         else:
             post.status = "pending"
 
+        # ต้อง save ก่อน ถึงจะเอาไปผูกกับ CoopPostImage ได้
         post.save()
+
+        # 9) รูปประกอบหลายรูป
+        extra_images = request.FILES.getlist('extra_images')
+        for img in extra_images:
+            CoopPostImage.objects.create(post=post, image=img)
+
         return redirect("post_success")
 
-    # 8) GET → ส่งรายชื่อจังหวัดเข้าไป
+    # 10) GET → ส่งรายชื่อจังหวัดเข้าไป
     return render(request, 'post_create.html', {
         "provinces": PROVINCES
     })
+
+
 
 
 @login_required
@@ -424,11 +451,29 @@ def reject_post(request, post_id):
     return redirect('teacher_home')
 
 
+from django.shortcuts import get_object_or_404
+
 @login_required
 def post_detail(request, post_id):
-    post = CoopPost.objects.get(id=post_id)
-    comments = Comment.objects.filter(post=post)
-    return render(request, 'post_detail.html', {"post": post, "comments": comments})
+    post = get_object_or_404(CoopPost, id=post_id)
+    comments = Comment.objects.filter(post=post).order_by('created_at')
+
+    # รูปประกอบเพิ่มเติม
+    extra_images = post.extra_images.all()  # ถ้าใช้ CoopPostImage แล้ว
+
+    # ✅ แยกตำแหน่งออกเป็น list ตั้งแต่ใน view
+    if post.position:
+        positions = [p.strip() for p in post.position.split(",")]
+    else:
+        positions = []
+
+    return render(request, 'post_detail.html', {
+        "post": post,
+        "comments": comments,
+        "extra_images": extra_images,
+        "positions": positions,      # ส่ง list ไป template
+    })
+
 
 
 @login_required

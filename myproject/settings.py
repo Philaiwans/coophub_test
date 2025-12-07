@@ -7,6 +7,7 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
+    'daphne',  # ต้องอยู่บรรทัดแรก
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -14,6 +15,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'myapp',
+    'chat',  # เพิ่มตรงนี้
 ]
 
 MIDDLEWARE = [
@@ -49,13 +51,14 @@ WSGI_APPLICATION = 'myproject.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'coopdb',
+        'NAME': 'coopdb',       # ตาม MYSQL_DATABASE
         'USER': 'root',
-        'PASSWORD': '',
-        'HOST': '127.0.0.1',
-        'PORT': '3306',
+        'PASSWORD': '123456',   # ตาม MYSQL_ROOT_PASSWORD
+        'HOST': '127.0.0.1',    # เพราะ Django รันบนเครื่อง Windows
+        'PORT': '3306',         # ตามที่เรา -p 3306:3306
     }
 }
+
 
 AUTH_USER_MODEL = 'myapp.CustomUser'
 
@@ -84,3 +87,12 @@ DEFAULT_FROM_EMAIL = 'CoopHub <sopangxr@gmail.com>'
 
 # ป้องกัน error timeout
 EMAIL_TIMEOUT = 30
+
+ASGI_APPLICATION = 'myproject.asgi.application'
+
+# ใช้ in-memory สำหรับทดสอบ (ไม่ต้องติดตั้ง Redis)
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    }
+}

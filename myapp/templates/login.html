@@ -43,7 +43,7 @@
       <button type="submit">เข้าสู่ระบบ</button>
     </form>
     <div class="bottom">
-      <a href="#">ลืมรหัสผ่าน</a>
+      <a href="{% url 'password_reset' %}">ลืมรหัสผ่าน</a>
       <a href="{% url 'register' %}">สมัครสมาชิก</a>
     </div>
     {% for msg in messages %}<p style="color:red;">{{ msg }}</p>{% endfor %}

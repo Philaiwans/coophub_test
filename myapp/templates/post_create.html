@@ -1,325 +1,392 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-<meta charset="UTF-8">
-<title>เพิ่มงานสหกิจ</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap">
+    <meta charset="UTF-8">
+    <title>เพิ่มงานสหกิจ</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap">
 
-<style>
-    body {
-        margin: 0;
-        font-family: "Prompt", sans-serif;
-        background: #ffffff;
-    }
+    <style>
+        body {
+            margin: 0;
+            font-family: "Prompt", sans-serif;
+            background: #ffffff;
+        }
 
-    /* ================= NAVBAR ================= */
-    .navbar {
-        background-color: #2f80ed;
-        color: white;
-        padding: 15px 20px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
+        /* ================= NAVBAR ================= */
+        .navbar {
+            background-color: #2f80ed;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-    .navbar-title {
-        font-size: 28px;
-        font-weight: bold;
-        font-family: "Comic Sans MS", cursive;
-        cursor: pointer;
-    }
+        .navbar-title {
+            font-size: 28px;
+            font-weight: bold;
+            font-family: "Comic Sans MS", cursive;
+            cursor: pointer;
+        }
 
-    .navbar-icons {
-        display: flex;
-        gap: 20px;
-        align-items: center;
-    }
+        .navbar-icons {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
 
-    .navbar-icons img {
-        width: 30px;
-        height: 30px;
-        cursor: pointer;
-    }
+        .navbar-icons img {
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+        }
 
-    /* ================= FORM CONTAINER ================= */
-    .container {
-        width: 90%;
-        margin: 30px auto;
-        background: white;
-        padding: 30px;
-        border-radius: 20px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-    }
+        /* ================= FORM CONTAINER ================= */
+        .container {
+            width: 90%;
+            margin: 30px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
 
-    .title {
-        font-size: 28px;
-        font-weight: bold;
-        text-align: center;
-        color: #2f80ed;
-    }
+        .title {
+            font-size: 28px;
+            font-weight: bold;
+            text-align: center;
+            color: #2f80ed;
+        }
 
-    .note {
-        text-align: center;
-        font-size: 15px;
-        color: #666;
-        margin-bottom: 25px;
-    }
+        .note {
+            text-align: center;
+            font-size: 15px;
+            color: #666;
+            margin-bottom: 25px;
+        }
 
-    /* Layout: Upload ซ้าย + Form 2 คอลัมน์ */
-    .form-wrapper {
-        width: 100%;
-        display: flex;
-        gap: 40px;
-    }
+        /* Layout: Upload ซ้าย + Form 2 คอลัมน์ */
+        .form-wrapper {
+            width: 100%;
+            display: flex;
+            gap: 40px;
+        }
 
-    /* กล่องอัปโหลดรูป */
-    .upload-box {
-        width: 320px;
-        height: 380px;
-        border: 2px dashed #cbd5e1;
-        border-radius: 18px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        color: #777;
-        text-align: center;
-        padding: 20px;
-    }
+        /* กล่องอัปโหลดรูป */
+        .upload-box {
+            width: 320px;
+            height: 380px;
+            border: 2px dashed #cbd5e1;
+            border-radius: 18px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #777;
+            text-align: center;
+            padding: 20px;
+        }
 
-    .upload-box img {
-        width: 90px;
-        opacity: 0.6;
-        margin-bottom: 10px;
-    }
+        .upload-box img {
+            width: 90px;
+            opacity: 0.6;
+            margin-bottom: 10px;
+        }
 
-    /* ฟอร์ม 2 คอลัมน์ */
-    .form-columns {
-        flex: 1;
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 20px 40px;
-    }
+        /* ฟอร์ม 2 คอลัมน์ */
+        .form-columns {
+            flex: 1;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px 40px;
+        }
 
-    .input-box label {
-        font-weight: 600;
-        display: block;
-        margin-bottom: 5px;
-    }
+        .input-box label {
+            font-weight: 600;
+            display: block;
+            margin-bottom: 5px;
+        }
 
-    input, select, textarea {
-        width: 100%;
-        padding: 12px;
-        border-radius: 10px;
-        border: 1px solid #d4d4d4;
-        font-size: 15px;
-    }
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid #d4d4d4;
+            font-size: 15px;
+        }
 
-    textarea {
-        height: 100px;
-    }
+        textarea {
+            height: 100px;
+        }
 
-    /* กล่องข้อความใหญ่ */
-    .big-box {
-        width: 100%;
-        margin-top: 30px;
-    }
+        /* กล่องข้อความใหญ่ */
+        .big-box {
+            width: 100%;
+            margin-top: 30px;
+        }
 
-    .big-box textarea {
-        width: 100%;
-        height: 180px;
-        border-radius: 12px;
-        padding: 15px;
-    }
+        .big-box textarea {
+            width: 100%;
+            height: 180px;
+            border-radius: 12px;
+            padding: 15px;
+        }
 
-    /* ปุ่มโพสต์ */
-    .post-btn {
-        width: 300px;
-        display: block;
-        margin: 30px auto;
-        padding: 14px;
-        font-size: 20px;
-        background: #2f80ed;
-        color: white;
-        border: none;
-        border-radius: 15px;
-        cursor: pointer;
-        font-weight: bold;
-    }
-</style>
+        /* ปุ่มโพสต์ */
+        .post-btn {
+            width: 300px;
+            display: block;
+            margin: 30px auto;
+            padding: 14px;
+            font-size: 20px;
+            background: #2f80ed;
+            color: white;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: bold;
+        }
 
-<script>
-function toggleSalary() {
-    let type = document.getElementById("salaryType").value;
-    let box = document.getElementById("salaryAmountBox");
-    box.style.display = (type === "มี") ? "block" : "none";
-}
-</script>
+        /* ปุ่มเพิ่มตำแหน่ง */
+        .add-position-btn {
+            padding: 6px 14px;
+            border-radius: 999px;
+            border: 1px solid #2f80ed;
+            background: white;
+            color: #2f80ed;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .add-position-btn:hover {
+            background: #2f80ed;
+            color: white;
+        }
 
+        /* สื่อเพิ่มเติม */
+        .extra-media-section {
+            margin-top: 25px;
+        }
+        .extra-media-title {
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .extra-media-note {
+            font-size: 13px;
+            color: #777;
+            margin-top: 3px;
+            margin-bottom: 10px;
+        }
+    </style>
+
+    <script>
+        function toggleSalary() {
+            let type = document.getElementById("salaryType").value;
+            let box = document.getElementById("salaryAmountBox");
+            box.style.display = (type === "มี") ? "block" : "none";
+        }
+
+        function addPosition() {
+            const container = document.getElementById("positions-container");
+            const count = container.querySelectorAll(".position-item").length + 1;
+
+            const div = document.createElement("div");
+            div.className = "position-item";
+            div.style.marginTop = "8px";
+            div.innerHTML = `
+                <input type="text" name="positions[]" placeholder="ตำแหน่งที่ ${count}" required>
+            `;
+            container.appendChild(div);
+        }
+    </script>
 </head>
 
 <body>
 
-<!-- ================= NAVBAR ================= -->
-<div class="navbar">
+    <!-- ================= NAVBAR ================= -->
+    <div class="navbar">
+        {% if user.role == 'student' %}
+            <div class="navbar-title" onclick="window.location.href='{% url 'student_home' %}'">
+                CoopHub
+            </div>
+        {% elif user.role == 'teacher' %}
+            <div class="navbar-title" onclick="window.location.href='{% url 'teacher_home' %}'">
+                CoopHub
+            </div>
+        {% else %}
+            <div class="navbar-title" onclick="window.location.href='{% url 'admin_dashboard' %}'">
+                CoopHub
+            </div>
+        {% endif %}
 
-    {% if user.role == 'student' %}
-        <div class="navbar-title" onclick="window.location.href='{% url 'student_home' %}'">
-            CoopHub
+        <div class="navbar-icons">
+            <img src="https://img.icons8.com/ios-filled/50/ffffff/appointment-reminders.png">
+            <a href="{% url 'create_post' %}">
+                <img src="https://img.icons8.com/ios-filled/50/ffffff/edit.png">
+            </a>
+            <a href="{% url 'trash_bin' %}">
+                <img src="https://img.icons8.com/ios-filled/50/ffffff/delete.png">
+            </a>
         </div>
-
-    {% elif user.role == 'teacher' %}
-        <div class="navbar-title" onclick="window.location.href='{% url 'teacher_home' %}'">
-            CoopHub
-        </div>
-
-    {% else %}
-        <div class="navbar-title" onclick="window.location.href='{% url 'admin_dashboard' %}'">
-            CoopHub
-        </div>
-    {% endif %}
-
-</div>
-
-
-    <div class="navbar-icons">
-        <img src="https://img.icons8.com/ios-filled/50/ffffff/appointment-reminders.png">
-        <a href="{% url 'create_post' %}">
-            <img src="https://img.icons8.com/ios-filled/50/ffffff/edit.png">
-        </a>
-        <img src="https://img.icons8.com/ios-filled/50/ffffff/delete.png">
     </div>
-</div>
 
-<!-- ================= CONTENT ================= -->
-<div class="container">
+    <!-- ================= CONTENT ================= -->
+    <div class="container">
 
-    <h2 class="title">เพิ่มงานสหกิจ</h2>
-    <p class="note">กรุณากรอกข้อมูลที่มีเครื่องหมาย * ให้ครบถ้วน</p>
+        <h2 class="title">เพิ่มงานสหกิจ</h2>
+        <p class="note">กรุณากรอกข้อมูลที่มีเครื่องหมาย * ให้ครบถ้วน</p>
 
-    <form method="POST" enctype="multipart/form-data">
-        {% csrf_token %}
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
 
-        <div class="form-wrapper">
+            <div class="form-wrapper">
 
-            <!-- ============ อัปโหลดรูป ============ -->
-            <div class="upload-box">
-                <img src="https://img.icons8.com/ios-filled/100/camera.png">
-                <p>รูปหน้าปกโพสต์<br>รองรับไฟล์ .jpg/.png</p>
-                <input type="file" name="image">
+                <!-- ============ อัปโหลดรูปปก ============ -->
+                <div class="upload-box">
+                    <img src="https://img.icons8.com/ios-filled/100/camera.png">
+                    <p>รูปหน้าปกโพสต์<br>รองรับไฟล์ .jpg/.png</p>
+                    <input type="file" name="image" accept="image/*">
+                </div>
+
+                <!-- ============ ฟอร์ม 2 คอลัมน์ ============ -->
+                <div class="form-columns">
+
+                    <div class="input-box">
+                        <label>ชื่อบริษัท *</label>
+                        <input type="text" name="company" required>
+                    </div>
+
+                    <div class="input-box">
+                        <label>จังหวัด *</label>
+                        <select name="province" required>
+                            <option value="">เลือกจังหวัด</option>
+                            {% for p in provinces %}
+                                <option value="{{ p }}">{{ p }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- ⭐ ตำแหน่งหลายอัน -->
+                    <div class="input-box" id="positions-container" style="grid-column: 1 / span 2;">
+                        <label>ตำแหน่งที่เปิดรับ *</label>
+
+                        <div class="position-item" style="margin-top: 5px;">
+                            <input type="text" name="positions[]" placeholder="เช่น Frontend Developer" required>
+                        </div>
+                    </div>
+
+                    <div style="grid-column: 1 / span 2; text-align: right; margin-top: -10px;">
+                        <button type="button" class="add-position-btn" onclick="addPosition()">
+                            + เพิ่มตำแหน่ง
+                        </button>
+                    </div>
+
+                    <div class="input-box">
+                        <label>วันทำงาน *</label>
+                        <select name="work_day" required>
+                            <option>จันทร์ - ศุกร์</option>
+                            <option>จันทร์ - เสาร์</option>
+                        </select>
+                    </div>
+
+                    <div class="input-box">
+                        <label>เวลาเริ่มงาน *</label>
+                        <input type="time" name="time_start" required>
+                    </div>
+
+                    <div class="input-box">
+                        <label>เวลาเลิกงาน *</label>
+                        <input type="time" name="time_end" required>
+                    </div>
+
+                    <div class="input-box">
+                        <label>วันที่เริ่มฝึก *</label>
+                        <input type="date" name="start_date" required>
+                    </div>
+
+                    <div class="input-box">
+                        <label>วันที่สิ้นสุด *</label>
+                        <input type="date" name="end_date" required>
+                    </div>
+
+                    <div class="input-box">
+                        <label>เบี้ยเลี้ยง *</label>
+                        <select name="salary_type" id="salaryType" onchange="toggleSalary()">
+                            <option>ไม่มี</option>
+                            <option value="มี">มี (ระบุจำนวน)</option>
+                            <option>ตามตกลง</option>
+                        </select>
+                    </div>
+
+                    <div class="input-box" id="salaryAmountBox" style="display:none;">
+                        <label>จำนวนเบี้ยเลี้ยง (บาท)</label>
+                        <input type="number" name="salary_amount" min="0" placeholder="เช่น 300">
+                    </div>
+
+                    <div class="input-box">
+                        <label>ทักษะที่ใช้ *</label>
+                        <input type="text" name="skills" placeholder="HTML, Python, Figma">
+                    </div>
+
+                    <div class="input-box">
+                        <label>เกรดขั้นต่ำ</label>
+                        <input type="text" name="grade">
+                    </div>
+
+                    <div class="input-box">
+                        <label>ช่องทางติดต่อ *</label>
+                        <input type="text" name="contact" placeholder="Email / เบอร์โทร / Line" required>
+                    </div>
+
+                    <div class="input-box">
+                        <label>ประเภทการฝึกงาน *</label>
+                        <select name="type_of_work">
+                            <option>On-site</option>
+                            <option>Online</option>
+                            <option>Hybrid</option>
+                        </select>
+                    </div>
+
+                    <div class="input-box">
+                        <label>ลิงก์ Portfolio</label>
+                        <input type="url" name="portfolio" placeholder="https://...">
+                    </div>
+
+                    <div class="input-box" style="grid-column: 1 / span 2;">
+                        <label>ที่ตั้งบริษัท *</label>
+                        <textarea name="location" required></textarea>
+                    </div>
+
+                </div>
             </div>
 
-            <!-- ============ ฟอร์ม 2 คอลัมน์ ============ -->
-            <div class="form-columns">
-
-                <div class="input-box">
-                    <label>ชื่อบริษัท *</label>
-                    <input type="text" name="company" required>
-                </div>
-
-                <div class="input-box">
-                    <label>จังหวัด *</label>
-                    <select name="province" required>
-                        <option value="">เลือกจังหวัด</option>
-                        {% for p in provinces %}
-                            <option value="{{ p }}">{{ p }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-                <div class="input-box">
-                    <label>ตำแหน่งที่ได้รับ *</label>
-                    <input type="text" name="position" required>
-                </div>
-
-                <div class="input-box">
-                    <label>วันทำงาน *</label>
-                    <select name="work_day" required>
-                        <option>จันทร์ - ศุกร์</option>
-                        <option>จันทร์ - เสาร์</option>
-                    </select>
-                </div>
-
-                <div class="input-box">
-                    <label>เวลาเริ่มงาน *</label>
-                    <input type="time" name="time_start" required>
-                </div>
-
-                <div class="input-box">
-                    <label>เวลาเลิกงาน *</label>
-                    <input type="time" name="time_end" required>
-                </div>
-
-                <div class="input-box">
-                    <label>วันที่เริ่มฝึก *</label>
-                    <input type="date" name="start_date" required>
-                </div>
-
-                <div class="input-box">
-                    <label>วันที่สิ้นสุด *</label>
-                    <input type="date" name="end_date" required>
-                </div>
-
-                <div class="input-box">
-                    <label>เบี้ยเลี้ยง *</label>
-                    <select name="salary_type" id="salaryType" onchange="toggleSalary()">
-                        <option>ไม่มี</option>
-                        <option value="มี">มี (ระบุจำนวน)</option>
-                        <option>ตามตกลง</option>
-                    </select>
-                </div>
-
-                <div class="input-box" id="salaryAmountBox" style="display:none;">
-                    <label>จำนวนเบี้ยเลี้ยง (บาท)</label>
-                    <input type="number" name="salary_amount" min="0" placeholder="เช่น 300">
-                </div>
-
-                <div class="input-box">
-                    <label>ทักษะที่ใช้ *</label>
-                    <input type="text" name="skills" placeholder="HTML, Python, Figma">
-                </div>
-
-                <div class="input-box">
-                    <label>เกรดขั้นต่ำ</label>
-                    <input type="text" name="grade">
-                </div>
-
-                <div class="input-box">
-                    <label>ช่องทางติดต่อ *</label>
-                    <input type="text" name="contact" placeholder="Email / เบอร์โทร / Line" required>
-                </div>
-
-                <div class="input-box">
-                    <label>ประเภทการฝึกงาน *</label>
-                    <select name="type_of_work">
-                        <option>On-site</option>
-                        <option>Online</option>
-                        <option>Hybrid</option>
-                    </select>
-                </div>
-
-                <div class="input-box">
-                    <label>ลิงก์ Portfolio</label>
-                    <input type="url" name="portfolio" placeholder="https://...">
-                </div>
-
-                <div class="input-box" style="grid-column: 1 / span 2;">
-                    <label>ที่ตั้งบริษัท *</label>
-                    <textarea name="location" required></textarea>
-                </div>
-
+            <!-- กล่องข้อความใหญ่ -->
+            <div class="big-box">
+                <label><b>มีอะไรเล่าสู่กันฟังไหม?</b></label>
+                <textarea name="description" placeholder="เพิ่มภาพประกอบหรือคำอธิบายเพิ่มเติม..."></textarea>
             </div>
-        </div>
 
-        <!-- กล่องข้อความใหญ่ -->
-        <div class="big-box">
-            <label><b>มีอะไรเล่าสู่กันฟังไหม?</b></label>
-            <textarea name="description" placeholder="เพิ่มภาพประกอบหรือคำอธิบายเพิ่มเติม..."></textarea>
-        </div>
+            <!-- ⭐ สื่อเพิ่มเติม: รูปประกอบ + วิดีโอ ⭐ -->
+            <div class="extra-media-section">
+                <div class="extra-media-title">สื่อเพิ่มเติม</div>
 
-        <button class="post-btn">โพสต์</button>
-    </form>
-</div>
+                <!-- รูปภาพประกอบหลายรูป -->
+                <label>รูปภาพประกอบเพิ่มเติม (อัปโหลดได้หลายรูป)</label>
+                <input type="file" name="extra_images" accept="image/*" multiple>
+                <div class="extra-media-note">
+                    เช่น รูปบรรยากาศที่ทำงาน, สภาพแวดล้อม, ทีมงาน ฯลฯ
+                </div>
+
+                <!-- วิดีโอบรรยากาศ -->
+                <label>วิดีโอบรรยากาศ (ไม่บังคับ)</label>
+                <input type="file" name="extra_video" accept="video/*">
+                <div class="extra-media-note">
+                    รองรับไฟล์ .mp4, .mov, .avi ขนาดไม่ใหญ่เกินที่ server กำหนด
+                </div>
+            </div>
+
+            <button class="post-btn">โพสต์</button>
+        </form>
+    </div>
 
 </body>
 </html>

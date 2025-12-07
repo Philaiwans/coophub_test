@@ -66,10 +66,18 @@
 
     h2 { margin-bottom: 5px; }
 
+    .detail-box p {
+        margin: 4px 0;
+    }
+
+    .positions-list {
+        margin: 4px 0 8px 20px;
+    }
+
     /* Comment Chat Box */
     .chat-container {
         width: 70%;
-        margin: 30px auto;
+        margin: 30px auto 40px;
         background: #e6e6e6;
         padding: 25px;
         border-radius: 15px;
@@ -144,6 +152,14 @@
         cursor: pointer;
     }
 
+    a.link-text {
+        color: #2f80ed;
+        text-decoration: none;
+    }
+    a.link-text:hover {
+        text-decoration: underline;
+    }
+
 </style>
 </head>
 <body>
@@ -151,9 +167,9 @@
 <!-- Navbar -->
 <div class="navbar">
 
-    {% if user_obj.role == 'student' %}
+    {% if user.role == 'student' %}
         <div class="navbar-title" onclick="location.href='{% url 'student_home' %}'">CoopHub</div>
-    {% elif user_obj.role == 'teacher' %}
+    {% elif user.role == 'teacher' %}
         <div class="navbar-title" onclick="location.href='{% url 'teacher_home' %}'">CoopHub</div>
     {% else %}
         <div class="navbar-title" onclick="location.href='{% url 'admin_dashboard' %}'">CoopHub</div>
@@ -180,8 +196,8 @@
     {% endif %}
 
     <div>
-        <h3>{{ post.owner.first_name }} {{ post.owner.last_name }} ({{ post.owner.student_id }})</h3>
-        <small>{{ post.created_at|date:"d F Y" }}</small>
+        <h3>{{ post.owner.first_name }} {{ post.owner.last_name }} {% if post.owner.student_id %}({{ post.owner.student_id }}){% endif %}</h3>
+        <small>โพสต์เมื่อ {{ post.created_at|date:"d F Y เวลา H:i น." }}</small>
     </div>
 </div>
 
@@ -200,21 +216,79 @@
 <!-- Detail Section -->
 <div class="detail-box">
 
-    <h2>รายละเอียด</h2>
+    <h2>รายละเอียดสถานที่ฝึกงาน</h2>
 
     <p><b>ชื่อบริษัท :</b> {{ post.company }}</p>
     <p><b>จังหวัด :</b> {{ post.province }}</p>
-    <p><b>ตำแหน่งที่ได้รับ :</b> {{ post.position }}</p>
-    <p><b>เวลาทำงาน :</b> {{ post.work_time }}</p>
+
+    <p><b>ตำแหน่งที่เปิดรับ :</b></p>
+    <ul class="positions-list">
+        {% if positions %}
+            {% for pos in positions %}
+                <li>{{ pos }}</li>
+            {% endfor %}
+        {% else %}
+            <li>-</li>
+        {% endif %}
+    </ul>
+
+
+    <p><b>วัน–เวลาทำงาน :</b> {{ post.work_time }}</p>
     <p><b>ระยะเวลาการฝึกงาน :</b> {{ post.internship_period }}</p>
     <p><b>เบี้ยเลี้ยง :</b> {{ post.salary }}</p>
+
     <p><b>ที่ตั้งบริษัท :</b> {{ post.location }}</p>
+
+    <!-- Location เช็คอิน (ถ้ามี field นี้ใน model) -->
+    {% if post.checkin_location %}
+        <p>
+            <b>Location เช็คอิน :</b>
+            {% if "http" in post.checkin_location %}
+                <a class="link-text" href="{{ post.checkin_location }}" target="_blank">
+                    เปิดแผนที่/ลิงก์เช็คอิน
+                </a>
+            {% else %}
+                {{ post.checkin_location }}
+            {% endif %}
+        </p>
+    {% endif %}
+
     <p><b>ทักษะที่ใช้ :</b> {{ post.skills }}</p>
-    <p><b>เกรดขั้นต่ำ :</b> {{ post.grade }}</p>
-    <p><b>วิธีการสมัคร :</b> {{ post.contact }}</p>
+    <p><b>เกรดขั้นต่ำ :</b> {{ post.grade|default:"-" }}</p>
+    <p><b>ช่องทางติดต่อ / วิธีการสมัคร :</b> {{ post.contact }}</p>
     <p><b>ประเภทงาน :</b> {{ post.type_of_work }}</p>
 
-    <p style="margin-top:18px;">{{ post.description }}</p>
+    <p>
+        <b>ลิงก์ Portfolio :</b>
+        {% if post.portfolio %}
+            <a class="link-text" href="{{ post.portfolio }}" target="_blank">{{ post.portfolio }}</a>
+        {% else %}
+            -
+        {% endif %}
+    </p>
+
+    <p>
+        <b>ลิงก์เพิ่มเติม :</b>
+        {% if post.extra_link %}
+            <a class="link-text" href="{{ post.extra_link }}" target="_blank">{{ post.extra_link }}</a>
+        {% else %}
+            -
+        {% endif %}
+    </p>
+
+    <p>
+        <b>ไฟล์แนบ :</b>
+        {% if post.extra_file %}
+            <a class="link-text" href="{{ post.extra_file.url }}" target="_blank">
+                ดาวน์โหลดไฟล์แนบ
+            </a>
+        {% else %}
+            -
+        {% endif %}
+    </p>
+
+    <h2 style="margin-top:25px;">เล่าสู่กันฟัง</h2>
+    <p style="margin-top:8px;">{{ post.description|linebreaksbr }}</p>
 </div>
 
 
@@ -225,12 +299,12 @@
 
     {% for c in comments %}
 
-        {% if c.user == user_obj %}
-        <!-- ขวา -->
+        {% if c.user.id == user.id %}
+        <!-- ขวา (คอมเมนต์ของเราเอง) -->
         <div class="comment-row comment-right-row">
             <div>
                 <div class="comment-meta">
-                    {{ c.user.first_name }} ({{ c.user.student_id }}) — {{ c.created_at|date:"d F Y" }}
+                    {{ c.user.first_name }} {% if c.user.student_id %}({{ c.user.student_id }}){% endif %} — {{ c.created_at|date:"d F Y H:i" }}
                 </div>
                 <div class="comment-right">
                     {{ c.text }}
@@ -245,7 +319,7 @@
         </div>
 
         {% else %}
-        <!-- ซ้าย -->
+        <!-- ซ้าย (คอมเมนต์ของคนอื่น) -->
         <div class="comment-row">
             {% if c.user.profile_image %}
                 <img class="comment-profile" src="{{ c.user.profile_image.url }}">
@@ -255,7 +329,7 @@
 
             <div>
                 <div class="comment-meta">
-                    {{ c.user.first_name }} ({{ c.user.student_id }}) — {{ c.created_at|date:"d F Y" }}
+                    {{ c.user.first_name }} {% if c.user.student_id %}({{ c.user.student_id }}){% endif %} — {{ c.created_at|date:"d F Y H:i" }}
                 </div>
 
                 <div class="comment-left">
@@ -265,6 +339,8 @@
         </div>
         {% endif %}
 
+    {% empty %}
+        <p>ยังไม่มีความคิดเห็น</p>
     {% endfor %}
 
 
@@ -279,4 +355,3 @@
 
 </body>
 </html>
-
