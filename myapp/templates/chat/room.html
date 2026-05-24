@@ -1,81 +1,396 @@
-"""
 <!DOCTYPE html>
-<html>
+<html lang="th">
 <head>
-    <title>Chat Room: {{ room.name }}</title>
-    <style>
-        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
-        #chat-log { border: 1px solid #ccc; height: 400px; overflow-y: scroll; padding: 10px; margin-bottom: 10px; background: #f9f9f9; }
-        .message { margin-bottom: 10px; padding: 5px; }
-        .username { font-weight: bold; color: #0066cc; }
-        .timestamp { font-size: 0.8em; color: #666; margin-left: 10px; }
-        #chat-message-input { width: 70%; padding: 10px; }
-        #chat-message-submit { width: 25%; padding: 10px; background: #0066cc; color: white; border: none; cursor: pointer; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{{ room.name }}</title>
+
+  <style>
+    body{ margin:0; font-family:"Prompt", Arial, sans-serif; background:#f6f7fb; }
+
+    /* ===== Navbar แบบเดียวกับหน้า Home ===== */
+    .navbar {
+      background-color: #2f80ed;
+      color: white;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .navbar-title {
+      font-size: 28px;
+      font-weight: bold;
+      font-family: "Comic Sans MS", cursive;
+      cursor: pointer;
+      user-select:none;
+    }
+    .navbar-icons {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+    .navbar-icons img {
+      width: 32px;
+      height: 32px;
+      cursor: pointer;
+    }
+
+    /* Profile (กดแล้วไป Home) */
+    .profile-img {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      object-fit: cover;
+      cursor: pointer;
+    }
+    .profile-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: white;
+      border: 2px solid #2f80ed;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #2f80ed;
+      cursor: pointer;
+      font-size: 20px;
+    }
+
+    /* ===== Chat card ===== */
+    .wrap{ max-width:900px; margin:0 auto; padding:18px; }
+    .card{
+      margin-top:14px; background:#fff; border-radius:16px;
+      box-shadow:0 2px 10px rgba(0,0,0,.06);
+      overflow:hidden; border:1px solid #eef0f4;
+    }
+    .chatbox{
+      height:65vh; min-height:420px; padding:14px; overflow:auto;
+      background:linear-gradient(#ffffff, #fbfbff);
+    }
+    .msg{ display:flex; margin:10px 0; gap:10px; align-items:flex-end; }
+    .msg.me{ justify-content:flex-end; }
+    .avatar{
+      width:34px; height:34px; border-radius:50%;
+      object-fit:cover; background:#e9eefb; border:1px solid #dfe6fb;
+      flex-shrink:0;
+    }
+    .bubble{
+      max-width:72%;
+      padding:10px 12px;
+      border-radius:14px;
+      font-size:15px;
+      line-height:1.35;
+      white-space:pre-wrap;
+      word-break:break-word;
+      box-shadow:0 1px 6px rgba(0,0,0,.06);
+      border:1px solid transparent;
+    }
+    .msg.me .bubble{
+      background:#2f80ed; color:#fff; border-color:#2f80ed;
+      border-bottom-right-radius:6px;
+    }
+    .msg.other .bubble{
+      background:#f1f5ff; color:#1a2a55; border-color:#e2e9ff;
+      border-bottom-left-radius:6px;
+    }
+    .meta{
+      font-size:12px; opacity:.7; margin-top:4px;
+      display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+    }
+    .meta .name{ font-weight:600; }
+    .msg.me .meta{ justify-content:flex-end; text-align:right; }
+
+    .attach{
+      margin-top:8px;
+      background:rgba(255,255,255,.2);
+      padding:8px; border-radius:12px;
+    }
+    .msg.other .attach{ background:#fff; border:1px solid #e7ecff; }
+    .attach img{
+      max-width:260px; width:100%; border-radius:12px; display:block;
+      border:1px solid rgba(0,0,0,.06);
+    }
+    .attach a{ color:inherit; text-decoration:underline; }
+
+    .inputbar{
+      display:flex; gap:10px; padding:12px;
+      border-top:1px solid #eef0f4; background:#fff; align-items:center;
+    }
+    #msg{
+      flex:1; border:1px solid #dfe3ea; border-radius:12px;
+      padding:12px 12px; font-size:15px; outline:none;
+    }
+    #msg:focus{ border-color:#2f80ed; }
+
+    .btn{
+      border:none; background:#2f80ed; color:#fff; height:44px;
+      padding:0 16px; border-radius:12px; font-weight:700;
+      cursor:pointer;
+    }
+    .btn:disabled{ opacity:.6; cursor:not-allowed; }
+    .btn-ghost{
+      background:#eef3ff; color:#2f80ed; border:1px solid #dbe6ff;
+      font-weight:700;
+    }
+    input[type="file"]{ display:none; }
+
+    .status{ margin-top:10px; font-size:13px; color:#444; opacity:.75; }
+    .status b{ color:#2f80ed; }
+
+    @media (max-width:640px){
+      .bubble{ max-width:85%; }
+      .chatbox{ height:70vh; }
+    }
+  </style>
 </head>
+
 <body>
-    <h1>{{ room.name }}</h1>
-    <div id="chat-log"></div>
-    <input id="chat-message-input" type="text" placeholder="Type your message..." autocomplete="off">
-    <button id="chat-message-submit">Send</button>
 
-    <script>
-        const roomSlug = '{{ room.slug }}';
-        const username = '{{ username }}';
-        const chatSocket = new WebSocket(
-            'ws://' + window.location.host + '/ws/chat/' + roomSlug + '/'
-        );
+  <!-- ===== Navbar ===== -->
+  <div class="navbar">
 
-        chatSocket.onmessage = function(e) {
-            const data = JSON.parse(e.data);
-            const chatLog = document.querySelector('#chat-log');
-            
-            if (data.type === 'chat_history') {
-                data.messages.forEach(msg => {
-                    appendMessage(msg.username, msg.message, msg.timestamp);
-                });
-            } else if (data.type === 'chat_message') {
-                appendMessage(data.username, data.message, data.timestamp);
-            }
-        };
+    <!-- กด CoopHub กลับหน้า Home ตาม role -->
+    <div class="navbar-title"
+         onclick="
+          {% if request.user.role == 'student' %}
+            window.location.href='{% url 'student_home' %}';
+          {% elif request.user.role == 'teacher' %}
+            window.location.href='{% url 'teacher_home' %}';
+          {% else %}
+            window.location.href='{% url 'admin_dashboard' %}';
+          {% endif %}
+         ">
+      CoopHub
+    </div>
 
-        chatSocket.onclose = function(e) {
-            console.error('Chat socket closed unexpectedly');
-        };
+    <div class="navbar-icons">
 
-        function appendMessage(username, message, timestamp) {
-            const chatLog = document.querySelector('#chat-log');
-            const messageElement = document.createElement('div');
-            messageElement.className = 'message';
-            const date = new Date(timestamp);
-            messageElement.innerHTML = `
-                <span class="username">${username}</span>
-                <span class="timestamp">${date.toLocaleTimeString()}</span>
-                <div>${message}</div>
-            `;
-            chatLog.appendChild(messageElement);
-            chatLog.scrollTop = chatLog.scrollHeight;
+      <!-- กระดิ่ง -->
+      {% if request.user.role == 'student' %}
+        <a href="{% url 'activity_student' %}">
+          <img src="https://img.icons8.com/ios-filled/50/ffffff/appointment-reminders.png" alt="notify">
+        </a>
+      {% else %}
+        <a href="{% url 'activity' %}">
+          <img src="https://img.icons8.com/ios-filled/50/ffffff/appointment-reminders.png" alt="notify">
+        </a>
+      {% endif %}
+
+      <!-- เขียนโพสต์ -->
+      <a href="{% url 'create_post' %}">
+        <img src="https://img.icons8.com/ios-filled/50/ffffff/edit.png" alt="create">
+      </a>
+
+      <!-- student = bookmark | teacher/admin = trash -->
+      {% if request.user.role == 'student' %}
+        <a href="{% url 'bookmark_list' %}">
+          <img src="https://img.icons8.com/ios-filled/50/ffffff/bookmark-ribbon.png" alt="bookmark">
+        </a>
+      {% else %}
+        <a href="{% url 'trash_bin' %}">
+          <img src="https://img.icons8.com/ios-filled/50/ffffff/delete.png" alt="trash">
+        </a>
+      {% endif %}
+
+      <!-- โปรไฟล์: กดแล้วไปหน้า Home ตาม role -->
+      <a
+        href="{% if request.user.role == 'student' %}{% url 'student_home' %}
+              {% elif request.user.role == 'teacher' %}{% url 'teacher_home' %}
+              {% else %}{% url 'admin_dashboard' %}{% endif %}"
+        style="display:inline-flex; align-items:center; text-decoration:none;"
+        title="ไปหน้า Home"
+      >
+        {% if request.user.profile_image %}
+          <img class="profile-img" src="{{ request.user.profile_image.url }}" alt="profile">
+        {% else %}
+          <div class="profile-icon" aria-label="profile">👤</div>
+        {% endif %}
+      </a>
+
+    </div>
+  </div>
+
+  <!-- ===== Chat UI ===== -->
+  <div class="wrap">
+    <div class="card">
+      <div id="chat" class="chatbox"></div>
+
+      <div class="inputbar">
+        <label class="btn btn-ghost" for="fileInput">แนบไฟล์</label>
+        <input id="fileInput" type="file" />
+
+        <input id="msg" placeholder="พิมพ์ข้อความ... " autocomplete="off"/>
+        <button class="btn" id="sendBtn">ส่ง</button>
+      </div>
+    </div>
+
+    <div class="status" id="statusText">สถานะ: <b>กำลังเชื่อมต่อ...</b></div>
+  </div>
+
+  <script>
+    // ===== chat =====
+    const roomSlug = "{{ room.slug }}";
+    const myUserId = {{ request.user.id|default:"null" }};
+
+    const scheme = (window.location.protocol === "https:") ? "wss" : "ws";
+    const wsUrl = scheme + "://" + window.location.host + "/ws/chat/" + roomSlug + "/";
+
+    const chatEl = document.getElementById("chat");
+    const inputEl = document.getElementById("msg");
+    const sendBtn = document.getElementById("sendBtn");
+    const fileInput = document.getElementById("fileInput");
+    const statusText = document.getElementById("statusText");
+
+    function setStatus(html){ statusText.innerHTML = "สถานะ: <b>" + html + "</b>"; }
+    function fmtTime(iso){
+      try{ return new Date(iso).toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"}); }
+      catch{ return ""; }
+    }
+
+    function appendMessage(payload){
+      const isMe = (payload.user_id === myUserId);
+      const wrap = document.createElement("div");
+      wrap.className = "msg " + (isMe ? "me" : "other");
+
+      const av = document.createElement("img");
+      av.className = "avatar";
+      av.alt = "avatar";
+      av.src = payload.profile_image || "https://img.icons8.com/ios-filled/100/2f80ed/user-male-circle.png";
+
+      const bubble = document.createElement("div");
+      bubble.className = "bubble";
+
+      if (payload.content){
+        const t = document.createElement("div");
+        t.textContent = payload.content;
+        bubble.appendChild(t);
+      }
+
+      if (payload.attachment_url){
+        const att = document.createElement("div");
+        att.className = "attach";
+
+        if (payload.message_type === "image"){
+          const img = document.createElement("img");
+          img.src = payload.attachment_url;
+          img.alt = payload.attachment_name || "image";
+          att.appendChild(img);
+        } else {
+          const a = document.createElement("a");
+          a.href = payload.attachment_url;
+          a.target = "_blank";
+          a.rel = "noopener";
+          a.textContent = payload.attachment_name || payload.attachment_url;
+          att.appendChild(a);
         }
+        bubble.appendChild(att);
+      }
 
-        document.querySelector('#chat-message-input').focus();
-        document.querySelector('#chat-message-input').onkeyup = function(e) {
-            if (e.keyCode === 13) {
-                document.querySelector('#chat-message-submit').click();
-            }
-        };
+      const meta = document.createElement("div");
+      meta.className = "meta";
+      meta.innerHTML = `<span class="name">${payload.display_name || "Unknown"}</span>
+                        <span class="time">${fmtTime(payload.timestamp)}</span>`;
 
-        document.querySelector('#chat-message-submit').onclick = function(e) {
-            const messageInputDom = document.querySelector('#chat-message-input');
-            const message = messageInputDom.value;
-            if (message.trim() !== '') {
-                chatSocket.send(JSON.stringify({
-                    'message': message,
-                    'username': username
-                }));
-                messageInputDom.value = '';
-            }
-        };
-    </script>
+      const col = document.createElement("div");
+      col.appendChild(bubble);
+      col.appendChild(meta);
+
+      if (!isMe) wrap.appendChild(av);
+      wrap.appendChild(col);
+      if (isMe) wrap.appendChild(av);
+
+      chatEl.appendChild(wrap);
+      chatEl.scrollTop = chatEl.scrollHeight;
+    }
+
+    // CSRF
+    function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          if (cookie.substring(0, name.length + 1) === (name + '=')) {
+            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            break;
+          }
+        }
+      }
+      return cookieValue;
+    }
+    const csrftoken = getCookie('csrftoken');
+
+    // WebSocket
+    const ws = new WebSocket(wsUrl);
+    ws.onopen = () => { setStatus("เชื่อมต่อแล้ว"); sendBtn.disabled = false; inputEl.focus(); };
+    ws.onclose = () => { setStatus("หลุดการเชื่อมต่อ (ลองรีเฟรชหน้า)"); sendBtn.disabled = true; };
+    ws.onerror = () => { setStatus("เกิดข้อผิดพลาด (ตรวจ routing / daphne)"); sendBtn.disabled = true; };
+
+    ws.onmessage = (e) => {
+      let data;
+      try { data = JSON.parse(e.data); } catch { return; }
+
+      if (data.type === "chat_history"){
+        (data.messages || []).forEach(m => appendMessage(m));
+        return;
+      }
+      if (data.type === "chat_message"){
+        appendMessage({
+          user_id: data.is_me_id,
+          display_name: data.display_name,
+          profile_image: data.profile_image,
+          message_type: data.message_type,
+          content: data.content,
+          attachment_url: data.attachment_url,
+          attachment_name: data.attachment_name,
+          timestamp: data.timestamp,
+        });
+      }
+    };
+
+    function sendText(){
+      const text = inputEl.value.trim();
+      if (!text) return;
+
+      ws.send(JSON.stringify({ message_type: "text", content: text }));
+      inputEl.value = "";
+      inputEl.focus();
+    }
+
+    sendBtn.addEventListener("click", sendText);
+    inputEl.addEventListener("keydown", (e) => { if (e.key === "Enter") sendText(); });
+
+    // Upload file แล้วส่ง url ผ่าน ws
+    fileInput.addEventListener("change", async () => {
+      const file = fileInput.files[0];
+      if (!file) return;
+
+      const fd = new FormData();
+      fd.append("file", file);
+
+      try{
+        const res = await fetch("{% url 'chat:upload_chat_file' %}", {
+          method: "POST",
+          headers: { "X-CSRFToken": csrftoken },
+          body: fd
+        });
+        const j = await res.json();
+        if (!j.ok) throw new Error(j.error || "upload failed");
+
+        ws.send(JSON.stringify({
+          message_type: j.kind,
+          content: "",
+          attachment_url: j.url,
+          attachment_name: j.name
+        }));
+      }catch(err){
+        alert("อัปโหลดไฟล์ไม่สำเร็จ: " + err.message);
+      }finally{
+        fileInput.value = "";
+      }
+    });
+  </script>
+
 </body>
 </html>
-"""

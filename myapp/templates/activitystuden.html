@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>Activity - Student</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: "Prompt", sans-serif;
+            background: #ffffff;
+        }
+
+        /* ===== Navbar แบบเดียวกับหน้า Home ===== */
+        .navbar {
+            background-color: #2f80ed;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .navbar-title {
+            font-size: 28px;
+            font-weight: bold;
+            font-family: "Comic Sans MS", cursive;
+            cursor: pointer;
+            user-select: none;
+        }
+        .navbar-icons {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        .navbar-icons img {
+            width: 32px;
+            height: 32px;
+            cursor: pointer;
+        }
+
+        /* Profile (กดแล้วไป Home) */
+        .profile-img {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            cursor: pointer;
+        }
+        .profile-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: white;
+            border: 2px solid #2f80ed;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #2f80ed;
+            cursor: pointer;
+            font-size: 20px;
+            line-height: 1;
+            user-select: none;
+        }
+
+        /* Header Activity */
+        .activity-header {
+            margin: 25px 0 15px 60px;
+            font-size: 30px;
+            font-weight: 700;
+            background: #1646a5;
+            color: white;
+            display: inline-block;
+            padding: 8px 35px;
+            border-radius: 10px;
+        }
+
+        /* Tabs */
+        .tabs {
+            margin-left: 60px;
+            display: flex;
+            gap: 10px;
+        }
+        .tab-btn {
+            padding: 8px 30px;
+            border-radius: 6px;
+            border: 1px solid #2f80ed;
+            background: white;
+            cursor: pointer;
+            font-size: 15px;
+        }
+        .tab-btn.active {
+            background: #2f80ed;
+            color: white;
+        }
+
+        /* Card list */
+        .card-list {
+            margin: 20px 60px 40px;
+        }
+        .card {
+            background: #f6f6f6;
+            border-radius: 16px;
+            padding: 18px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        .card-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 10px;
+            object-fit: cover;
+            background: #ccc;
+        }
+        .card-title {
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .card-sub {
+            font-size: 14px;
+            margin-bottom: 2px;
+        }
+        .card-time {
+            font-size: 13px;
+            color: gray;
+        }
+
+        .link-post {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        .link-post:hover .card-title {
+            text-decoration: underline;
+        }
+
+        /* วงกลมสถานะ */
+        .status-circle {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            color: #ffffff;
+        }
+        .status-approved { background: #00e676; }
+        .status-pending  { background: #d9d9d9; color: #666666; }
+        .status-rejected { background: #ff1744; }
+    </style>
+</head>
+
+<body>
+
+<!-- ===== Navbar ===== -->
+<div class="navbar">
+
+    <!-- กด CoopHub กลับหน้า Home -->
+    <div class="navbar-title" onclick="window.location.href='{% url 'student_home' %}'">
+        CoopHub
+    </div>
+
+    <div class="navbar-icons">
+
+        <!-- กระดิ่ง -->
+        <a href="{% url 'activity_student' %}">
+            <img src="https://img.icons8.com/ios-filled/50/ffffff/appointment-reminders.png" alt="notify">
+        </a>
+
+        <!-- เขียนโพสต์ -->
+        <a href="{% url 'create_post' %}">
+            <img src="https://img.icons8.com/ios-filled/50/ffffff/edit.png" alt="create">
+        </a>
+
+        <!-- Bookmark -->
+        <a href="{% url 'bookmark_list' %}">
+            <img src="https://img.icons8.com/ios-filled/50/ffffff/bookmark-ribbon.png" alt="bookmark">
+        </a>
+
+        <!-- โปรไฟล์: กดแล้วไปหน้า Home -->
+        <a href="{% url 'student_home' %}"
+           style="display:inline-flex; align-items:center; text-decoration:none;"
+           title="ไปหน้า Home">
+
+            {% if user_obj.profile_image %}
+                <img class="profile-img" src="{{ user_obj.profile_image.url }}" alt="profile">
+            {% else %}
+                <div class="profile-icon" aria-label="profile">👤</div>
+            {% endif %}
+
+        </a>
+
+    </div>
+</div>
+
+<div class="activity-header">Activity</div>
+
+<!-- Tabs -->
+<div class="tabs">
+    <a href="{% url 'activity_student' %}?tab=alert">
+        <button class="tab-btn {% if current_tab == 'alert' %}active{% endif %}">แจ้งเตือน</button>
+    </a>
+    <a href="{% url 'activity_student' %}?tab=status">
+        <button class="tab-btn {% if current_tab == 'status' %}active{% endif %}">สถานะโพสต์</button>
+    </a>
+    <a href="{% url 'activity_student' %}?tab=comment">
+        <button class="tab-btn {% if current_tab == 'comment' %}active{% endif %}">ความคิดเห็น</button>
+    </a>
+</div>
+
+<div class="card-list">
+
+    {# ---------- TAB สถานะโพสต์ ---------- #}
+    {% if current_tab == 'status' %}
+
+        {% if posts %}
+            {% for p in posts %}
+                <a class="link-post" href="{% url 'post_detail' p.id %}">
+                    <div class="card">
+                        <div class="card-left">
+                            {% if user_obj.profile_image %}
+                                <img class="avatar" src="{{ user_obj.profile_image.url }}">
+                            {% else %}
+                                <img class="avatar" src="https://img.icons8.com/ios-filled/100/808080/user.png">
+                            {% endif %}
+
+                            <div>
+                                <div class="card-title">{{ p.company }}</div>
+
+                                <div class="card-sub">
+                                    {% if p.status == 'approved' %}
+                                        ได้รับการยืนยัน
+                                        {% if p.last_approver %}
+                                            โดยอาจารย์ {{ p.last_approver.first_name }} {{ p.last_approver.last_name }}
+                                        {% endif %}
+                                    {% elif p.status == 'pending' %}
+                                        รอการยืนยันจากอาจารย์
+                                    {% elif p.status == 'rejected' %}
+                                        ข้อมูลไม่ผ่าน / ต้องแก้ไข
+                                        {% if p.last_approver %}
+                                            (โดยอาจารย์ {{ p.last_approver.first_name }} {{ p.last_approver.last_name }})
+                                        {% endif %}
+                                    {% endif %}
+                                </div>
+
+                                <div class="card-time">
+                                    {{ p.created_at|date:"d/m/Y H:i" }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            {% if p.status == 'approved' %}
+                                <div class="status-circle status-approved">✓</div>
+                            {% elif p.status == 'pending' %}
+                                <div class="status-circle status-pending">•</div>
+                            {% elif p.status == 'rejected' %}
+                                <div class="status-circle status-rejected">✕</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </a>
+            {% endfor %}
+        {% else %}
+            <p style="text-align:center; margin-top:40px; font-size:18px; color:gray;">
+                ยังไม่มีโพสต์ของคุณในระบบ
+            </p>
+        {% endif %}
+
+    {# ---------- TAB ความคิดเห็น ---------- #}
+    {% elif current_tab == 'comment' %}
+
+        {% if notifications %}
+            {% for n in notifications %}
+
+                {% if n.post %}
+                    <a class="link-post" href="{% url 'post_detail' n.post.id %}">
+                {% endif %}
+
+                <div class="card" {% if not n.post %}style="opacity:.65; cursor:not-allowed;"{% endif %}>
+                    <div class="card-left">
+                        {% if n.actor and n.actor.profile_image %}
+                            <img class="avatar" src="{{ n.actor.profile_image.url }}">
+                        {% else %}
+                            <img class="avatar" src="https://img.icons8.com/ios-filled/100/808080/user.png">
+                        {% endif %}
+
+                        <div>
+                            <div class="card-title">
+                                {% if n.actor %}
+                                    {{ n.actor.first_name }} :
+                                {% endif %}
+                                {{ n.message }}
+                            </div>
+
+                            <div class="card-sub">
+                                {% if n.post %}
+                                    หัวข้อสถานที่ฝึกงาน: {{ n.post.company }}
+                                {% else %}
+                                    โพสต์นี้ถูกลบออกจากระบบแล้ว
+                                {% endif %}
+                            </div>
+
+                            <div class="card-time">
+                                {{ n.created_at|date:"d/m/Y H:i" }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {% if n.post %}
+                    </a>
+                {% endif %}
+
+            {% endfor %}
+        {% else %}
+            <p style="text-align:center; margin-top:40px; font-size:18px; color:gray;">
+                ยังไม่มีการแจ้งเตือนความคิดเห็น
+            </p>
+        {% endif %}
+
+    {# ---------- TAB แจ้งเตือนทั่วไป ---------- #}
+    {% else %}
+
+        {% if notifications %}
+            {% for n in notifications %}
+
+                {% if n.post %}
+                    <a class="link-post" href="{% url 'post_detail' n.post.id %}">
+                {% endif %}
+
+                <div class="card" {% if not n.post %}style="opacity:.65; cursor:not-allowed;"{% endif %}>
+                    <div class="card-left">
+                        {% if n.actor and n.actor.profile_image %}
+                            <img class="avatar" src="{{ n.actor.profile_image.url }}">
+                        {% else %}
+                            <img class="avatar" src="https://img.icons8.com/ios-filled/100/808080/user.png">
+                        {% endif %}
+
+                        <div>
+                            <div class="card-title">
+                                {% if n.actor %}
+                                    {{ n.actor.first_name }} {{ n.actor.last_name }} :
+                                {% endif %}
+                                {{ n.message }}
+                            </div>
+
+                            <div class="card-sub">
+                                {% if n.post %}
+                                    สถานที่ฝึกงาน: {{ n.post.company }}
+                                {% else %}
+                                    โพสต์นี้ถูกลบออกจากระบบแล้ว
+                                {% endif %}
+                            </div>
+
+                            <div class="card-time">
+                                {{ n.created_at|date:"d/m/Y H:i" }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {% if n.post %}
+                    </a>
+                {% endif %}
+
+            {% endfor %}
+        {% else %}
+            <p style="text-align:center; margin-top:40px; font-size:18px; color:gray;">
+                ยังไม่มีการแจ้งเตือน
+            </p>
+        {% endif %}
+
+    {% endif %}
+</div>
+
+</body>
+</html>

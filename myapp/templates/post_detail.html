@@ -2,356 +2,493 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>{{ post.company }}</title>
 
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap">
+
 <style>
-    body {
-        font-family: "Prompt", sans-serif;
-        margin: 0;
-        background: #ffffff;
-    }
+  body{ margin:0; font-family:"Prompt", Arial, sans-serif; background:#f6f7fb; }
 
-    /* Navbar */
-    .navbar {
-        background-color: #2f80ed;
-        color: white;
-        padding: 15px 20px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-    .navbar-title {
-        font-size: 28px;
-        font-weight: bold;
-        font-family: "Comic Sans MS", cursive;
-        cursor: pointer;
-    }
-    .navbar-icons img {
-        width: 32px;
-        height: 32px;
-        cursor: pointer;
-    }
+  /* ===== Navbar แบบเดียวกับหน้า Chat ===== */
+  .navbar {
+    background-color: #2f80ed;
+    color: white;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .navbar-title {
+    font-size: 28px;
+    font-weight: bold;
+    font-family: "Comic Sans MS", cursive;
+    cursor: pointer;
+    user-select:none;
+  }
+  .navbar-icons {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+  }
+  .navbar-icons img {
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+  }
+  .profile-img {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    cursor: pointer;
+  }
+  .profile-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: white;
+    border: 2px solid #2f80ed;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #2f80ed;
+    cursor: pointer;
+    font-size: 20px;
+  }
 
-    /* Profile Up Top */
-    .poster-info {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        padding: 25px 50px 10px;
-    }
+  /* ===== Layout ===== */
+  .wrap{ max-width:980px; margin:0 auto; padding:18px; }
+  .card{
+    margin-top:14px; background:#fff; border-radius:18px;
+    box-shadow:0 2px 10px rgba(0,0,0,.06);
+    overflow:hidden; border:1px solid #eef0f4;
+  }
 
-    .poster-img {
-        width: 70px;
-        height: 70px;
-        border-radius: 50%;
-        object-fit: cover;
-    }
+  /* ===== Poster header ===== */
+  .poster-info{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    padding:18px 18px 12px;
+    border-bottom:1px solid #eef0f4;
+  }
+  .poster-img{
+    width:56px; height:56px; border-radius:50%;
+    object-fit:cover; background:#e9eefb; border:1px solid #dfe6fb;
+    flex-shrink:0;
+  }
+  .poster-name{ margin:0; font-size:18px; font-weight:700; }
+  .poster-sub{ margin-top:2px; font-size:13px; opacity:.7; }
 
-    /* Center Title + Image */
-    .title-container {
-        text-align: center;
-        margin-top: 10px;
-    }
-    .post-image {
-        width: 70%;
-        border-radius: 10px;
-        margin-top: 15px;
-    }
+  /* ===== Post body ===== */
+  .content{ padding:18px; }
+  .title-container{ text-align:center; }
+  .title-container h1{ margin:0; font-size:30px; color:#1a2a55; }
+ .post-image{
+  width:100%;
+  max-width:650px;
+  height:350px;
+  object-fit:cover;
+  border-radius:14px;
+  margin-top:14px;
+  border:1px solid #eef0f4;
+  box-shadow:0 1px 8px rgba(0,0,0,.05);
+}
 
-    /* Detail Section */
-    .detail-box {
-        width: 70%;
-        margin: 40px auto;
-    }
+  .detail-box{
+    margin-top:18px;
+    background:#fbfbff;
+    border:1px solid #eef0f4;
+    border-radius:16px;
+    padding:16px;
+  }
+  .detail-box h2{
+    margin:0 0 10px 0;
+    font-size:18px;
+    color:#2f80ed;
+  }
+  .row{ margin:8px 0; color:#233; }
+  .row b{ color:#111; }
+  .positions-list{ margin:6px 0 0 18px; }
+  .benefits-list{ margin:6px 0 0 18px; }
+  .benefits-list li{ margin:6px 0; }
+  .muted{ opacity:.75; }
 
-    h2 { margin-bottom: 5px; }
+  a.link-text { color:#2f80ed; text-decoration:none; }
+  a.link-text:hover { text-decoration: underline; }
 
-    .detail-box p {
-        margin: 4px 0;
-    }
+  /* ===== Comments ===== */
+  .chat-container{
+    margin-top:16px;
+    background:#fff;
+    border:1px solid #eef0f4;
+    border-radius:16px;
+    padding:16px;
+  }
+  .comment-row{ display:flex; align-items:flex-end; gap:10px; margin:12px 0; }
+  .comment-right-row{ justify-content:flex-end; }
 
-    .positions-list {
-        margin: 4px 0 8px 20px;
-    }
+  .comment-profile{
+    width:34px; height:34px; border-radius:50%;
+    object-fit:cover; background:#e9eefb; border:1px solid #dfe6fb;
+    flex-shrink:0;
+  }
 
-    /* Comment Chat Box */
-    .chat-container {
-        width: 70%;
-        margin: 30px auto 40px;
-        background: #e6e6e6;
-        padding: 25px;
-        border-radius: 15px;
-    }
+  .comment-bubble{
+    max-width:72%;
+    padding:10px 12px;
+    border-radius:14px;
+    font-size:15px;
+    line-height:1.35;
+    white-space:pre-wrap;
+    word-break:break-word;
+    box-shadow:0 1px 6px rgba(0,0,0,.06);
+    border:1px solid transparent;
+  }
+  .comment-left .comment-bubble{
+    background:#f1f5ff; color:#1a2a55; border-color:#e2e9ff;
+    border-bottom-left-radius:6px;
+  }
+  .comment-right .comment-bubble{
+    background:#2f80ed; color:#fff; border-color:#2f80ed;
+    border-bottom-right-radius:6px;
+  }
+  .comment-meta{
+    font-size:12px; opacity:.7;
+    margin-bottom:4px;
+  }
+  .comment-right .comment-meta{ text-align:right; }
 
-    .comment-left, .comment-right {
-        max-width: 70%;
-        padding: 12px 18px;
-        margin-bottom: 15px;
-        border-radius: 18px;
-        display: inline-block;
-        position: relative;
-    }
+  .comment-form{
+    margin-top:14px;
+    display:flex;
+    gap:10px;
+    align-items:center;
+  }
+  .comment-form textarea{
+    flex:1;
+    border-radius:14px;
+    padding:12px;
+    border:1px solid #dfe3ea;
+    font-size:15px;
+    outline:none;
+    min-height:44px;
+    resize: vertical;
+  }
+  .comment-form textarea:focus{ border-color:#2f80ed; }
+  .comment-form button{
+    border:none;
+    background:#2f80ed;
+    color:white;
+    border-radius:14px;
+    height:44px;
+    padding:0 16px;
+    cursor:pointer;
+    font-weight:700;
+  }
 
-    .comment-left {
-        background: white;
-        align-self: flex-start;
-        border-bottom-left-radius: 0;
-    }
-
-    .comment-right {
-        background: #f2f2f2;
-        align-self: flex-end;
-        float: right;
-        border-bottom-right-radius: 0;
-    }
-
-    .comment-profile {
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        object-fit: cover;
-    }
-
-    .comment-meta {
-        font-size: 13px;
-        color: gray;
-        margin-bottom: 3px;
-    }
-
-    .comment-row {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        clear: both;
-        margin-bottom: 15px;
-    }
-
-    .comment-right-row {
-        justify-content: flex-end;
-    }
-
-    /* Comment Form */
-    .comment-form {
-        margin-top: 20px;
-        display: flex;
-        gap: 10px;
-    }
-    .comment-form textarea {
-        flex: 1;
-        border-radius: 20px;
-        padding: 12px;
-        border: 1px solid #bbb;
-        font-size: 16px;
-    }
-    .comment-form button {
-        padding: 12px 20px;
-        border: none;
-        background: #2f80ed;
-        color: white;
-        border-radius: 20px;
-        cursor: pointer;
-    }
-
-    a.link-text {
-        color: #2f80ed;
-        text-decoration: none;
-    }
-    a.link-text:hover {
-        text-decoration: underline;
-    }
-
+  @media (max-width:640px){
+    .comment-bubble{ max-width:85%; }
+  }
 </style>
 </head>
+
 <body>
 
-<!-- Navbar -->
-<div class="navbar">
+  <!-- ===== Navbar ===== -->
+  <div class="navbar">
 
-    {% if user.role == 'student' %}
-        <div class="navbar-title" onclick="location.href='{% url 'student_home' %}'">CoopHub</div>
-    {% elif user.role == 'teacher' %}
-        <div class="navbar-title" onclick="location.href='{% url 'teacher_home' %}'">CoopHub</div>
-    {% else %}
-        <div class="navbar-title" onclick="location.href='{% url 'admin_dashboard' %}'">CoopHub</div>
-    {% endif %}
+    <!-- กด CoopHub กลับหน้า Home ตาม role -->
+    <div class="navbar-title"
+         onclick="
+          {% if request.user.role == 'student' %}
+            window.location.href='{% url 'student_home' %}';
+          {% elif request.user.role == 'teacher' %}
+            window.location.href='{% url 'teacher_home' %}';
+          {% else %}
+            window.location.href='{% url 'admin_dashboard' %}';
+          {% endif %}
+         ">
+      CoopHub
+    </div>
 
     <div class="navbar-icons">
-        <img src="https://img.icons8.com/ios-filled/50/ffffff/appointment-reminders.png">
-        <a href="{% url 'create_post' %}">
-            <img src="https://img.icons8.com/ios-filled/50/ffffff/edit.png">
+
+      <!-- กระดิ่ง -->
+      {% if request.user.role == 'student' %}
+        <a href="{% url 'activity_student' %}">
+          <img src="https://img.icons8.com/ios-filled/50/ffffff/appointment-reminders.png" alt="notify">
         </a>
+      {% else %}
+        <a href="{% url 'activity' %}">
+          <img src="https://img.icons8.com/ios-filled/50/ffffff/appointment-reminders.png" alt="notify">
+        </a>
+      {% endif %}
+
+      <!-- เขียนโพสต์ -->
+      <a href="{% url 'create_post' %}">
+        <img src="https://img.icons8.com/ios-filled/50/ffffff/edit.png" alt="create">
+      </a>
+
+      <!-- student = bookmark | teacher/admin = trash -->
+      {% if request.user.role == 'student' %}
+        <a href="{% url 'bookmark_list' %}">
+          <img src="https://img.icons8.com/ios-filled/50/ffffff/bookmark-ribbon.png" alt="bookmark">
+        </a>
+      {% else %}
         <a href="{% url 'trash_bin' %}">
-            <img src="https://img.icons8.com/ios-filled/50/ffffff/delete.png">
+          <img src="https://img.icons8.com/ios-filled/50/ffffff/delete.png" alt="trash">
         </a>
+      {% endif %}
+
+      <!-- โปรไฟล์: กดแล้วไปหน้า Home ตาม role -->
+      <a
+        href="{% if request.user.role == 'student' %}{% url 'student_home' %}
+              {% elif request.user.role == 'teacher' %}{% url 'teacher_home' %}
+              {% else %}{% url 'admin_dashboard' %}{% endif %}"
+        style="display:inline-flex; align-items:center; text-decoration:none;"
+        title="ไปหน้า Home"
+      >
+        {% if request.user.profile_image %}
+          <img class="profile-img" src="{{ request.user.profile_image.url }}" alt="profile">
+        {% else %}
+          <div class="profile-icon" aria-label="profile">👤</div>
+        {% endif %}
+      </a>
+
     </div>
-</div>
+  </div>
 
+  <div class="wrap">
+    <div class="card">
 
-<!-- Poster info -->
-<div class="poster-info">
-    {% if post.owner.profile_image %}
-        <img class="poster-img" src="{{ post.owner.profile_image.url }}">
-    {% else %}
-        <img class="poster-img" src="https://img.icons8.com/ios-filled/100/808080/user.png">
-    {% endif %}
-
-    <div>
-        <h3>{{ post.owner.first_name }} {{ post.owner.last_name }} {% if post.owner.student_id %}({{ post.owner.student_id }}){% endif %}</h3>
-        <small>โพสต์เมื่อ {{ post.created_at|date:"d F Y เวลา H:i น." }}</small>
-    </div>
-</div>
-
-
-<!-- Title + Image -->
-<div class="title-container">
-    <h1>{{ post.company }}</h1>
-
-    {% if post.image %}
-    <img class="post-image" src="{{ post.image.url }}">
-    {% endif %}
-</div>
-
-
-
-<!-- Detail Section -->
-<div class="detail-box">
-
-    <h2>รายละเอียดสถานที่ฝึกงาน</h2>
-
-    <p><b>ชื่อบริษัท :</b> {{ post.company }}</p>
-    <p><b>จังหวัด :</b> {{ post.province }}</p>
-
-    <p><b>ตำแหน่งที่เปิดรับ :</b></p>
-    <ul class="positions-list">
-        {% if positions %}
-            {% for pos in positions %}
-                <li>{{ pos }}</li>
-            {% endfor %}
+      <!-- ===== Poster info ===== -->
+      <div class="poster-info">
+        {% if post.owner.profile_image %}
+          <img class="poster-img" src="{{ post.owner.profile_image.url }}" alt="poster">
         {% else %}
-            <li>-</li>
+          <img class="poster-img" src="https://img.icons8.com/ios-filled/100/2f80ed/user-male-circle.png" alt="poster">
         {% endif %}
-    </ul>
 
+        <div>
+          <h3 class="poster-name">
+            {{ post.owner.first_name }} {{ post.owner.last_name }}
 
-    <p><b>วัน–เวลาทำงาน :</b> {{ post.work_time }}</p>
-    <p><b>ระยะเวลาการฝึกงาน :</b> {{ post.internship_period }}</p>
-    <p><b>เบี้ยเลี้ยง :</b> {{ post.salary }}</p>
-
-    <p><b>ที่ตั้งบริษัท :</b> {{ post.location }}</p>
-
-    <!-- Location เช็คอิน (ถ้ามี field นี้ใน model) -->
-    {% if post.checkin_location %}
-        <p>
-            <b>Location เช็คอิน :</b>
-            {% if "http" in post.checkin_location %}
-                <a class="link-text" href="{{ post.checkin_location }}" target="_blank">
-                    เปิดแผนที่/ลิงก์เช็คอิน
-                </a>
+            {% if post.owner.role == 'teacher' %}
+              (อาจารย์)
+            {% elif post.owner.role == 'student' %}
+              {% if post.owner.student_id %}
+                ({{ post.owner.student_id }})
+              {% endif %}
             {% else %}
-                {{ post.checkin_location }}
+              (Admin)
             {% endif %}
-        </p>
-    {% endif %}
+          </h3>
 
-    <p><b>ทักษะที่ใช้ :</b> {{ post.skills }}</p>
-    <p><b>เกรดขั้นต่ำ :</b> {{ post.grade|default:"-" }}</p>
-    <p><b>ช่องทางติดต่อ / วิธีการสมัคร :</b> {{ post.contact }}</p>
-    <p><b>ประเภทงาน :</b> {{ post.type_of_work }}</p>
+          <div class="poster-sub">
+            โพสต์เมื่อ {{ post.created_at|date:"d F Y เวลา H:i น." }}
+          </div>
+        </div>
+      </div>
 
-    <p>
-        <b>ลิงก์ Portfolio :</b>
-        {% if post.portfolio %}
-            <a class="link-text" href="{{ post.portfolio }}" target="_blank">{{ post.portfolio }}</a>
-        {% else %}
-            -
-        {% endif %}
-    </p>
+      <!-- ===== Content ===== -->
+      <div class="content">
 
-    <p>
-        <b>ลิงก์เพิ่มเติม :</b>
-        {% if post.extra_link %}
-            <a class="link-text" href="{{ post.extra_link }}" target="_blank">{{ post.extra_link }}</a>
-        {% else %}
-            -
-        {% endif %}
-    </p>
-
-    <p>
-        <b>ไฟล์แนบ :</b>
-        {% if post.extra_file %}
-            <a class="link-text" href="{{ post.extra_file.url }}" target="_blank">
-                ดาวน์โหลดไฟล์แนบ
-            </a>
-        {% else %}
-            -
-        {% endif %}
-    </p>
-
-    <h2 style="margin-top:25px;">เล่าสู่กันฟัง</h2>
-    <p style="margin-top:8px;">{{ post.description|linebreaksbr }}</p>
-</div>
-
-
-
-<!-- Comment Section -->
-<div class="chat-container">
-    <h3 style="margin-bottom:15px;">ความคิดเห็น</h3>
-
-    {% for c in comments %}
-
-        {% if c.user.id == user.id %}
-        <!-- ขวา (คอมเมนต์ของเราเอง) -->
-        <div class="comment-row comment-right-row">
-            <div>
-                <div class="comment-meta">
-                    {{ c.user.first_name }} {% if c.user.student_id %}({{ c.user.student_id }}){% endif %} — {{ c.created_at|date:"d F Y H:i" }}
-                </div>
-                <div class="comment-right">
-                    {{ c.text }}
-                </div>
-            </div>
-
-            {% if c.user.profile_image %}
-                <img class="comment-profile" src="{{ c.user.profile_image.url }}">
-            {% else %}
-                <img class="comment-profile" src="https://img.icons8.com/ios-filled/100/808080/user.png">
+        <!-- Title + Image -->
+        <div class="title-container">
+          <div style="display: flex; justify-content: center; align-items: center; gap: 10px;">
+            <h1 style="margin: 0;">{{ post.company }}</h1>
+            {% if request.user == post.owner or request.user.role == "teacher" or request.user.role == "admin" or request.user.username == "admin007" %}
+              <a href="{% url 'edit_post' post.id %}" title="แก้ไขโพสต์" style="display: inline-block; padding: 6px; border: 1px solid #ccc; border-radius: 8px; background: white;">
+                <img src="https://img.icons8.com/ios-filled/50/000000/edit.png" alt="edit" style="width: 20px; height: 20px; vertical-align: middle;">
+              </a>
             {% endif %}
+          </div>
+
+          {% if post.image %}
+            <img class="post-image" src="{{ post.image.url }}" alt="post image">
+          {% endif %}
         </div>
 
-        {% else %}
-        <!-- ซ้าย (คอมเมนต์ของคนอื่น) -->
-        <div class="comment-row">
-            {% if c.user.profile_image %}
-                <img class="comment-profile" src="{{ c.user.profile_image.url }}">
-            {% else %}
-                <img class="comment-profile" src="https://img.icons8.com/ios-filled/100/808080/user.png">
-            {% endif %}
+        <!-- Detail -->
+        <div class="detail-box">
+          <h2>รายละเอียดสถานที่ฝึกงาน</h2>
 
-            <div>
-                <div class="comment-meta">
-                    {{ c.user.first_name }} {% if c.user.student_id %}({{ c.user.student_id }}){% endif %} — {{ c.created_at|date:"d F Y H:i" }}
+          <div class="row"><b>ชื่อบริษัท :</b> {{ post.company }}</div>
+          <div class="row"><b>จังหวัด :</b> {{ post.province }}</div>
+
+          <div class="row"><b>ตำแหน่งที่เปิดรับ :</b>
+            <ul class="positions-list">
+              {% if positions %}
+                {% for pos in positions %}
+                  <li>{{ pos }}</li>
+                {% endfor %}
+              {% else %}
+                <li class="muted">-</li>
+              {% endif %}
+            </ul>
+          </div>
+
+          {% if post.work_time %}
+            <div class="row"><b>วัน–เวลาทำงาน :</b> {{ post.work_time }}</div>
+          {% endif %}
+
+          {% if post.internship_period %}
+            <div class="row"><b>ระยะเวลาการฝึกงาน :</b> {{ post.internship_period }}</div>
+          {% endif %}
+
+          <div class="row">
+            <b>เบี้ยเลี้ยง :</b>
+            {% if post.salary %}
+              {{ post.salary }}
+            {% else %}
+              <span class="muted">-</span>
+            {% endif %}
+          </div>
+
+          <!-- ✅ สวัสดิการ -->
+          <div class="row"><b>สวัสดิการ :</b>
+            {% if post.benefits %}
+              <ul class="benefits-list">
+                {% for line in post.benefits.splitlines %}
+                  {% if line %}
+                    <li>{{ line }}</li>
+                  {% endif %}
+                {% endfor %}
+              </ul>
+            {% else %}
+              <span class="muted">-</span>
+            {% endif %}
+          </div>
+
+          <div class="row"><b>ที่ตั้งบริษัท :</b> {{ post.location|default:"-" }}</div>
+
+          {% if post.checkin_location %}
+            <div class="row">
+              <b>เช็คอิน / แผนที่ :</b>
+              <a class="link-text" href="{{ post.checkin_location }}" target="_blank">เปิดแผนที่</a>
+            </div>
+          {% endif %}
+
+          <div class="row"><b>ทักษะที่ใช้ :</b> {{ post.skills|default:"-" }}</div>
+          <div class="row"><b>เกรดขั้นต่ำ :</b> {{ post.grade|default:"-" }}</div>
+          <div class="row"><b>ช่องทางติดต่อ / วิธีการสมัคร :</b> {{ post.contact|default:"-" }}</div>
+          <div class="row"><b>ประเภทการฝึกงาน :</b> {{ post.type_of_work|default:"-" }}</div>
+
+          {% if post.portfolio %}
+            <div class="row">
+              <b>Portfolio :</b>
+              <a class="link-text" href="{{ post.portfolio }}" target="_blank">{{ post.portfolio }}</a>
+            </div>
+          {% endif %}
+
+          {% if post.extra_link %}
+            <div class="row">
+              <b>ลิงก์เพิ่มเติม :</b>
+              <a class="link-text" href="{{ post.extra_link }}" target="_blank">{{ post.extra_link }}</a>
+            </div>
+          {% endif %}
+
+          {% if post.extra_file %}
+            <div class="row">
+              <b>ไฟล์แนบ :</b>
+              <a class="link-text" href="{{ post.extra_file.url }}" target="_blank">ดาวน์โหลดไฟล์แนบ</a>
+            </div>
+          {% endif %}
+
+          {% if post.video %}
+            <div class="row">
+              <b>วิดีโอ :</b>
+              <a class="link-text" href="{{ post.video.url }}" target="_blank">เปิดวิดีโอ</a>
+            </div>
+          {% endif %}
+
+          <h2 style="margin-top:16px;">มีอะไรเล่าสู่กันฟังไหม?</h2>
+          <div class="row" style="margin-top:8px;">
+            {% if post.description %}
+              {{ post.description|linebreaksbr }}
+            {% else %}
+              <span class="muted">-</span>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- ===== Comments ===== -->
+        <div class="chat-container">
+          <h3 style="margin:0 0 10px 0;">ความคิดเห็น</h3>
+
+          {% for c in comments %}
+
+            {% if c.user.id == user.id %}
+              <!-- ขวา (คอมเมนต์ของเราเอง) -->
+              <div class="comment-row comment-right-row">
+                <div class="comment-right">
+                  <div class="comment-meta">
+                    {{ c.user.first_name }} {{ c.user.last_name }}
+                    {% if c.user.role == 'teacher' %}
+                      (อาจารย์)
+                    {% elif c.user.role == 'student' %}
+                      {% if c.user.student_id %}({{ c.user.student_id }}){% endif %}
+                    {% else %}
+                      (Admin)
+                    {% endif %}
+                    — {{ c.created_at|date:"d F Y H:i" }}
+                  </div>
+
+                  <div class="comment-bubble">{{ c.text }}</div>
                 </div>
+
+                {% if c.user.profile_image %}
+                  <img class="comment-profile" src="{{ c.user.profile_image.url }}" alt="me">
+                {% else %}
+                  <img class="comment-profile" src="https://img.icons8.com/ios-filled/100/2f80ed/user-male-circle.png" alt="me">
+                {% endif %}
+              </div>
+
+            {% else %}
+              <!-- ซ้าย (คอมเมนต์ของคนอื่น) -->
+              <div class="comment-row">
+                {% if c.user.profile_image %}
+                  <img class="comment-profile" src="{{ c.user.profile_image.url }}" alt="user">
+                {% else %}
+                  <img class="comment-profile" src="https://img.icons8.com/ios-filled/100/2f80ed/user-male-circle.png" alt="user">
+                {% endif %}
 
                 <div class="comment-left">
-                    {{ c.text }}
+                  <div class="comment-meta">
+                    {{ c.user.first_name }} {{ c.user.last_name }}
+                    {% if c.user.role == 'teacher' %}
+                      (อาจารย์)
+                    {% elif c.user.role == 'student' %}
+                      {% if c.user.student_id %}({{ c.user.student_id }}){% endif %}
+                    {% else %}
+                      (Admin)
+                    {% endif %}
+                    — {{ c.created_at|date:"d F Y H:i" }}
+                  </div>
+
+                  <div class="comment-bubble">{{ c.text }}</div>
                 </div>
-            </div>
+              </div>
+            {% endif %}
+
+          {% empty %}
+            <p class="muted">ยังไม่มีความคิดเห็น</p>
+          {% endfor %}
+
+          <!-- ส่งคอมเมนต์ -->
+          <form class="comment-form" method="POST" action="{% url 'add_comment' post.id %}">
+            {% csrf_token %}
+            <textarea name="comment" placeholder="แสดงความคิดเห็น..." required></textarea>
+            <button type="submit">➤</button>
+          </form>
+
         </div>
-        {% endif %}
 
-    {% empty %}
-        <p>ยังไม่มีความคิดเห็น</p>
-    {% endfor %}
-
-
-    <!-- ส่งคอมเมนต์ -->
-    <form class="comment-form" method="POST" action="{% url 'add_comment' post.id %}">
-        {% csrf_token %}
-        <textarea name="comment" placeholder="แสดงความคิดเห็น..." required></textarea>
-        <button>➤</button>
-    </form>
-
-</div>
+      </div>
+    </div>
+  </div>
 
 </body>
 </html>

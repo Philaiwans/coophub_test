@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CoopHub Bot</title>
+
+  <style>
+    body{
+      margin:0;
+      font-family:"Prompt", Arial, sans-serif;
+      background:#f6f7fb;
+    }
+
+    /* ===== Navbar แบบเดียวกับหน้า Home/room ===== */
+    .navbar {
+      background-color: #2f80ed;
+      color: white;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .navbar-title {
+      font-size: 28px;
+      font-weight: bold;
+      font-family: "Comic Sans MS", cursive;
+      cursor: pointer;
+      user-select:none;
+    }
+    .navbar-icons {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+    .navbar-icons img {
+      width: 32px;
+      height: 32px;
+      cursor: pointer;
+    }
+
+    /* Profile (กดแล้วไป Home) */
+    .profile-img {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      object-fit: cover;
+      cursor: pointer;
+    }
+    .profile-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: white;
+      border: 2px solid #2f80ed;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #2f80ed;
+      cursor: pointer;
+      font-size: 20px;
+    }
+
+    /* ===== Chat UI เดิม (คงไว้) ===== */
+    .wrap{
+      max-width:900px;
+      margin:0 auto;
+      padding:18px;
+    }
+
+    .card{
+      margin-top:14px;
+      background:#fff;
+      border-radius:16px;
+      box-shadow:0 2px 10px rgba(0,0,0,.06);
+      overflow:hidden;
+      border:1px solid #eef0f4;
+    }
+    .chatbox{
+      height:65vh;
+      min-height:420px;
+      padding:14px;
+      overflow:auto;
+      background:linear-gradient(#ffffff, #fbfbff);
+    }
+
+    .msg{
+      display:flex;
+      margin:10px 0;
+      gap:10px;
+      align-items:flex-end;
+    }
+    .msg.me{ justify-content:flex-end; }
+    .bubble{
+      max-width:70%;
+      padding:10px 12px;
+      border-radius:14px;
+      font-size:15px;
+      line-height:1.35;
+      white-space:pre-wrap;
+      word-break:break-word;
+      box-shadow:0 1px 6px rgba(0,0,0,.06);
+    }
+    .msg.bot .bubble{
+      background:#f1f5ff;
+      color:#1a2a55;
+      border:1px solid #e2e9ff;
+      border-bottom-left-radius:6px;
+    }
+    .msg.me .bubble{
+      background:#2f80ed;
+      color:#fff;
+      border:1px solid #2f80ed;
+      border-bottom-right-radius:6px;
+    }
+    .meta{
+      font-size:12px;
+      opacity:.65;
+      margin-top:4px;
+    }
+    .msg.me .meta{ text-align:right; }
+
+    .inputbar{
+      display:flex;
+      gap:10px;
+      padding:12px;
+      border-top:1px solid #eef0f4;
+      background:#fff;
+    }
+    #msg{
+      flex:1;
+      border:1px solid #dfe3ea;
+      border-radius:12px;
+      padding:12px 12px;
+      font-size:15px;
+      outline:none;
+    }
+    #msg:focus{ border-color:#2f80ed; }
+    button{
+      border:none;
+      background:#2f80ed;
+      color:#fff;
+      padding:0 18px;
+      border-radius:12px;
+      font-weight:700;
+      cursor:pointer;
+    }
+    button:disabled{
+      opacity:.6;
+      cursor:not-allowed;
+    }
+    .status{
+      margin-top:10px;
+      font-size:13px;
+      color:#444;
+      opacity:.75;
+    }
+    .status b{ color:#2f80ed; }
+
+    @media (max-width:640px){
+      .bubble{ max-width:85%; }
+      .chatbox{ height:70vh; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ===== Navbar (เหมือน room) ===== -->
+  <div class="navbar">
+
+    <!-- กด CoopHub กลับหน้า Home ตาม role -->
+    <div class="navbar-title"
+         onclick="
+          {% if request.user.role == 'student' %}
+            window.location.href='{% url 'student_home' %}';
+          {% elif request.user.role == 'teacher' %}
+            window.location.href='{% url 'teacher_home' %}';
+          {% else %}
+            window.location.href='{% url 'admin_dashboard' %}';
+          {% endif %}
+         ">
+      CoopHub
+    </div>
+
+    <div class="navbar-icons">
+
+      <!-- กระดิ่ง -->
+      {% if request.user.role == 'student' %}
+        <a href="{% url 'activity_student' %}">
+          <img src="https://img.icons8.com/ios-filled/50/ffffff/appointment-reminders.png" alt="notify">
+        </a>
+      {% else %}
+        <a href="{% url 'activity' %}">
+          <img src="https://img.icons8.com/ios-filled/50/ffffff/appointment-reminders.png" alt="notify">
+        </a>
+      {% endif %}
+
+      <!-- เขียนโพสต์ -->
+      <a href="{% url 'create_post' %}">
+        <img src="https://img.icons8.com/ios-filled/50/ffffff/edit.png" alt="create">
+      </a>
+
+      <!-- student = bookmark | teacher/admin = trash -->
+      {% if request.user.role == 'student' %}
+        <a href="{% url 'bookmark_list' %}">
+          <img src="https://img.icons8.com/ios-filled/50/ffffff/bookmark-ribbon.png" alt="bookmark">
+        </a>
+      {% else %}
+        <a href="{% url 'trash_bin' %}">
+          <img src="https://img.icons8.com/ios-filled/50/ffffff/delete.png" alt="trash">
+        </a>
+      {% endif %}
+
+      <!-- โปรไฟล์: กดแล้วไปหน้า Home ตาม role -->
+      <a
+        href="{% if request.user.role == 'student' %}{% url 'student_home' %}
+              {% elif request.user.role == 'teacher' %}{% url 'teacher_home' %}
+              {% else %}{% url 'admin_dashboard' %}{% endif %}"
+        style="display:inline-flex; align-items:center; text-decoration:none;"
+        title="ไปหน้า Home"
+      >
+        {% if request.user.profile_image %}
+          <img class="profile-img" src="{{ request.user.profile_image.url }}" alt="profile">
+        {% else %}
+          <div class="profile-icon" aria-label="profile">👤</div>
+        {% endif %}
+      </a>
+
+    </div>
+  </div>
+
+  <!-- ===== Chat UI เดิม (คงไว้) ===== -->
+  <div class="wrap">
+    <div class="card">
+      <div id="chat" class="chatbox"></div>
+
+      <div class="inputbar">
+        <input id="msg" placeholder="พิมพ์ข้อความ... (เช่น สวัสดี / เกรดขั้นต่ำ / วิธีสมัคร)" autocomplete="off"/>
+        <button id="sendBtn" onclick="sendMsg()">ส่ง</button>
+      </div>
+    </div>
+
+    <div class="status" id="statusText">สถานะ: <b>กำลังเชื่อมต่อ...</b></div>
+  </div>
+
+  <script>
+    const slug = "{{ room.slug }}";
+
+    // ใช้ ws/wss ตามโปรโตคอลของเว็บ
+    const scheme = (window.location.protocol === "https:") ? "wss" : "ws";
+    const wsUrl = scheme + "://" + window.location.host + "/ws/chatbot/" + slug + "/";
+
+    const chatEl = document.getElementById("chat");
+    const inputEl = document.getElementById("msg");
+    const sendBtn = document.getElementById("sendBtn");
+    const statusText = document.getElementById("statusText");
+
+    function appendMessage(sender, text) {
+      const wrapper = document.createElement("div");
+      wrapper.className = "msg " + (sender === "me" ? "me" : "bot");
+
+      const bubble = document.createElement("div");
+      bubble.className = "bubble";
+      bubble.textContent = text;
+
+      const meta = document.createElement("div");
+      meta.className = "meta";
+      meta.textContent = (sender === "me") ? "คุณ" : "CoopHub Bot";
+
+      const container = document.createElement("div");
+      container.appendChild(bubble);
+      container.appendChild(meta);
+
+      wrapper.appendChild(container);
+      chatEl.appendChild(wrapper);
+
+      chatEl.scrollTop = chatEl.scrollHeight;
+    }
+
+    function setStatus(html){
+      statusText.innerHTML = "สถานะ: <b>" + html + "</b>";
+    }
+
+    const ws = new WebSocket(wsUrl);
+
+    ws.onopen = () => {
+      setStatus("เชื่อมต่อแล้ว");
+      sendBtn.disabled = false;
+      inputEl.focus();
+    };
+
+    ws.onclose = () => {
+      setStatus("หลุดการเชื่อมต่อ (ลองรีเฟรชหน้า)");
+      sendBtn.disabled = true;
+    };
+
+    ws.onerror = () => {
+      setStatus("เกิดข้อผิดพลาด (ตรวจ routing / daphne)");
+      sendBtn.disabled = true;
+    };
+
+    ws.onmessage = function(e){
+      let data;
+      try {
+        data = JSON.parse(e.data);
+      } catch {
+        return;
+      }
+      // บอทของเราใช้ sender/message
+      const sender = data.sender || "bot";
+      const message = data.message || "";
+
+      if (message) {
+        appendMessage(sender === "bot" ? "bot" : "bot", message);
+      }
+    };
+
+    function sendMsg(){
+      const text = inputEl.value.trim();
+      if (!text) return;
+
+      appendMessage("me", text);
+
+      try {
+        ws.send(JSON.stringify({ message: text }));
+      } catch {
+        appendMessage("bot", "ส่งไม่สำเร็จ: การเชื่อมต่อมีปัญหา ลองรีเฟรชหน้า");
+      }
+
+      inputEl.value = "";
+      inputEl.focus();
+    }
+
+    // กด Enter เพื่อส่ง
+    inputEl.addEventListener("keydown", function(e){
+      if (e.key === "Enter") sendMsg();
+    });
+  </script>
+</body>
+</html>

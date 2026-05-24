@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>แก้ไขงานสหกิจ</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: "Prompt", sans-serif;
+      background: #ffffff;
+    }
+
+    /* ===== Navbar แบบเดียวกับหน้า Home (ตามตัวอย่าง) ===== */
+    .navbar {
+      background-color: #2f80ed;
+      color: white;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .navbar-title {
+      font-size: 28px;
+      font-weight: bold;
+      font-family: "Comic Sans MS", cursive;
+      cursor: pointer;
+      user-select: none;
+    }
+    .navbar-icons {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+    .navbar-icons img {
+      width: 32px;
+      height: 32px;
+      cursor: pointer;
+    }
+
+    /* Profile (กดแล้วไปหน้า Home ตาม role) */
+    .profile-img {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      object-fit: cover;
+      cursor: pointer;
+    }
+    .profile-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: white;
+      border: 2px solid #2f80ed;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #2f80ed;
+      cursor: pointer;
+      font-size: 20px;
+      line-height: 1;
+      user-select: none;
+    }
+
+    /* ================= FORM CONTAINER ================= */
+    .container {
+      width: 90%;
+      margin: 30px auto;
+      background: white;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    }
+
+    .title {
+      font-size: 28px;
+      font-weight: bold;
+      text-align: center;
+      color: #2f80ed;
+    }
+
+    .note {
+      text-align: center;
+      font-size: 15px;
+      color: #666;
+      margin-bottom: 25px;
+    }
+
+    /* Layout: Upload ซ้าย + Form 2 คอลัมน์ */
+    .form-wrapper {
+      width: 100%;
+      display: flex;
+      gap: 40px;
+    }
+
+    /* กล่องอัปโหลดรูปหน้าปก */
+    .upload-box {
+      width: 320px;
+      height: 380px;
+      border: 2px dashed #cbd5e1;
+      border-radius: 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: #777;
+      text-align: center;
+      padding: 20px;
+      box-sizing: border-box;
+      gap: 10px;
+    }
+
+    .cover-preview{
+      width: 100%;
+      height: 220px;
+      border-radius: 14px;
+      border: 1px solid #e7ecff;
+      background: #f7faff;
+      overflow: hidden;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      position: relative;
+    }
+    .cover-preview img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+    .cover-placeholder{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:8px;
+      color:#6b7280;
+      font-size:14px;
+      padding: 10px;
+    }
+    .cover-placeholder svg{ width:44px; height:44px; opacity:.6; }
+
+    .small-hint{
+      font-size: 12px;
+      color:#777;
+      margin: 0;
+    }
+
+    /* ฟอร์ม 2 คอลัมน์ */
+    .form-columns {
+      flex: 1;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px 40px;
+    }
+
+    .input-box label {
+      font-weight: 600;
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid #d4d4d4;
+      font-size: 15px;
+      box-sizing: border-box;
+    }
+
+    textarea { height: 100px; }
+
+    /* กล่องข้อความใหญ่ */
+    .big-box {
+      width: 100%;
+      margin-top: 30px;
+    }
+    .big-box textarea {
+      width: 100%;
+      height: 180px;
+      border-radius: 12px;
+      padding: 15px;
+      box-sizing: border-box;
+    }
+
+    /* ปุ่มโพสต์ */
+    .post-btn {
+      width: 300px;
+      display: block;
+      margin: 30px auto 0;
+      padding: 14px;
+      font-size: 20px;
+      background: #2f80ed;
+      color: white;
+      border: none;
+      border-radius: 15px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    /* ปุ่มเพิ่มตำแหน่ง */
+    .add-position-btn {
+      padding: 6px 14px;
+      border-radius: 999px;
+      border: 1px solid #2f80ed;
+      background: white;
+      color: #2f80ed;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .add-position-btn:hover {
+      background: #2f80ed;
+      color: white;
+    }
+
+    @media (max-width: 920px){
+      .form-wrapper{ flex-direction: column; }
+      .upload-box{ width: 100%; height: auto; }
+    }
+  </style>
+
+  <script>
+    function toggleSalary() {
+      const type = document.getElementById("salaryType").value;
+      const box = document.getElementById("salaryAmountBox");
+      box.style.display = (type === "มี") ? "block" : "none";
+    }
+
+    function addPosition() {
+      const container = document.getElementById("positions-container");
+      const count = container.querySelectorAll(".position-item").length + 1;
+
+      const div = document.createElement("div");
+      div.className = "position-item";
+      div.style.marginTop = "8px";
+      div.innerHTML = `<input type="text" name="positions[]" placeholder="ตำแหน่งที่ ${count}" required>`;
+      container.appendChild(div);
+    }
+
+    // preview รูปปกใหม่ก่อนบันทึก
+    function previewCover(input){
+      const file = input.files && input.files[0];
+      if (!file) return;
+
+      if (!file.type.startsWith("image/")) return;
+
+      const img = document.getElementById("coverImg");
+      const holder = document.getElementById("coverHolder");
+
+      const url = URL.createObjectURL(file);
+      if (img){
+        img.src = url;
+        img.style.display = "block";
+      }
+      if (holder){
+        holder.style.display = "none";
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      // ให้ salary แสดงถูกต้องตอนโหลดหน้า
+      toggleSalary();
+    });
+  </script>
+</head>
+
+<body>
+
+  <!-- ===== Navbar (เหมือนตัวอย่าง) ===== -->
+  <div class="navbar">
+
+    <!-- กด CoopHub กลับหน้า Home ตาม role -->
+    <div class="navbar-title"
+      onclick="
+        {% if request.user.role == 'student' %}
+          window.location.href='{% url 'student_home' %}';
+        {% elif request.user.role == 'teacher' %}
+          window.location.href='{% url 'teacher_home' %}';
+        {% else %}
+          window.location.href='{% url 'admin_dashboard' %}';
+        {% endif %}
+      ">
+      CoopHub
+    </div>
+
+    <div class="navbar-icons">
+
+      <!-- กระดิ่ง -->
+      {% if request.user.role == 'student' %}
+        <a href="{% url 'activity_student' %}">
+          <img src="https://img.icons8.com/ios-filled/50/ffffff/appointment-reminders.png" alt="notify">
+        </a>
+      {% else %}
+        <a href="{% url 'activity' %}">
+          <img src="https://img.icons8.com/ios-filled/50/ffffff/appointment-reminders.png" alt="notify">
+        </a>
+      {% endif %}
+
+      <!-- เขียนโพสต์ -->
+      <a href="{% url 'create_post' %}">
+        <img src="https://img.icons8.com/ios-filled/50/ffffff/edit.png" alt="create">
+      </a>
+
+      <!-- student = bookmark | teacher/admin = trash -->
+      {% if request.user.role == 'student' %}
+        <a href="{% url 'bookmark_list' %}">
+          <img src="https://img.icons8.com/ios-filled/50/ffffff/bookmark-ribbon.png" alt="bookmark">
+        </a>
+      {% else %}
+        <a href="{% url 'trash_bin' %}">
+          <img src="https://img.icons8.com/ios-filled/50/ffffff/delete.png" alt="trash">
+        </a>
+      {% endif %}
+
+      <!-- โปรไฟล์: กดแล้วไปหน้า Home ตาม role -->
+      <a
+        href="{% if request.user.role == 'student' %}{% url 'student_home' %}
+              {% elif request.user.role == 'teacher' %}{% url 'teacher_home' %}
+              {% else %}{% url 'admin_dashboard' %}{% endif %}"
+        style="display:inline-flex; align-items:center; text-decoration:none;"
+        title="ไปหน้า Home"
+      >
+        {% if request.user.profile_image %}
+          <img class="profile-img" src="{{ request.user.profile_image.url }}" alt="profile">
+        {% else %}
+          <div class="profile-icon" aria-label="profile">👤</div>
+        {% endif %}
+      </a>
+
+    </div>
+  </div>
+
+  <!-- ================= CONTENT ================= -->
+  <div class="container">
+
+    <h2 class="title">แก้ไขงานสหกิจ</h2>
+    <p class="note">ปรับแก้ข้อมูล แล้วกด “บันทึกการแก้ไข”</p>
+
+    <form method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+
+      <div class="form-wrapper">
+
+        <!-- ============ รูปหน้าปก ============ -->
+        <div class="upload-box">
+          <div class="cover-preview">
+            {% if post.image %}
+              <img id="coverImg" src="{{ post.image.url }}" alt="cover">
+              <div id="coverHolder" class="cover-placeholder" style="display:none;"></div>
+            {% else %}
+              <img id="coverImg" src="" alt="cover" style="display:none;">
+              <div id="coverHolder" class="cover-placeholder">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <path d="M9 7h6" stroke="#64748b" stroke-width="2" stroke-linecap="round"/>
+                  <path d="M4 7c0-1.1.9-2 2-2h12c1.1 0 2 .9 2 2v10c0 1.1-.9 2-2 2H6c-1.1 0-2-.9-2-2V7Z" stroke="#64748b" stroke-width="2"/>
+                  <path d="M4 15l4-4 4 4 3-3 5 5" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <div>ยังไม่มีรูปหน้าปก</div>
+              </div>
+            {% endif %}
+          </div>
+
+          <p class="small-hint">อัปโหลดเพื่อเปลี่ยนรูปใหม่ (ถ้าต้องการ)</p>
+          <input type="file" name="image" accept="image/*" onchange="previewCover(this)">
+          <p class="small-hint">รองรับ .jpg / .png</p>
+        </div>
+
+        <!-- ============ ฟอร์ม 2 คอลัมน์ ============ -->
+        <div class="form-columns">
+
+          <div class="input-box">
+            <label>ชื่อบริษัท *</label>
+            <input type="text" name="company" value="{{ post.company }}" required>
+          </div>
+
+          <div class="input-box">
+            <label>จังหวัด *</label>
+            <select name="province" required>
+              <option value="">เลือกจังหวัด</option>
+              {% for p in provinces %}
+                <option value="{{ p }}" {% if p == post.province %}selected{% endif %}>{{ p }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- ⭐ ตำแหน่งหลายอัน -->
+          <div class="input-box" id="positions-container" style="grid-column: 1 / span 2;">
+            <label>ตำแหน่งที่เปิดรับ *</label>
+
+            {% if positions %}
+              {% for pos in positions %}
+                <div class="position-item" style="margin-top: 5px;">
+                  <input type="text" name="positions[]" value="{{ pos }}" required>
+                </div>
+              {% endfor %}
+            {% else %}
+              <div class="position-item" style="margin-top: 5px;">
+                <input type="text" name="positions[]" placeholder="เช่น Frontend Developer" required>
+              </div>
+            {% endif %}
+          </div>
+
+          <div style="grid-column: 1 / span 2; text-align: right; margin-top: -10px;">
+            <button type="button" class="add-position-btn" onclick="addPosition()">+ เพิ่มตำแหน่ง</button>
+          </div>
+
+          <div class="input-box">
+            <label>วันทำงาน *</label>
+            <select name="work_day" required>
+              <option value="">เลือก</option>
+              <!-- ใช้รายการเดียวกับ create (ถ้าคุณมีค่าอื่น ๆ ก็เติมเพิ่มได้) -->
+              <option {% if post.work_day == "จันทร์–จันทร์" %}selected{% endif %}>จันทร์–จันทร์</option>
+              <option {% if post.work_day == "จันทร์–อังคาร" %}selected{% endif %}>จันทร์–อังคาร</option>
+              <option {% if post.work_day == "จันทร์–พุธ" %}selected{% endif %}>จันทร์–พุธ</option>
+              <option {% if post.work_day == "จันทร์–พฤหัสบดี" %}selected{% endif %}>จันทร์–พฤหัสบดี</option>
+              <option {% if post.work_day == "จันทร์–ศุกร์" %}selected{% endif %}>จันทร์–ศุกร์</option>
+              <option {% if post.work_day == "จันทร์–เสาร์" %}selected{% endif %}>จันทร์–เสาร์</option>
+              <option {% if post.work_day == "จันทร์–อาทิตย์" %}selected{% endif %}>จันทร์–อาทิตย์</option>
+              <option {% if post.work_day == "อังคาร–จันทร์" %}selected{% endif %}>อังคาร–จันทร์</option>
+              <option {% if post.work_day == "อังคาร–อังคาร" %}selected{% endif %}>อังคาร–อังคาร</option>
+              <option {% if post.work_day == "อังคาร–พุธ" %}selected{% endif %}>อังคาร–พุธ</option>
+              <option {% if post.work_day == "อังคาร–พฤหัสบดี" %}selected{% endif %}>อังคาร–พฤหัสบดี</option>
+              <option {% if post.work_day == "อังคาร–ศุกร์" %}selected{% endif %}>อังคาร–ศุกร์</option>
+              <option {% if post.work_day == "อังคาร–เสาร์" %}selected{% endif %}>อังคาร–เสาร์</option>
+              <option {% if post.work_day == "อังคาร–อาทิตย์" %}selected{% endif %}>อังคาร–อาทิตย์</option>
+              <option {% if post.work_day == "พุธ–จันทร์" %}selected{% endif %}>พุธ–จันทร์</option>
+              <option {% if post.work_day == "พุธ–อังคาร" %}selected{% endif %}>พุธ–อังคาร</option>
+              <option {% if post.work_day == "พุธ–พุธ" %}selected{% endif %}>พุธ–พุธ</option>
+              <option {% if post.work_day == "พุธ–พฤหัสบดี" %}selected{% endif %}>พุธ–พฤหัสบดี</option>
+              <option {% if post.work_day == "พุธ–ศุกร์" %}selected{% endif %}>พุธ–ศุกร์</option>
+              <option {% if post.work_day == "พุธ–เสาร์" %}selected{% endif %}>พุธ–เสาร์</option>
+              <option {% if post.work_day == "พุธ–อาทิตย์" %}selected{% endif %}>พุธ–อาทิตย์</option>
+              <option {% if post.work_day == "พฤหัสบดี–จันทร์" %}selected{% endif %}>พฤหัสบดี–จันทร์</option>
+              <option {% if post.work_day == "พฤหัสบดี–อังคาร" %}selected{% endif %}>พฤหัสบดี–อังคาร</option>
+              <option {% if post.work_day == "พฤหัสบดี–พุธ" %}selected{% endif %}>พฤหัสบดี–พุธ</option>
+              <option {% if post.work_day == "พฤหัสบดี–พฤหัสบดี" %}selected{% endif %}>พฤหัสบดี–พฤหัสบดี</option>
+              <option {% if post.work_day == "พฤหัสบดี–ศุกร์" %}selected{% endif %}>พฤหัสบดี–ศุกร์</option>
+              <option {% if post.work_day == "พฤหัสบดี–เสาร์" %}selected{% endif %}>พฤหัสบดี–เสาร์</option>
+              <option {% if post.work_day == "พฤหัสบดี–อาทิตย์" %}selected{% endif %}>พฤหัสบดี–อาทิตย์</option>
+              <option {% if post.work_day == "ศุกร์–ศุกร์" %}selected{% endif %}>ศุกร์–ศุกร์</option>
+              <option {% if post.work_day == "เสาร์–เสาร์" %}selected{% endif %}>เสาร์–เสาร์</option>
+              <option {% if post.work_day == "อาทิตย์–อาทิตย์" %}selected{% endif %}>อาทิตย์–อาทิตย์</option>
+            </select>
+          </div>
+
+          <div class="input-box">
+            <label>เวลาเริ่มงาน *</label>
+            <input type="time" name="time_start" value="{{ post.time_start|default:'' }}" required>
+          </div>
+
+          <div class="input-box">
+            <label>เวลาเลิกงาน *</label>
+            <input type="time" name="time_end" value="{{ post.time_end|default:'' }}" required>
+          </div>
+
+          <div class="input-box">
+            <label>วันที่เริ่มฝึก *</label>
+            <input type="date" name="start_date" value="{{ post.start_date|date:'Y-m-d' }}" required>
+          </div>
+
+          <div class="input-box">
+            <label>วันที่สิ้นสุด *</label>
+            <input type="date" name="end_date" value="{{ post.end_date|date:'Y-m-d' }}" required>
+          </div>
+
+          <div class="input-box">
+            <label>เบี้ยเลี้ยง *</label>
+            <select name="salary_type" id="salaryType" onchange="toggleSalary()">
+              <option value="ไม่มี" {% if salary_type == "ไม่มี" %}selected{% endif %}>ไม่มี</option>
+              <option value="มี" {% if salary_type == "มี" %}selected{% endif %}>มี (ระบุจำนวน)</option>
+              <option value="ตามตกลง" {% if salary_type == "ตามตกลง" %}selected{% endif %}>ตามตกลง</option>
+            </select>
+          </div>
+
+          <div class="input-box" id="salaryAmountBox" style="display:none;">
+            <label>จำนวนเบี้ยเลี้ยง (บาท)</label>
+            <input type="number" name="salary_amount" min="0" value="{{ salary_amount|default:'' }}" placeholder="เช่น 300">
+          </div>
+
+          <div class="input-box">
+            <label>ทักษะที่ใช้ *</label>
+            <input type="text" name="skills" value="{{ post.skills|default:'' }}" placeholder="HTML, Python, Figma">
+          </div>
+
+          <div class="input-box">
+            <label>เกรดขั้นต่ำ</label>
+            <input type="text" name="grade" value="{{ post.grade|default:'' }}">
+          </div>
+
+          <div class="input-box">
+            <label>ช่องทางติดต่อ *</label>
+            <input type="text" name="contact" value="{{ post.contact|default:'' }}" placeholder="Email / เบอร์โทร / Line" required>
+          </div>
+
+          <div class="input-box">
+            <label>ประเภทการฝึกงาน *</label>
+            <select name="type_of_work">
+              <option value="On-site" {% if post.type_of_work == "On-site" %}selected{% endif %}>On-site</option>
+              <option value="Online" {% if post.type_of_work == "Online" %}selected{% endif %}>Online</option>
+              <option value="Hybrid" {% if post.type_of_work == "Hybrid" %}selected{% endif %}>Hybrid</option>
+            </select>
+          </div>
+
+          <div class="input-box">
+            <label>ลิงก์ Portfolio</label>
+            <input type="url" name="portfolio" value="{{ post.portfolio|default:'' }}" placeholder="https://...">
+          </div>
+
+          <div class="input-box" style="grid-column: 1 / span 2;">
+            <label>ที่ตั้งบริษัท *</label>
+            <textarea name="location" required>{{ post.location|default:'' }}</textarea>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- กล่องข้อความใหญ่ -->
+      <div class="big-box">
+        <label><b>มีอะไรเล่าสู่กันฟังไหม?</b></label>
+        <textarea name="description" placeholder="เพิ่มคำอธิบายเพิ่มเติม...">{{ post.description|default:'' }}</textarea>
+      </div>
+
+      <button class="post-btn" type="submit">บันทึกการแก้ไข</button>
+    </form>
+  </div>
+
+</body>
+</html>

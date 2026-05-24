@@ -53,9 +53,10 @@ urlpatterns = [
 
     # Home by role
     path('student/', views.student_home, name='student_home'),
+    path('student/dashboard/', views.student_dashboard, name='student_dashboard'),  # ⭐ ใหม่
     path('teacher/', views.teacher_home, name='teacher_home'),
     path('admin-dashboard/', views.admin_dashboard, name='admin_dashboard'),
-
+path('management-dashboard/', views.management_dashboard, name='management_dashboard'),
     # Profile
     path('profile/', views.profile_view, name='profile'),
     path('profile/edit/', views.edit_profile, name='edit_profile'),
@@ -82,5 +83,24 @@ urlpatterns = [
     path('post/restore/<int:post_id>/', views.restore_post, name='restore_post'),
     path('trash/', views.trash_bin, name='trash_bin'),
     path('post/restore/<int:post_id>/', views.restore_post, name='restore_post'),
+    
+    path('bookmarks/', views.bookmark_list, name='bookmark_list'),
+    path('bookmark/toggle/<int:post_id>/', views.toggle_bookmark, name='toggle_bookmark'),
+    
+    # Activity / การแจ้งเตือน (ครู + แอดมิน)
+    path('activity/', views.activity_view, name='activity'),
 
+    # Activity สำหรับนักศึกษา
+    path('activity-student/', views.activity_student_view, name='activity_student'),
+
+    path('activity-history/', views.activity_history, name='activity_history'),
+
+    # ⭐ หน้าแก้ไขโพสต์
+    path('post/edit/<int:post_id>/', views.edit_post, name='edit_post'),
+    path('members/', views.member_list, name='member_list'),
+
+    path('trash/empty/', views.empty_trash, name='empty_trash'),
+   
+    path("accounts/manage/", views.manage_accounts, name="manage_accounts"),
+    path("accounts/delete/<int:user_id>/", views.delete_user, name="delete_user"),
 ]

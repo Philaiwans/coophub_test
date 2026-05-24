@@ -2,7 +2,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-
 class CustomUser(AbstractUser):
     ROLE_CHOICES = (
         ('student', 'นักศึกษา'),
@@ -101,3 +100,93 @@ class Comment(models.Model):
 
     def __str__(self):
         return f"Comment by {self.user.username} on {self.post.company}"
+
+
+class Bookmark(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    post = models.ForeignKey(CoopPost, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'post')   # 1 user bookmark 1 post ได้ครั้งเดียว
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.user.username} -> {self.post.company}"
+class PostView(models.Model):
+    post = models.ForeignKey(
+        CoopPost,
+        on_delete=models.CASCADE,
+        related_name='views'
+    )
+    # ถ้า user ไม่ล็อกอิน (เผื่อใช้ในอนาคต) ให้เป็น null ได้
+    user = models.ForeignKey(
+        CustomUser,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        uname = self.user.username if self.user else "anonymous"
+        return f"View {self.post.id} by {uname}"
+
+
+# ---------- การแจ้งเตือน ----------
+class Notification(models.Model):
+    NOTI_TYPE_CHOICES = (
+        ('post', 'โพสต์ใหม่/อัปเดตโพสต์'),      # แท็บ "แจ้งเตือน"
+        ('comment', 'ความคิดเห็น'),             # แท็บ "ความคิดเห็น"
+        ('review', 'ตรวจสอบโพสต์'),             # แท็บ "ตรวจสอบ"
+        ('approval', 'ประวัติการอนุมัติ'),      # แท็บ "การอนุมัติ"
+    )
+
+    # คนที่ "ได้รับ" การแจ้งเตือน
+    user = models.ForeignKey(
+        CustomUser,
+        on_delete=models.CASCADE,
+        related_name='notifications'
+    )
+
+    # คนที่เป็น "ผู้กระทำ" เช่น คนคอมเมนต์ / คนสร้างโพสต์ / คนอนุมัติ
+    actor = models.ForeignKey(
+        CustomUser,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='actor_notifications'
+    )
+
+    post = models.ForeignKey(
+        CoopPost,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
+
+    # ใช้ string 'Comment' เพราะอยู่ล่างกว่าในไฟล์
+    comment = models.ForeignKey(
+        'Comment',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
+
+    noti_type = models.CharField(max_length=20, choices=NOTI_TYPE_CHOICES)
+    message = models.TextField()
+
+    # ใช้เก็บผลการอนุมัติ เช่น approved / rejected
+    extra_status = models.CharField(max_length=20, blank=True, null=True)
+
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.user.username} - {self.noti_type}"

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CoopHub - จัดการบัญชี</title>
+  <style>
+    body{ margin:0; font-family:"Prompt", Arial, sans-serif; background:#f6f7fb; }
+
+    .navbar {
+      background-color: #2f80ed;
+      color: white;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .navbar-title {
+      font-size: 28px;
+      font-weight: bold;
+      font-family: "Comic Sans MS", cursive;
+      cursor: pointer;
+      user-select:none;
+    }
+
+    .container{ padding: 22px; max-width: 880px; margin: 0 auto; }
+    .title-row{ display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+    .title-row h2{ margin:0; font-size: 20px; }
+
+    .search-row{ display:flex; gap:10px; margin-bottom:18px; }
+    .search-row input{
+      flex:1; padding:12px 14px; border-radius:14px; border:1px solid #d9d9d9; outline:none;
+    }
+    .search-row button{
+      padding:12px 16px; border:none; border-radius:14px; background:#2f80ed; color:#fff; cursor:pointer;
+    }
+
+    .user-card{
+      background:#fff;
+      border:1px solid #e6e6e6;
+      border-radius:16px;
+      padding:14px 16px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      margin-bottom:12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    }
+    .left{
+      display:flex;
+      gap:14px;
+      align-items:center;
+      min-width:0;
+    }
+    .avatar{
+      width:56px; height:56px;
+      border-radius:10px;
+      object-fit:cover;
+      background:#f0f0f0;
+      border:1px solid #e5e5e5;
+    }
+    .info{ min-width:0; }
+    .name{ font-weight:700; margin:0; font-size:16px; }
+    .sub{ margin:2px 0; color:#444; font-size:13px; }
+    .meta{ margin:2px 0; color:#666; font-size:12px; }
+
+    .right{
+      display:flex; align-items:center; gap:10px;
+    }
+
+    .trash-btn{
+      border:none; background:transparent; cursor:pointer;
+      padding:6px; border-radius:10px;
+    }
+    .trash-btn:hover{ background:#f2f2f2; }
+
+    .msg{
+      background:#fff; border:1px solid #e6e6e6;
+      padding:10px 12px; border-radius:12px; margin-bottom:14px;
+      font-size:14px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="navbar">
+    <div class="navbar-title" onclick="window.location.href='{% url 'admin_dashboard' %}'">CoopHub</div>
+    <div></div>
+  </div>
+
+  <div class="container">
+    <div class="title-row">
+      <h2>จัดการบัญชี</h2>
+    </div>
+
+    {% if messages %}
+      {% for m in messages %}
+        <div class="msg">{{ m }}</div>
+      {% endfor %}
+    {% endif %}
+
+    <form class="search-row" method="GET">
+      <input type="text" name="q" value="{{ q }}" placeholder="ค้นหาชื่อ/username/email" />
+      <button type="submit">ค้นหา</button>
+    </form>
+
+    {% for u in users %}
+      <div class="user-card">
+
+        <div class="left">
+          {% if u.profile_image %}
+            <img class="avatar" src="{{ u.profile_image.url }}" alt="profile">
+          {% else %}
+            <img class="avatar" src="https://img.icons8.com/ios-filled/100/cccccc/user-male-circle.png" alt="profile">
+          {% endif %}
+
+          <div class="info">
+            <p class="name">{{ u.first_name }} {{ u.last_name }}</p>
+            <p class="sub">{% if u.student_id %}{{ u.student_id }}{% endif %}</p>
+            <p class="meta">username: {{ u.username }}</p>
+            <p class="meta">email: {{ u.email }}</p>
+            <p class="meta">role: {{ u.role }}</p>
+          </div>
+        </div>
+
+        <!-- ปุ่มลบ: ซ่อนเมื่อเป็น admin + ซ่อนเมื่อลบตัวเอง -->
+        <div class="right">
+          {% if u.id != request.user.id and u.role != "admin" and u.username != "admin007" %}
+            <form method="POST"
+                  action="{% url 'delete_user' u.id %}"
+                  onsubmit="return confirm('ยืนยันลบผู้ใช้ {{ u.username }} ?');">
+              {% csrf_token %}
+              <button class="trash-btn" type="submit" title="ลบผู้ใช้งาน">
+                <img src="https://img.icons8.com/ios-glyphs/30/000000/trash.png" alt="delete">
+              </button>
+            </form>
+          {% endif %}
+        </div>
+
+      </div>
+    {% empty %}
+      <p style="text-align:center; color:#777; margin-top:24px;">ไม่พบผู้ใช้งาน</p>
+    {% endfor %}
+  </div>
+
+</body>
+</html>

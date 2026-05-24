@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>บันทึกกิจกรรม - CoopHub</title>
+
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap">
+
+  <style>
+    body{ margin:0; font-family:"Prompt", Arial, sans-serif; background:#f6f7fb; }
+
+    /* ===== Navbar แบบเดียวกับตัวอย่าง ===== */
+    .navbar {
+      background-color: #2f80ed;
+      color: white;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .navbar-title {
+      font-size: 28px;
+      font-weight: bold;
+      font-family: "Comic Sans MS", cursive;
+      cursor: pointer;
+      user-select:none;
+    }
+    .navbar-icons {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+    .navbar-icons img {
+      width: 32px;
+      height: 32px;
+      cursor: pointer;
+    }
+
+    /* Profile (กดแล้วไป Home) */
+    .profile-img {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      object-fit: cover;
+      cursor: pointer;
+    }
+    .profile-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: white;
+      border: 2px solid #2f80ed;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #2f80ed;
+      cursor: pointer;
+      font-size: 20px;
+    }
+
+    /* ===== Page ===== */
+    .wrap{ max-width:980px; margin:0 auto; padding:18px; }
+    .topbar{
+      display:flex; align-items:center; justify-content:space-between;
+      margin: 10px 0 14px;
+    }
+    .title{
+      margin:0;
+      font-size:24px;
+      font-weight:800;
+      color:#1a2a55;
+    }
+    .subtitle{
+      margin:4px 0 0;
+      font-size:13px;
+      opacity:.75;
+    }
+
+    .btn-primary{
+      border:none;
+      background:#2f80ed;
+      color:#fff;
+      border-radius:14px;
+      height:44px;
+      padding:0 16px;
+      font-weight:700;
+      cursor:pointer;
+      box-shadow:0 2px 10px rgba(0,0,0,.08);
+    }
+
+    .card{
+      background:#fff;
+      border-radius:16px;
+      box-shadow:0 2px 10px rgba(0,0,0,.06);
+      overflow:hidden;
+      border:1px solid #eef0f4;
+    }
+
+    /* ===== List item ===== */
+    .item{
+      display:flex;
+      gap:14px;
+      padding:14px;
+      border-bottom:1px solid #eef0f4;
+      cursor:pointer;
+      align-items:center;
+    }
+    .item:last-child{ border-bottom:none; }
+    .thumb{
+      width:74px;
+      height:74px;
+      border-radius:14px;
+      object-fit:cover;
+      background:#e9eefb;
+      border:1px solid #dfe6fb;
+      flex-shrink:0;
+    }
+    .content{ flex:1; min-width:0; }
+    .company{
+      font-size:18px;
+      font-weight:800;
+      margin:0 0 6px 0;
+      color:#111;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .meta{
+      font-size:14px;
+      color:#233;
+      margin:3px 0;
+      opacity:.9;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .date{
+      font-size:13px;
+      color:#666;
+      margin-top:6px;
+    }
+
+    .status-pill{
+      display:inline-flex;
+      align-items:center;
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:700;
+      border:1px solid transparent;
+      margin-left:8px;
+      vertical-align:middle;
+    }
+    .st-pending{ background:#fff7e6; border-color:#ffe3b3; color:#a86b00; }
+    .st-approved{ background:#e9fff2; border-color:#bff1d1; color:#1f7a3a; }
+    .st-rejected{ background:#ffecec; border-color:#ffc9c9; color:#b42318; }
+
+    .empty{
+      padding:28px;
+      text-align:center;
+      color:#666;
+    }
+
+    @media (max-width:640px){
+      .topbar{ flex-direction:column; align-items:flex-start; gap:10px; }
+      .btn-primary{ width:100%; }
+      .thumb{ width:66px; height:66px; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ===== Navbar ===== -->
+  <div class="navbar">
+
+    <!-- กด CoopHub กลับหน้า Home ตาม role -->
+    <div class="navbar-title"
+         onclick="
+          {% if request.user.role == 'student' %}
+            window.location.href='{% url 'student_home' %}';
+          {% elif request.user.role == 'teacher' %}
+            window.location.href='{% url 'teacher_home' %}';
+          {% else %}
+            window.location.href='{% url 'admin_dashboard' %}';
+          {% endif %}
+         ">
+      CoopHub
+    </div>
+
+    <div class="navbar-icons">
+
+      <!-- กระดิ่ง -->
+      {% if request.user.role == 'student' %}
+        <a href="{% url 'activity_student' %}">
+          <img src="https://img.icons8.com/ios-filled/50/ffffff/appointment-reminders.png" alt="notify">
+        </a>
+      {% else %}
+        <a href="{% url 'activity' %}">
+          <img src="https://img.icons8.com/ios-filled/50/ffffff/appointment-reminders.png" alt="notify">
+        </a>
+      {% endif %}
+
+      <!-- เขียนโพสต์ -->
+      <a href="{% url 'create_post' %}">
+        <img src="https://img.icons8.com/ios-filled/50/ffffff/edit.png" alt="create">
+      </a>
+
+      <!-- student = bookmark | teacher/admin = trash -->
+      {% if request.user.role == 'student' %}
+        <a href="{% url 'bookmark_list' %}">
+          <img src="https://img.icons8.com/ios-filled/50/ffffff/bookmark-ribbon.png" alt="bookmark">
+        </a>
+      {% else %}
+        <a href="{% url 'trash_bin' %}">
+          <img src="https://img.icons8.com/ios-filled/50/ffffff/delete.png" alt="trash">
+        </a>
+      {% endif %}
+
+      <!-- โปรไฟล์: กดแล้วไปหน้า Home ตาม role -->
+      <a
+        href="{% if request.user.role == 'student' %}{% url 'student_home' %}
+              {% elif request.user.role == 'teacher' %}{% url 'teacher_home' %}
+              {% else %}{% url 'admin_dashboard' %}{% endif %}"
+        style="display:inline-flex; align-items:center; text-decoration:none;"
+        title="ไปหน้า Home"
+      >
+        {% if request.user.profile_image %}
+          <img class="profile-img" src="{{ request.user.profile_image.url }}" alt="profile">
+        {% else %}
+          <div class="profile-icon" aria-label="profile">👤</div>
+        {% endif %}
+      </a>
+
+    </div>
+  </div>
+
+  <!-- ===== Content ===== -->
+  <div class="wrap">
+    <div class="topbar">
+      <div>
+        <h1 class="title">บันทึกกิจกรรม</h1>
+        <div class="subtitle">คลิกการ์ดเพื่อแก้ไขโพสต์</div>
+      </div>
+
+      <button class="btn-primary" onclick="window.location.href='{% url 'create_post' %}'">
+        + เพิ่มโพสต์ใหม่
+      </button>
+    </div>
+
+    <div class="card">
+      {% for p in posts %}
+        <div class="item" onclick="window.location.href='{% url 'edit_post' p.id %}'">
+          {% if p.image %}
+            <img class="thumb" src="{{ p.image.url }}" alt="thumb">
+          {% else %}
+            <div class="thumb"></div>
+          {% endif %}
+
+          <div class="content">
+            <div class="company">
+              {{ p.company }}
+              {% if p.status == 'pending' %}
+                <span class="status-pill st-pending">รออนุมัติ</span>
+              {% elif p.status == 'approved' %}
+                <span class="status-pill st-approved">ผ่าน</span>
+              {% elif p.status == 'rejected' %}
+                <span class="status-pill st-rejected">ไม่ผ่าน</span>
+              {% endif %}
+            </div>
+
+            <div class="meta">ตำแหน่ง: {{ p.position }}</div>
+            <div class="meta">จังหวัด: {{ p.province }}</div>
+
+            <div class="date">วันที่โพสต์: {{ p.created_at|date:"d/m/Y H:i" }} น.</div>
+          </div>
+        </div>
+      {% empty %}
+        <div class="empty">ยังไม่มีประวัติการโพสต์</div>
+      {% endfor %}
+    </div>
+  </div>
+
+</body>
+</html>

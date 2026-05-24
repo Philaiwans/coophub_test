@@ -2,36 +2,232 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<title>โพสต์รออนุมัติ</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CoopHub - โพสต์รออนุมัติ</title>
+
 <style>
-    body { font-family: Prompt; }
-    .card {
-        width: 90%; margin: 15px auto; padding: 15px;
-        background: #f3f3f3; border-radius: 12px;
-        display: flex; justify-content: space-between;
-    }
-    .btn {
-        padding: 8px 15px; background: #2f80ed; color: white;
-        border-radius: 8px; text-decoration: none;
-    }
+  body{
+    margin:0;
+    font-family:"Prompt", Arial, sans-serif;
+    background:#ffffff;
+  }
+
+  /* ===== Navbar แบบเดียวกับหน้า Home (ตามตัวอย่าง) ===== */
+  .navbar {
+    background-color:#2f80ed;
+    color:white;
+    padding:15px 20px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  }
+  .navbar-title {
+    font-size:28px;
+    font-weight:bold;
+    font-family:"Comic Sans MS", cursive;
+    cursor:pointer;
+    user-select:none;
+  }
+  .navbar-icons {
+    display:flex;
+    gap:20px;
+    align-items:center;
+  }
+  .navbar-icons img {
+    width:32px;
+    height:32px;
+    cursor:pointer;
+  }
+
+  /* Profile (กดแล้วไป Home) */
+  .profile-img {
+    width:36px;
+    height:36px;
+    border-radius:50%;
+    object-fit:cover;
+    cursor:pointer;
+  }
+  .profile-icon {
+    width:36px;
+    height:36px;
+    border-radius:50%;
+    background:white;
+    border:2px solid #2f80ed;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    color:#2f80ed;
+    cursor:pointer;
+    font-size:20px;
+  }
+
+  /* Page header */
+  .page-title{
+    padding:25px 30px 10px;
+    font-size:26px;
+    font-weight:700;
+  }
+  .sub-title{
+    padding:0 30px 15px;
+    color:gray;
+  }
+
+  /* Cards */
+  .card{
+    width: calc(100% - 60px);
+    margin: 15px auto;
+    padding: 18px 20px;
+    background: #f6f6f6;
+    border-radius: 16px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:15px;
+    box-shadow:0 2px 6px rgba(0,0,0,0.06);
+  }
+  .card-left{
+    display:flex;
+    gap:12px;
+    align-items:center;
+    flex:1;
+    min-width:0;
+  }
+  .avatar{
+    width:55px;
+    height:55px;
+    border-radius:12px;
+    object-fit:cover;
+    background:#ddd;
+    flex:0 0 auto;
+  }
+  .info{ min-width:0; }
+  .company{
+    font-weight:800;
+    font-size:18px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .meta{
+    font-size:14px;
+    color:#333;
+    margin-top:3px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .btn{
+    padding:10px 16px;
+    background:#2f80ed;
+    color:white;
+    border-radius:10px;
+    text-decoration:none;
+    font-weight:600;
+    white-space:nowrap;
+  }
+  .btn:hover{ opacity:.9; }
+
+  .empty{
+    text-align:center;
+    color:gray;
+    font-size:18px;
+    margin-top:40px;
+  }
 </style>
 </head>
+
 <body>
 
-<h2 style="padding:20px;">โพสต์รออนุมัติ</h2>
+  <!-- ===== Navbar (เหมือนตัวอย่าง) ===== -->
+  <div class="navbar">
 
-{% for p in posts %}
-<div class="card">
-    <div>
-        <b>{{ p.company }}</b><br>
-        ผู้โพสต์: {{ p.owner.first_name }} {{ p.owner.last_name }}
+    <!-- กด CoopHub กลับหน้า Home ตาม role -->
+    <div class="navbar-title"
+         onclick="
+          {% if request.user.role == 'student' %}
+            window.location.href='{% url 'student_home' %}';
+          {% elif request.user.role == 'teacher' %}
+            window.location.href='{% url 'teacher_home' %}';
+          {% else %}
+            window.location.href='{% url 'admin_dashboard' %}';
+          {% endif %}
+         ">
+      CoopHub
+    </div>
+
+    <div class="navbar-icons">
+
+      <!-- กระดิ่ง -->
+      {% if request.user.role == 'student' %}
+        <a href="{% url 'activity_student' %}">
+          <img src="https://img.icons8.com/ios-filled/50/ffffff/appointment-reminders.png" alt="notify">
+        </a>
+      {% else %}
+        <a href="{% url 'activity' %}">
+          <img src="https://img.icons8.com/ios-filled/50/ffffff/appointment-reminders.png" alt="notify">
+        </a>
+      {% endif %}
+
+      <!-- เขียนโพสต์ -->
+      <a href="{% url 'create_post' %}">
+        <img src="https://img.icons8.com/ios-filled/50/ffffff/edit.png" alt="create">
+      </a>
+
+      <!-- student = bookmark | teacher/admin = trash -->
+      {% if request.user.role == 'student' %}
+        <a href="{% url 'bookmark_list' %}">
+          <img src="https://img.icons8.com/ios-filled/50/ffffff/bookmark-ribbon.png" alt="bookmark">
+        </a>
+      {% else %}
+        <a href="{% url 'trash_bin' %}">
+          <img src="https://img.icons8.com/ios-filled/50/ffffff/delete.png" alt="trash">
+        </a>
+      {% endif %}
+
+      <!-- โปรไฟล์: กดแล้วไปหน้า Home ตาม role -->
+      <a
+        href="{% if request.user.role == 'student' %}{% url 'student_home' %}
+              {% elif request.user.role == 'teacher' %}{% url 'teacher_home' %}
+              {% else %}{% url 'admin_dashboard' %}{% endif %}"
+        style="display:inline-flex; align-items:center; text-decoration:none;"
+        title="ไปหน้า Home"
+      >
+        {% if request.user.profile_image %}
+          <img class="profile-img" src="{{ request.user.profile_image.url }}" alt="profile">
+        {% else %}
+          <div class="profile-icon" aria-label="profile">👤</div>
+        {% endif %}
+      </a>
+
+    </div>
+  </div>
+
+  <div class="page-title">โพสต์รออนุมัติ</div>
+  <div class="sub-title">รายการโพสต์ของนักศึกษาที่อยู่ในสถานะรอตรวจสอบ</div>
+
+  {% for p in posts %}
+  <div class="card">
+    <div class="card-left">
+      {% if p.owner.profile_image %}
+        <img class="avatar" src="{{ p.owner.profile_image.url }}" alt="owner">
+      {% else %}
+        <img class="avatar" src="https://img.icons8.com/ios-filled/100/808080/user.png" alt="owner">
+      {% endif %}
+
+      <div class="info">
+        <div class="company">{{ p.company }}</div>
+        <div class="meta">
+          ผู้โพสต์: {{ p.owner.first_name }} {{ p.owner.last_name }}
+          {% if p.owner.student_id %} ({{ p.owner.student_id }}){% endif %}
+        </div>
+      </div>
     </div>
 
     <a href="{% url 'post_review_detail' p.id %}" class="btn">ดูรายละเอียด</a>
-</div>
-{% empty %}
-<p style="text-align:center;">ไม่มีโพสต์รออนุมัติ</p>
-{% endfor %}
+  </div>
+  {% empty %}
+    <div class="empty">ไม่มีโพสต์รออนุมัติ</div>
+  {% endfor %}
 
 </body>
 </html>

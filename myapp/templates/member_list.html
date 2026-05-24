@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CoopHub - รายชื่อสมาชิกนักศึกษา</title>
+
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap">
+
+  <style>
+    body{
+      margin:0;
+      font-family:"Prompt", Arial, sans-serif;
+      background:#f6f7fb;
+      color:#0f172a;
+    }
+
+    /* ===== Navbar แบบเดียวกับตัวอย่าง ===== */
+    .navbar {
+      background-color: #2f80ed;
+      color: white;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .navbar-title {
+      font-size: 28px;
+      font-weight: bold;
+      font-family: "Comic Sans MS", cursive;
+      cursor: pointer;
+      user-select:none;
+    }
+    .navbar-icons {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+    .navbar-icons img {
+      width: 32px;
+      height: 32px;
+      cursor: pointer;
+    }
+
+    /* Profile ของผู้ล็อกอิน */
+    .profile-img {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      object-fit: cover;
+      cursor: pointer;
+    }
+    .profile-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: white;
+      border: 2px solid #2f80ed;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #2f80ed;
+      cursor: pointer;
+      font-size: 20px;
+      line-height: 1;
+      user-select:none;
+    }
+
+    /* ===== Page ===== */
+    .page-container{
+      width:92%;
+      max-width:1000px;
+      margin:22px auto;
+    }
+
+    .page-title{
+      display:inline-block;
+      background:#2459c7;
+      color:#fff;
+      padding:12px 22px;
+      border-radius:14px;
+      font-size:20px;
+      font-weight:800;
+      box-shadow:0 2px 10px rgba(0,0,0,.06);
+      margin-bottom:18px;
+    }
+
+    .member-card{
+      background:#fff;
+      border:1px solid #eef0f4;
+      border-radius:16px;
+      padding:16px 18px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      margin-bottom:12px;
+      box-shadow:0 2px 10px rgba(0,0,0,.05);
+    }
+
+    .member-info{
+      display:flex;
+      align-items:center;
+      gap:14px;
+      min-width:0;
+    }
+
+    /* รูปโปรไฟล์นักศึกษา */
+    .student-avatar{
+      width:62px;
+      height:62px;
+      border-radius:14px;
+      object-fit:cover;
+      background:#e5e7eb;
+      border:1px solid #e6eaf2;
+      flex:0 0 auto;
+    }
+    .avatar-fallback{
+      width:62px;
+      height:62px;
+      border-radius:14px;
+      background:#e5e7eb;
+      border:1px solid #e6eaf2;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:22px;
+      color:#64748b;
+      font-weight:900;
+      flex:0 0 auto;
+      user-select:none;
+    }
+
+    .member-text{
+      min-width:0;
+    }
+
+    .member-text-name{
+      font-size:16px;
+      font-weight:900;
+      margin:0;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .member-text-id{
+      font-size:13px;
+      color:#64748b;
+      margin-top:4px;
+      font-weight:700;
+    }
+
+    .status-circle{
+      width:44px;
+      height:44px;
+      border-radius:50%;
+      border:1px solid #e5e7eb;
+      flex:0 0 auto;
+    }
+    .status-circle.active{ background:#22c55e; }   /* เขียว */
+    .status-circle.inactive{ background:#cbd5e1; } /* เทา */
+
+    .note{
+      margin-top:18px;
+      background:#fff;
+      border:1px solid #eef0f4;
+      border-radius:16px;
+      padding:14px 16px;
+      box-shadow:0 2px 10px rgba(0,0,0,.05);
+      font-size:13px;
+      color:#475569;
+      font-weight:700;
+    }
+    .note p{ margin:8px 0; }
+
+    .dot{
+      display:inline-block;
+      width:12px;
+      height:12px;
+      border-radius:50%;
+      margin-right:8px;
+      vertical-align:middle;
+    }
+    .dot-green{ background:#22c55e; }
+    .dot-gray{ background:#cbd5e1; }
+
+    @media (max-width:640px){
+      .status-circle{ width:38px; height:38px; }
+      .student-avatar,.avatar-fallback{ width:54px; height:54px; }
+      .page-title{ font-size:18px; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ===== Navbar ===== -->
+  <div class="navbar">
+
+    <!-- กด CoopHub กลับหน้า Home ตาม role -->
+    <div class="navbar-title"
+      onclick="
+        {% if request.user.role == 'student' %}
+          window.location.href='{% url 'student_home' %}';
+        {% elif request.user.role == 'teacher' %}
+          window.location.href='{% url 'teacher_home' %}';
+        {% else %}
+          window.location.href='{% url 'admin_dashboard' %}';
+        {% endif %}
+      ">
+      CoopHub
+    </div>
+
+    <div class="navbar-icons">
+
+      <!-- กระดิ่ง -->
+      {% if request.user.role == 'student' %}
+        <a href="{% url 'activity_student' %}">
+          <img src="https://img.icons8.com/ios-filled/50/ffffff/appointment-reminders.png" alt="notify">
+        </a>
+      {% else %}
+        <a href="{% url 'activity' %}">
+          <img src="https://img.icons8.com/ios-filled/50/ffffff/appointment-reminders.png" alt="notify">
+        </a>
+      {% endif %}
+
+      <!-- เขียนโพสต์ -->
+      <a href="{% url 'create_post' %}">
+        <img src="https://img.icons8.com/ios-filled/50/ffffff/edit.png" alt="create">
+      </a>
+
+      <!-- student = bookmark | teacher/admin = trash -->
+      {% if request.user.role == 'student' %}
+        <a href="{% url 'bookmark_list' %}">
+          <img src="https://img.icons8.com/ios-filled/50/ffffff/bookmark-ribbon.png" alt="bookmark">
+        </a>
+      {% else %}
+        <a href="{% url 'trash_bin' %}">
+          <img src="https://img.icons8.com/ios-filled/50/ffffff/delete.png" alt="trash">
+        </a>
+      {% endif %}
+
+      <!-- โปรไฟล์: กดแล้วไปหน้า Home ตาม role -->
+      <a
+        href="{% if request.user.role == 'student' %}{% url 'student_home' %}
+              {% elif request.user.role == 'teacher' %}{% url 'teacher_home' %}
+              {% else %}{% url 'admin_dashboard' %}{% endif %}"
+        style="display:inline-flex; align-items:center; text-decoration:none;"
+        title="ไปหน้า Home"
+      >
+        {% if request.user.profile_image %}
+          <img class="profile-img" src="{{ request.user.profile_image.url }}" alt="profile">
+        {% else %}
+          <div class="profile-icon" aria-label="profile">👤</div>
+        {% endif %}
+      </a>
+
+    </div>
+  </div>
+
+  <!-- ===== Page Content ===== -->
+  <div class="page-container">
+
+    <div class="page-title">รายชื่อสมาชิกนักศึกษา</div>
+
+    {% for student in students %}
+      <div class="member-card">
+
+        <div class="member-info">
+          <!-- ✅ รูปโปรไฟล์นักศึกษา -->
+          {% if student.profile_image %}
+            <img class="student-avatar" src="{{ student.profile_image.url }}" alt="avatar">
+          {% else %}
+            <div class="avatar-fallback" aria-label="no-avatar">👤</div>
+          {% endif %}
+
+          <div class="member-text">
+            <p class="member-text-name">{{ student.first_name }} {{ student.last_name }}</p>
+            <div class="member-text-id">รหัสนักศึกษา: {{ student.student_id|default:"-" }}</div>
+          </div>
+        </div>
+
+        <div class="status-circle {% if student.has_approved_post %}active{% else %}inactive{% endif %}"
+             title="{% if student.has_approved_post %}มีโพสต์ที่อนุมัติแล้ว{% else %}ยังไม่มีโพสต์ที่อนุมัติ{% endif %}">
+        </div>
+
+      </div>
+    {% empty %}
+      <p style="color:#64748b; font-weight:800;">ยังไม่มีสมาชิกนักศึกษา</p>
+    {% endfor %}
+
+    <div class="note">
+      <p><span class="dot dot-green"></span>สีเขียว = นักศึกษาที่เคยโพสต์ และมีอย่างน้อย 1 โพสต์ “ผ่านการอนุมัติ”</p>
+      <p><span class="dot dot-gray"></span>สีเทา = นักศึกษาที่ยังไม่เคยโพสต์ หรือยังไม่มีโพสต์ที่ “ผ่านการอนุมัติ”</p>
+    </div>
+
+  </div>
+
+</body>
+</html>

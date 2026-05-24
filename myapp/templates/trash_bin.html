@@ -1,135 +1,344 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CoopHub - Trash Bin</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CoopHub - Trash Bin</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap">
 
-    <style>
-        body {
-            margin: 0;
-            font-family: "Prompt", Arial, sans-serif;
-            background-color: #ffffff;
-        }
+  <style>
+    body{ margin:0; font-family:"Prompt", Arial, sans-serif; background:#f6f7fb; color:#111827; }
 
-        /* Navbar */
-        .navbar {
-            background-color: #2f80ed;
-            color: white;
-            padding: 15px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+    /* ===== Navbar แบบเดียวกับหน้า Home ===== */
+    .navbar{
+      background-color:#2f80ed;
+      color:#fff;
+      padding:15px 20px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+    }
+    .navbar-title{
+      font-size:28px;
+      font-weight:bold;
+      font-family:"Comic Sans MS", cursive;
+      cursor:pointer;
+      user-select:none;
+    }
+    .navbar-icons{
+      display:flex;
+      gap:20px;
+      align-items:center;
+    }
+    .navbar-icons img{
+      width:32px;
+      height:32px;
+      cursor:pointer;
+    }
 
-        .navbar-title {
-            font-size: 28px;
-            font-weight: bold;
-            font-family: "Comic Sans MS", cursive;
-            cursor: pointer;
-        }
+    /* Profile (กดแล้วไป Home) */
+    .profile-img{
+      width:36px;
+      height:36px;
+      border-radius:50%;
+      object-fit:cover;
+      cursor:pointer;
+    }
+    .profile-icon{
+      width:36px;
+      height:36px;
+      border-radius:50%;
+      background:white;
+      border:2px solid #2f80ed;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      color:#2f80ed;
+      cursor:pointer;
+      font-size:20px;
+      line-height:1;
+      user-select:none;
+    }
 
-        .navbar-icons img {
-            width: 32px;
-            height: 32px;
-            cursor: pointer;
-        }
+    /* ===== Page ===== */
+    .wrap{ max-width:980px; margin:0 auto; padding:22px 18px 50px; }
 
-        .navbar-icons {
-            display: flex;
-            gap: 20px;
-            align-items: center;
-        }
+    .top-row{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-end;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-bottom:14px;
+    }
+    .page-title{
+      margin:0;
+      font-size:26px;
+      font-weight:800;
+      letter-spacing:-0.2px;
+    }
+    .sub{
+      margin:6px 0 0 0;
+      color:#6b7280;
+      font-size:14px;
+    }
 
-        /* Cards */
-        .post-card {
-            background: white;
-            border: 1px solid #e0e0e0;
-            border-radius: 20px;
-            padding: 20px;
-            display: flex;
-            justify-content: space-between;
-            gap: 20px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-        }
+    /* ปุ่มล้างถังขยะ (มินิมอล) */
+    .danger-btn{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      background:#111827;
+      color:#fff;
+      border:none;
+      border-radius:12px;
+      padding:10px 14px;
+      font-size:14px;
+      font-weight:700;
+      cursor:pointer;
+    }
+    .danger-btn svg{ width:18px; height:18px; }
 
-        .post-image {
-            width: 140px;
-            height: 140px;
-            object-fit: cover;
-            border-radius: 15px;
-        }
+    /* ===== Cards ===== */
+    .grid{
+      margin-top:12px;
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:12px;
+    }
 
-        .restore-btn img {
-            width: 26px;
-            cursor: pointer;
-        }
-    </style>
+    .card{
+      background:#fff;
+      border:1px solid #eef0f4;
+      border-radius:16px;
+      padding:14px;
+      display:flex;
+      gap:14px;
+      align-items:center;
+      box-shadow:0 2px 10px rgba(0,0,0,.06);
+    }
+
+    .thumb{
+      width:140px;
+      height:96px;
+      border-radius:14px;
+      object-fit:cover;
+      background:#f3f4f6;
+      border:1px solid #eef0f4;
+      flex-shrink:0;
+    }
+
+    .content{ flex:1; min-width:0; }
+    .company{
+      margin:0 0 6px 0;
+      font-size:18px;
+      font-weight:800;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .meta{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px 12px;
+      font-size:13px;
+      color:#374151;
+    }
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:6px 10px;
+      border-radius:999px;
+      background:#f7faff;
+      border:1px solid #e7ecff;
+      color:#1f2a55;
+      max-width:100%;
+    }
+    .pill b{ font-weight:800; }
+
+    .date{
+      margin-top:8px;
+      font-size:12px;
+      color:#9ca3af;
+    }
+
+    /* Actions */
+    .actions{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      align-items:flex-end;
+      flex-shrink:0;
+    }
+
+    .icon-action{
+      width:40px;
+      height:40px;
+      border-radius:12px;
+      background:#fff;
+      border:1px solid #eef0f4;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      cursor:pointer;
+      text-decoration:none;
+      box-shadow:0 2px 10px rgba(0,0,0,.05);
+    }
+    .icon-action svg{ width:18px; height:18px; }
+    .icon-action:hover{ transform: translateY(-1px); }
+
+    .empty{
+      background:#fff;
+      border:1px dashed #dbe6ff;
+      border-radius:16px;
+      padding:26px 16px;
+      text-align:center;
+      color:#6b7280;
+    }
+
+    @media (max-width:640px){
+      .card{ flex-direction:column; align-items:stretch; }
+      .thumb{ width:100%; height:180px; }
+      .actions{ flex-direction:row; justify-content:flex-end; }
+    }
+  </style>
 </head>
 
 <body>
 
-    <!-- Navbar -->
-    <div class="navbar">
+  <!-- ===== Navbar ===== -->
+  <div class="navbar">
 
-        {% if user_obj.role == 'student' %}
-        <div class="navbar-title" onclick="window.location.href='{% url 'student_home' %}'">CoopHub</div>
-
-        {% elif user_obj.role == 'teacher' %}
-        <div class="navbar-title" onclick="window.location.href='{% url 'teacher_home' %}'">CoopHub</div>
-
-        {% else %}
-        <div class="navbar-title" onclick="window.location.href='{% url 'admin_dashboard' %}'">CoopHub</div>
-        {% endif %}
-
-        <div class="navbar-icons">
-            <img src="https://img.icons8.com/ios-filled/50/ffffff/appointment-reminders.png">
-            <a href="{% url 'create_post' %}">
-                <img src="https://img.icons8.com/ios-filled/50/ffffff/edit.png">
-            </a>
-            <img src="https://img.icons8.com/ios-filled/50/ffffff/delete.png">
-        </div>
+    <!-- กด CoopHub กลับหน้า Home ตาม role -->
+    <div class="navbar-title"
+         onclick="
+          {% if request.user.role == 'student' %}
+            window.location.href='{% url 'student_home' %}';
+          {% elif request.user.role == 'teacher' %}
+            window.location.href='{% url 'teacher_home' %}';
+          {% else %}
+            window.location.href='{% url 'admin_dashboard' %}';
+          {% endif %}
+         ">
+      CoopHub
     </div>
 
-    <!-- Page Title -->
-    <h2 style="padding: 20px 30px;">โพสต์ที่ลบไว้</h2>
+    <div class="navbar-icons">
 
-    <!-- Posts Grid -->
-    <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:25px; padding:0 30px 40px;">
+      <!-- กระดิ่ง -->
+      {% if request.user.role == 'student' %}
+        <a href="{% url 'activity_student_toggle' %}">
+          <img src="https://img.icons8.com/ios-filled/50/ffffff/appointment-reminders.png" alt="notify">
+        </a>
+      {% else %}
+        <a href="{% url 'activity' %}">
+          <img src="https://img.icons8.com/ios-filled/50/ffffff/appointment-reminders.png" alt="notify">
+        </a>
+      {% endif %}
 
-        {% for p in posts %}
-        <div class="post-card">
+      <!-- เขียนโพสต์ -->
+      <a href="{% url 'create_post' %}">
+        <img src="https://img.icons8.com/ios-filled/50/ffffff/edit.png" alt="create">
+      </a>
 
-            <div style="flex:1;">
-                <h3 style="margin:0; font-size:22px; font-weight:bold;">{{ p.company }}</h3>
+      <!-- student = bookmark | teacher/admin = trash -->
+      {% if request.user.role == 'student' %}
+        <a href="{% url 'bookmark_list' %}">
+          <img src="https://img.icons8.com/ios-filled/50/ffffff/bookmark-ribbon.png" alt="bookmark">
+        </a>
+      {% else %}
+        <a href="{% url 'trash_bin' %}">
+          <img src="https://img.icons8.com/ios-filled/50/ffffff/delete.png" alt="trash">
+        </a>
+      {% endif %}
 
-                <p style="margin:4px 0;">จังหวัด: {{ p.province }}</p>
-                <p style="margin:4px 0;">เบี้ยเลี้ยง: {{ p.salary }}</p>
-                <p style="margin:4px 0;">ตำแหน่ง: {{ p.position }}</p>
+      <!-- โปรไฟล์: กดแล้วไปหน้า Home ตาม role -->
+      <a
+        href="{% if request.user.role == 'student' %}{% url 'student_home' %}
+              {% elif request.user.role == 'teacher' %}{% url 'teacher_home' %}
+              {% else %}{% url 'admin_dashboard' %}{% endif %}"
+        style="display:inline-flex; align-items:center; text-decoration:none;"
+        title="ไปหน้า Home"
+      >
+        {% if request.user.profile_image %}
+          <img class="profile-img" src="{{ request.user.profile_image.url }}" alt="profile">
+        {% else %}
+          <div class="profile-icon" aria-label="profile">👤</div>
+        {% endif %}
+      </a>
 
-                <p style="margin:4px 0; color:gray;">
-                    วันที่โพสต์: {{ p.created_at|date:"d/m/Y" }}
-                </p>
+    </div>
+  </div>
 
-                <!-- Restore Button -->
-                <a class="restore-btn" href="{% url 'restore_post' p.id %}">
-                    <img src="https://img.icons8.com/ios-glyphs/30/000000/restore.png">
-                </a>
+  <!-- ===== Content ===== -->
+  <div class="wrap">
+
+    <div class="top-row">
+      <div>
+        <h1 class="page-title">โพสต์ที่ลบไว้</h1>
+        <p class="sub">สามารถกู้คืนโพสต์ได้จากหน้านี้</p>
+      </div>
+
+      <!-- ปุ่มล้างถังขยะ (ลบถาวร) -->
+      {% if request.user.role == 'admin' or request.user.username == 'admin007' %}
+        <form method="POST" action="{% url 'empty_trash' %}" style="margin:0;">
+          {% csrf_token %}
+          <button class="danger-btn" type="submit"
+                  onclick="return confirm('ต้องการลบถาวรทั้งหมดในถังขยะใช่ไหม?');">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M3 6h18" stroke="white" stroke-width="2" stroke-linecap="round"/>
+              <path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2" stroke="white" stroke-width="2" stroke-linecap="round"/>
+              <path d="M6 6l1 15a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-15" stroke="white" stroke-width="2" stroke-linecap="round"/>
+              <path d="M10 11v6" stroke="white" stroke-width="2" stroke-linecap="round"/>
+              <path d="M14 11v6" stroke="white" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            ล้างถังขยะ
+          </button>
+        </form>
+      {% endif %}
+    </div>
+
+    <div class="grid">
+      {% for p in posts %}
+        <div class="card">
+
+          {% if p.image %}
+            <img class="thumb" src="{{ p.image.url }}" alt="post-image">
+          {% else %}
+            <img class="thumb" src="https://img.icons8.com/ios-filled/200/cccccc/image.png" alt="no-image">
+          {% endif %}
+
+          <div class="content">
+            <p class="company">{{ p.company }}</p>
+
+            <div class="meta">
+              <span class="pill"><b>จังหวัด:</b> {{ p.province }}</span>
+              <span class="pill"><b>เบี้ยเลี้ยง:</b> {{ p.salary }}</span>
+              <span class="pill"><b>ตำแหน่ง:</b> {{ p.position }}</span>
             </div>
 
-            {% if p.image %}
-            <img class="post-image" src="{{ p.image.url }}">
-            {% endif %}
+            <div class="date">วันที่โพสต์: {{ p.created_at|date:"d/m/Y" }}</div>
+          </div>
+
+          <div class="actions">
+            <!-- Restore -->
+            <a class="icon-action" href="{% url 'restore_post' p.id %}" title="กู้คืน">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M7 7v4h4" stroke="#111827" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M7.4 11A7 7 0 1 1 7 12" stroke="#111827" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </a>
+          </div>
 
         </div>
-
-        {% empty %}
-        <p style="grid-column:1/3; text-align:center; color:gray; font-size:18px; margin-top:30px;">
-            ยังไม่มีโพสต์ที่ถูกลบ
-        </p>
-        {% endfor %}
-
+      {% empty %}
+        <div class="empty">ยังไม่มีโพสต์ที่ถูกลบ</div>
+      {% endfor %}
     </div>
+
+  </div>
 
 </body>
 </html>

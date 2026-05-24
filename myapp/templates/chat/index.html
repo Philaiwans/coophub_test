@@ -1,0 +1,23 @@
+<!-- chat/templates/chat/index.html -->
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Rooms</title>
+</head>
+<body>
+  <h2>My Rooms</h2>
+
+  <ul>
+    {% for item in rooms_for_user %}
+      <li>
+        <a href="{% url 'chat:room' item.room.slug %}">
+          {{ item.label }}
+        </a>
+      </li>
+    {% empty %}
+      <li>No rooms</li>
+    {% endfor %}
+  </ul>
+</body>
+</html>

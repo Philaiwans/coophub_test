@@ -1,39 +1,446 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-<meta charset="UTF-8">
-<title>ตรวจสอบโพสต์</title>
-<style>
-    body { font-family: Prompt; padding: 20px; }
-    .btn-approve {
-        padding: 10px 20px; background: #28a745; color: white;
-        border-radius: 8px; text-decoration: none;
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CoopHub - ตรวจสอบโพสต์</title>
+
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap">
+
+  <style>
+    body{
+      margin:0;
+      font-family:"Prompt", Arial, sans-serif;
+      background:#f6f7fb;
+      color:#0f172a;
     }
-    .btn-reject {
-        padding: 10px 20px; background: #d9534f; color: white;
-        border-radius: 8px; text-decoration: none;
+
+    /* ===== Navbar (เหมือน post_create.html) ===== */
+    .navbar{
+      background-color:#2f80ed;
+      color:white;
+      padding:15px 20px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
     }
-</style>
+    .navbar-title{
+      font-size:28px;
+      font-weight:bold;
+      font-family:"Comic Sans MS", cursive;
+      cursor:pointer;
+      user-select:none;
+    }
+    .navbar-icons{
+      display:flex;
+      gap:20px;
+      align-items:center;
+    }
+    .navbar-icons img{
+      width:32px;
+      height:32px;
+      cursor:pointer;
+    }
+    .profile-img{
+      width:36px;height:36px;border-radius:50%;
+      object-fit:cover;cursor:pointer;
+    }
+    .profile-icon{
+      width:36px;height:36px;border-radius:50%;
+      background:#fff;border:2px solid #2f80ed;
+      display:flex;justify-content:center;align-items:center;
+      color:#2f80ed;cursor:pointer;font-size:20px;
+      line-height:1;
+      user-select:none;
+    }
+
+    /* ===== Layout ===== */
+    .container{
+      width:92%;
+      max-width:1100px;
+      margin:24px auto;
+      background:#fff;
+      border-radius:20px;
+      box-shadow:0 4px 20px rgba(0,0,0,0.06);
+      overflow:hidden;
+      border:1px solid #eef0f4;
+    }
+
+    .header{
+      padding:18px 22px;
+      border-bottom:1px solid #eef0f4;
+      background:linear-gradient(180deg, #ffffff, #fbfbff);
+    }
+    .header h1{
+      margin:0;
+      font-size:22px;
+      font-weight:900;
+      color:#2f80ed;
+    }
+    .header p{
+      margin:6px 0 0;
+      color:#64748b;
+      font-size:14px;
+      font-weight:600;
+    }
+
+    .content{
+      padding:18px 22px 22px;
+    }
+
+    /* ===== Owner card ===== */
+    .owner-card{
+      display:flex;
+      gap:14px;
+      align-items:center;
+      padding:14px;
+      border-radius:16px;
+      border:1px solid #e7ecff;
+      background:#f7faff;
+      margin-bottom:16px;
+    }
+    .owner-avatar{
+      width:54px;height:54px;
+      border-radius:14px;
+      object-fit:cover;
+      border:1px solid #dfe6fb;
+      background:#fff;
+      flex:0 0 auto;
+    }
+    .owner-meta{
+      min-width:0;
+      flex:1;
+    }
+    .owner-name{
+      font-size:16px;
+      font-weight:900;
+      margin:0;
+      color:#0f172a;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .owner-sub{
+      margin:3px 0 0;
+      color:#475569;
+      font-weight:700;
+      font-size:13px;
+    }
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:6px 10px;
+      border-radius:999px;
+      background:#eef3ff;
+      border:1px solid #dbe6ff;
+      color:#2f80ed;
+      font-weight:900;
+      font-size:12px;
+      margin-left:auto;
+      white-space:nowrap;
+    }
+
+    /* ===== Main grid ===== */
+    .grid{
+      display:grid;
+      grid-template-columns: 360px 1fr;
+      gap:18px;
+      align-items:start;
+    }
+
+    /* Cover image */
+    .cover{
+      border-radius:18px;
+      overflow:hidden;
+      border:1px solid #e7ecff;
+      background:#fbfbff;
+    }
+    .cover img{
+      width:100%;
+      height:420px;
+      object-fit:cover;
+      display:block;
+    }
+    .no-cover{
+      height:420px;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      color:#64748b;
+      font-weight:900;
+      border:2px dashed #cbd5e1;
+      background:#fff;
+    }
+
+    /* Table */
+    table{
+      width:100%;
+      border-collapse:separate;
+      border-spacing:0;
+      border:1px solid #e7ecff;
+      border-radius:18px;
+      overflow:hidden;
+      background:#fff;
+    }
+    th, td{
+      padding:12px 14px;
+      border-bottom:1px solid #eef2ff;
+      text-align:left;
+      vertical-align:top;
+    }
+    th{
+      width:220px;
+      background:#f7faff;
+      color:#475569;
+      font-size:13px;
+      font-weight:900;
+      white-space:nowrap;
+    }
+    td{
+      font-size:15px;
+      font-weight:700;
+      color:#0f172a;
+      white-space:pre-wrap;
+      word-break:break-word;
+    }
+    tr:last-child th, tr:last-child td{ border-bottom:none; }
+
+    .link{
+      color:#2f80ed;
+      text-decoration:underline;
+      font-weight:900;
+    }
+
+    /* Extra images */
+    .section-title{
+      margin:18px 0 10px;
+      font-size:15px;
+      font-weight:900;
+      color:#1a2a55;
+    }
+    .gallery{
+      display:grid;
+      grid-template-columns:repeat(4, 1fr);
+      gap:10px;
+    }
+    .gimg{
+      width:100%;
+      height:110px;
+      border-radius:14px;
+      object-fit:cover;
+      border:1px solid #e7ecff;
+      background:#fff;
+      cursor:pointer;
+    }
+
+    /* Action buttons */
+    .actions{
+      display:flex;
+      gap:12px;
+      justify-content:center;
+      margin-top:20px;
+      flex-wrap:wrap;
+    }
+    .btn{
+      padding:12px 18px;
+      border-radius:14px;
+      text-decoration:none;
+      font-weight:900;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:200px;
+      height:46px;
+      border:1px solid transparent;
+      cursor:pointer;
+    }
+    .btn-approve{ background:#16a34a; color:#fff; }
+    .btn-reject{ background:#ef4444; color:#fff; }
+    .btn:hover{ filter:brightness(.95); }
+
+    @media (max-width:980px){
+      .grid{ grid-template-columns:1fr; }
+      .cover img, .no-cover{ height:280px; }
+      .gallery{ grid-template-columns:repeat(2, 1fr); }
+      th{ width:140px; }
+      .btn{ width:100%; min-width:unset; }
+      .pill{ margin-left:0; }
+      .owner-card{ flex-wrap:wrap; }
+    }
+  </style>
 </head>
 
 <body>
 
-<h1>{{ post.company }}</h1>
+  <!-- ===== Navbar ===== -->
+  <div class="navbar">
 
-{% if post.image %}
-<img src="{{ post.image.url }}" width="500">
-{% endif %}
+    <div class="navbar-title"
+      onclick="
+        {% if request.user.role == 'student' %}
+          window.location.href='{% url 'student_home' %}';
+        {% elif request.user.role == 'teacher' %}
+          window.location.href='{% url 'teacher_home' %}';
+        {% else %}
+          window.location.href='{% url 'admin_dashboard' %}';
+        {% endif %}
+      ">
+      CoopHub
+    </div>
 
-<p><b>ตำแหน่ง:</b> {{ post.position }}</p>
-<p><b>จังหวัด:</b> {{ post.province }}</p>
-<p><b>เบี้ยเลี้ยง:</b> {{ post.salary }}</p>
-<p><b>เวลาทำงาน:</b> {{ post.work_time }}</p>
-<p><b>รายละเอียด:</b> {{ post.description }}</p>
+    <div class="navbar-icons">
 
-<br><br>
+      {% if request.user.role == 'student' %}
+        <a href="{% url 'activity_student' %}">
+          <img src="https://img.icons8.com/ios-filled/50/ffffff/appointment-reminders.png" alt="notify">
+        </a>
+      {% else %}
+        <a href="{% url 'activity' %}">
+          <img src="https://img.icons8.com/ios-filled/50/ffffff/appointment-reminders.png" alt="notify">
+        </a>
+      {% endif %}
 
-<a href="{% url 'approve_post' post.id %}" class="btn-approve">ยืนยัน</a>
-<a href="{% url 'reject_post' post.id %}" class="btn-reject">แก้ไข/ไม่ผ่าน</a>
+      <a href="{% url 'create_post' %}">
+        <img src="https://img.icons8.com/ios-filled/50/ffffff/edit.png" alt="create">
+      </a>
+
+      {% if request.user.role == 'student' %}
+        <a href="{% url 'bookmark_list' %}">
+          <img src="https://img.icons8.com/ios-filled/50/ffffff/bookmark-ribbon.png" alt="bookmark">
+        </a>
+      {% else %}
+        <a href="{% url 'trash_bin' %}">
+          <img src="https://img.icons8.com/ios-filled/50/ffffff/delete.png" alt="trash">
+        </a>
+      {% endif %}
+
+      <a
+        href="{% if request.user.role == 'student' %}{% url 'student_home' %}
+              {% elif request.user.role == 'teacher' %}{% url 'teacher_home' %}
+              {% else %}{% url 'admin_dashboard' %}{% endif %}"
+        style="display:inline-flex; align-items:center; text-decoration:none;"
+        title="ไปหน้า Home"
+      >
+        {% if request.user.profile_image %}
+          <img class="profile-img" src="{{ request.user.profile_image.url }}" alt="profile">
+        {% else %}
+          <div class="profile-icon" aria-label="profile">👤</div>
+        {% endif %}
+      </a>
+
+    </div>
+  </div>
+
+  <!-- ===== Page ===== -->
+  <div class="container">
+
+    <div class="header">
+      <h1>ตรวจสอบโพสต์</h1>
+      <p>ตรวจข้อมูลให้ครบก่อนกด “ยืนยัน” หรือ “แก้ไข/ไม่ผ่าน”</p>
+    </div>
+
+    <div class="content">
+
+      <!-- ===== Owner info ===== -->
+      <div class="owner-card">
+        {% if post.owner.profile_image %}
+          <img class="owner-avatar" src="{{ post.owner.profile_image.url }}" alt="owner">
+        {% else %}
+          <img class="owner-avatar" src="https://img.icons8.com/ios-filled/100/2f80ed/user-male-circle.png" alt="owner">
+        {% endif %}
+
+        <div class="owner-meta">
+          <p class="owner-name">
+            {{ post.owner.first_name }} {{ post.owner.last_name }}
+          </p>
+          <p class="owner-sub">
+            รหัสนักศึกษา:
+            {% if post.owner.student_id %}
+              {{ post.owner.student_id }}
+            {% else %}
+              -
+            {% endif %}
+          </p>
+        </div>
+
+        <div class="pill">
+          สถานะ: {{ post.get_status_display }}
+        </div>
+      </div>
+
+      <div class="grid">
+
+        <!-- ===== Cover ===== -->
+        <div class="cover">
+          {% if post.image %}
+            <img src="{{ post.image.url }}" alt="cover">
+          {% else %}
+            <div class="no-cover">ไม่มีรูปหน้าปก</div>
+          {% endif %}
+        </div>
+
+        <!-- ===== Details ===== -->
+        <div>
+          <table>
+            <tr><th>ชื่อบริษัท</th><td>{{ post.company|default:"-" }}</td></tr>
+            <tr><th>จังหวัด</th><td>{{ post.province|default:"-" }}</td></tr>
+            <tr><th>ตำแหน่งที่เปิดรับ</th><td>{{ post.position|default:"-" }}</td></tr>
+
+            <!-- ✅ ใช้ field ที่มีจริง -->
+            <tr><th>เวลาทำงาน</th><td>{{ post.work_time|default:"-" }}</td></tr>
+            <tr><th>ช่วงฝึกงาน</th><td>{{ post.internship_period|default:"-" }}</td></tr>
+
+            <tr><th>เบี้ยเลี้ยง</th><td>{{ post.salary|default:"-" }}</td></tr>
+            <tr><th>ทักษะที่ใช้</th><td>{{ post.skills|default:"-" }}</td></tr>
+            <tr><th>เกรดขั้นต่ำ</th><td>{{ post.grade|default:"-" }}</td></tr>
+            <tr><th>ช่องทางติดต่อ</th><td>{{ post.contact|default:"-" }}</td></tr>
+            <tr><th>ประเภทการฝึกงาน</th><td>{{ post.type_of_work|default:"-" }}</td></tr>
+
+            <tr><th>ที่ตั้งบริษัท</th><td>{{ post.location|default:"-" }}</td></tr>
+            <tr><th>เช็คอิน</th><td>{{ post.checkin_location|default:"-" }}</td></tr>
+
+            <tr>
+              <th>Portfolio</th>
+              <td>
+                {% if post.portfolio %}
+                  <a class="link" href="{{ post.portfolio }}" target="_blank" rel="noopener">เปิดลิงก์</a>
+                {% else %}
+                  -
+                {% endif %}
+              </td>
+            </tr>
+
+            <tr><th>รายละเอียด</th><td>{{ post.description|default:"-" }}</td></tr>
+            <tr><th>วันที่สร้าง</th><td>{{ post.created_at|date:"d/m/Y H:i" }}</td></tr>
+          </table>
+
+          <!-- ===== Extra images gallery ===== -->
+          <div class="section-title">รูปประกอบเพิ่มเติม</div>
+
+          {% if post.extra_images.all %}
+            <div class="gallery">
+              {% for img in post.extra_images.all %}
+                <img class="gimg" src="{{ img.image.url }}" alt="extra">
+              {% empty %}
+                <div style="color:#64748b; font-weight:800;">ไม่มีรูปประกอบ</div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div style="color:#64748b; font-weight:800;">ไม่มีรูปประกอบ</div>
+          {% endif %}
+
+          <!-- ===== Actions ===== -->
+          <div class="actions">
+            <a href="{% url 'approve_post' post.id %}" class="btn btn-approve">ยืนยัน</a>
+            <a href="{% url 'reject_post' post.id %}" class="btn btn-reject">แก้ไข/ไม่ผ่าน</a>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
 
 </body>
 </html>

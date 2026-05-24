@@ -127,13 +127,16 @@
     <!-- Navbar -->
     <div class="navbar">
 
-        <div class="navbar-title" onclick="window.location.href='{% url 'teacher_home' %}'">
+        <div class="navbar-title">
             CoopHub
         </div>
 
         <div class="navbar-icons">
 
-            <img src="https://img.icons8.com/ios-filled/50/ffffff/appointment-reminders.png">
+            <a href="{% url 'activity' %}">
+                <img src="https://img.icons8.com/ios-filled/50/ffffff/appointment-reminders.png">
+            </a>
+
 
             <a href="{% url 'create_post' %}">
                 <img src="https://img.icons8.com/ios-filled/50/ffffff/edit.png">
@@ -151,13 +154,13 @@
                 {% endif %}
 
                 <div class="dropdown-menu" id="dropdownMenu">
-                    <a href="#">Community</a>
-                    <a href="#">Major chat</a>
+                    <a href="{% url 'chat:room' 'coophub-community' %}">Community</a>
                     <a href="{% url 'profile' %}">My profile</a>
                     <a href="{% url 'teacher_approval' %}">คำขอเข้าร่วม</a>
-                    <a href="#">ดูรายชื่อสมาชิก</a>
-                    <a href="#">แดชบอร์ด</a>
-                    <a href="#">บันทึกกิจกรรม</a>
+                    <a href="{% url 'member_list' %}">ดูรายชื่อสมาชิก</a>
+                    <a href="{% url 'manage_accounts' %}">จัดการบัญชี</a>
+                    <a href="{% url 'activity_history' %}">บันทึกกิจกรรม</a>
+                    <a href="{% url 'management_dashboard' %}">แดชบอร์ด</a>
                     <a href="{% url 'logout' %}">ออกจากระบบ</a>
                 </div>
             </div>
@@ -189,6 +192,7 @@
                     <p style="margin:4px 0;">จังหวัด: {{ p.province }}</p>
                     <p style="margin:4px 0;">เบี้ยเลี้ยง: {{ p.salary }}</p>
                     <p style="margin:4px 0;">ตำแหน่งที่ได้รับ: {{ p.position }}</p>
+                    <p style="margin:4px 0;">ที่ตั้งบริษัท: {{ p.location }}</p>
 
                     <p style="margin:4px 0;">ผู้โพสต์:
                         {{ p.owner.first_name }} {{ p.owner.last_name }}
@@ -200,11 +204,18 @@
                     </p>
 
                     {% if user_obj.role == "teacher" or user_obj.role == "admin" or user_obj.username == "admin007" %}
-                    <a class="delete-btn"
-                       href="{% url 'delete_post' p.id %}"
-                       onclick="event.stopPropagation();">
-                        <img src="https://img.icons8.com/ios-glyphs/30/000000/trash.png">
-                    </a>
+                    <div style="display: flex; gap: 8px;">
+                        <a class="delete-btn"
+                           href="{% url 'edit_post' p.id %}"
+                           onclick="event.stopPropagation();" title="แก้ไขโพสต์">
+                            <img src="https://img.icons8.com/ios-filled/50/000000/edit.png">
+                        </a>
+                        <a class="delete-btn"
+                           href="{% url 'delete_post' p.id %}"
+                           onclick="event.stopPropagation();" title="ลบโพสต์">
+                            <img src="https://img.icons8.com/ios-glyphs/30/000000/trash.png">
+                        </a>
+                    </div>
                     {% endif %}
                 </div>
 

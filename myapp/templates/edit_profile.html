@@ -1,157 +1,549 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <title>แก้ไขโปรไฟล์</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>แก้ไขโปรไฟล์ | CoopHub</title>
 
-    <style>
-        body {
-            margin: 0;
-            font-family: 'Prompt', sans-serif;
-            background-color: #f5f5f5;
-        }
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap">
 
-        /* Navbar */
-        .navbar {
-            background-color: #2f80ed;
-            padding: 15px 25px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            color: white;
-            font-size: 26px;
-            font-weight: bold;
-            cursor: pointer;
-        }
+  <style>
+    :root{
+      --blue:#2f80ed;
+      --bg:#f6f7fb;
+      --card:#ffffff;
+      --line:#e9edf5;
+      --text:#1a2a55;
+      --muted:#6b7280;
+      --shadow:0 2px 14px rgba(0,0,0,.06);
+      --radius:18px;
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family:"Prompt", Arial, sans-serif;
+      background:var(--bg);
+      color:#111;
+    }
 
-        .container {
-            max-width: 900px;
-            margin: 30px auto;
-            background: white;
-            padding: 35px;
-            border-radius: 15px;
-            box-shadow: 0px 3px 10px rgba(0,0,0,0.1);
-        }
+    /* ===== Navbar (เหมือนตัวอย่าง) ===== */
+    .navbar {
+      background-color: var(--blue);
+      color: white;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .navbar-title {
+      font-size: 28px;
+      font-weight: bold;
+      font-family: "Comic Sans MS", cursive;
+      cursor: pointer;
+      user-select:none;
+    }
+    .navbar-icons {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+    .navbar-icons img {
+      width: 32px;
+      height: 32px;
+      cursor: pointer;
+    }
+    .profile-img {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      object-fit: cover;
+      cursor: pointer;
+    }
+    .profile-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: white;
+      border: 2px solid var(--blue);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: var(--blue);
+      cursor: pointer;
+      font-size: 18px;
+      font-weight:800;
+    }
 
-        h2 {
-            color: #333;
-            margin-bottom: 30px;
-        }
+    /* ===== Page ===== */
+    .wrap{
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 18px;
+    }
+    .card{
+      margin-top: 14px;
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid #eef0f4;
+      overflow:hidden;
+    }
+    .header{
+      padding: 18px 18px 10px;
+      border-bottom: 1px solid var(--line);
+      display:flex;
+      justify-content:space-between;
+      gap:14px;
+      flex-wrap:wrap;
+      align-items:flex-end;
+    }
+    .header h1{
+      margin:0;
+      font-size: 24px;
+      color: var(--text);
+    }
+    .sub{
+      margin-top:4px;
+      font-size: 13px;
+      color: var(--muted);
+    }
 
-        input[type="text"], input[type="email"] {
-            width: 100%;
-            padding: 10px;
-            margin: 8px 0 15px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            font-size: 16px;
-        }
+    .content{ padding: 18px; }
 
-        .profile-upload {
-            text-align: center;
-            margin-bottom: 25px;
-        }
+    /* ===== Avatar box ===== */
+    .avatar-box{
+      display:flex;
+      gap:16px;
+      align-items:center;
+      padding:16px;
+      border:1px dashed #cfe2ff;
+      border-radius: 16px;
+      background: linear-gradient(#ffffff, #fbfbff);
+    }
+    .avatar-preview{
+      width:86px; height:86px;
+      border-radius: 50%;
+      border: 3px solid var(--blue);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+      background: radial-gradient(circle at 30% 30%, #ffffff, #eef4ff);
+      flex-shrink:0;
+    }
+    .avatar-preview img{
+      width:100%; height:100%;
+      object-fit:cover;
+    }
+    .avatar-letter{
+      width:100%; height:100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:30px;
+      font-weight:900;
+      color:#1a2a55;
+      background: linear-gradient(135deg, #eaf2ff, #ffffff);
+    }
+    .avatar-meta h3{
+      margin:0;
+      font-size:16px;
+      color: var(--text);
+    }
+    .avatar-meta p{
+      margin:4px 0 0;
+      font-size:13px;
+      color: var(--muted);
+    }
+    .btnrow{ display:flex; gap:10px; margin-top:10px; flex-wrap:wrap; }
+    .btn{
+      border:none;
+      background: var(--blue);
+      color:#fff;
+      height:40px;
+      padding:0 14px;
+      border-radius: 12px;
+      cursor:pointer;
+      font-weight:800;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+    }
+    .btn-ghost{
+      background:#eef3ff;
+      color: var(--blue);
+      border:1px solid #dbe6ff;
+      font-weight:800;
+    }
 
-        .circle-upload {
-            width: 180px;
-            height: 180px;
-            border-radius: 50%;
-            border: 3px solid #2f80ed;
-            margin: auto;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            color: #888;
-            font-size: 15px;
-            flex-direction: column;
-            background-color: #f9f9f9;
-        }
+    /* ===== Form grid ===== */
+    form{ margin:0; }
+    .grid{
+      margin-top:16px;
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:14px 14px;
+    }
+    .field label{
+      display:block;
+      font-size:13px;
+      color:#374151;
+      margin: 0 0 6px;
+      font-weight:700;
+    }
+    .input, select{
+      width:100%;
+      border:1px solid #dfe3ea;
+      border-radius: 12px;
+      padding: 12px 12px;
+      font-size:15px;
+      outline:none;
+      background:#fff;
+    }
+    .input:focus, select:focus{ border-color: var(--blue); }
+    .input[disabled]{
+      background:#f3f4f6;
+      color:#6b7280;
+      cursor:not-allowed;
+    }
+    .hint{
+      margin-top:6px;
+      font-size:12px;
+      color: var(--muted);
+      line-height:1.35;
+    }
+    .span2{ grid-column: 1 / -1; }
 
-        .btn-save {
-            width: 150px;
-            background-color: #2f80ed;
-            padding: 12px;
-            border: none;
-            border-radius: 10px;
-            color: white;
-            font-size: 18px;
-            cursor: pointer;
-            margin-top: 20px;
-            display: block;
-            margin-left: auto;
-            margin-right: auto;
-        }
+    .actions{
+      margin-top:18px;
+      display:flex;
+      justify-content:flex-end;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .save{
+      height:46px;
+      padding:0 18px;
+      border-radius: 14px;
+    }
+    .back{
+      height:46px;
+      padding:0 18px;
+      border-radius: 14px;
+      background:#fff;
+      border:1px solid #e5e7eb;
+      color:#111;
+      font-weight:800;
+      cursor:pointer;
+    }
 
-    </style>
+    @media (max-width: 780px){
+      .grid{ grid-template-columns: 1fr; }
+      .actions{ justify-content:stretch; }
+      .save, .back{ width:100%; justify-content:center; }
+      .avatar-box{ align-items:flex-start; }
+    }
+  </style>
 </head>
 
 <body>
 
-<!-- ✅ Navbar แยกตาม role -->
-<div class="navbar">
-    {% if user.role == 'student' %}
-        <div onclick="window.location.href='{% url 'student_home' %}'">CoopHub</div>
-    {% elif user.role == 'teacher' %}
-        <div onclick="window.location.href='{% url 'teacher_home' %}'">CoopHub</div>
-    {% else %}
-        <div onclick="window.location.href='{% url 'admin_dashboard' %}'">CoopHub</div>
-    {% endif %}
-</div>
+  <!-- ===== Navbar (เหมือนตัวอย่าง) ===== -->
+  <div class="navbar">
 
-<div class="container">
-    <h2>ข้อมูลส่วนตัว</h2>
+    <div class="navbar-title"
+         onclick="
+          {% if request.user.role == 'student' %}
+            window.location.href='{% url 'student_home' %}';
+          {% elif request.user.role == 'teacher' %}
+            window.location.href='{% url 'teacher_home' %}';
+          {% else %}
+            window.location.href='{% url 'admin_dashboard' %}';
+          {% endif %}
+         ">
+      CoopHub
+    </div>
 
-    <form method="POST" enctype="multipart/form-data">
-        {% csrf_token %}
+    <div class="navbar-icons">
+      {% if request.user.role == 'student' %}
+        <a href="{% url 'activity_student' %}">
+          <img src="https://img.icons8.com/ios-filled/50/ffffff/appointment-reminders.png" alt="notify">
+        </a>
+      {% else %}
+        <a href="{% url 'activity' %}">
+          <img src="https://img.icons8.com/ios-filled/50/ffffff/appointment-reminders.png" alt="notify">
+        </a>
+      {% endif %}
 
-        <!-- Upload Profile -->
-        <div class="profile-upload">
-            <label for="profileInput">
-                <div class="circle-upload"
-                     style="
-                        {% if user.profile_image %}
-                            background-image: url('{{ user.profile_image.url }}');
-                            background-size: cover;
-                            background-position: center;
-                        {% endif %}
-                     ">
-                    {% if not user.profile_image %}
-                        📷 <br> อัพโหลดรูปโปรไฟล์ <br>
-                        <small>ไฟล์ .jpg .png</small>
-                    {% endif %}
-                </div>
-            </label>
-            <input id="profileInput" type="file" name="profile_image" style="display: none;">
-        </div>
+      <a href="{% url 'create_post' %}">
+        <img src="https://img.icons8.com/ios-filled/50/ffffff/edit.png" alt="create">
+      </a>
 
-        <label>Username</label>
-        <input type="text" name="username" value="{{ user.username }}">
+      {% if request.user.role == 'student' %}
+        <a href="{% url 'bookmark_list' %}">
+          <img src="https://img.icons8.com/ios-filled/50/ffffff/bookmark-ribbon.png" alt="bookmark">
+        </a>
+      {% else %}
+        <a href="{% url 'trash_bin' %}">
+          <img src="https://img.icons8.com/ios-filled/50/ffffff/delete.png" alt="trash">
+        </a>
+      {% endif %}
 
-        <label>ชื่อ</label>
-        <input type="text" name="first_name" value="{{ user.first_name }}">
-
-        <label>นามสกุล</label>
-        <input type="text" name="last_name" value="{{ user.last_name }}">
-
-        <label>คณะ</label>
-        <input type="text" name="faculty" value="{{ user.faculty }}">
-
-        <label>สาขา</label>
-        <input type="text" name="major" value="{{ user.major }}">
-
-        {% if user.role == 'student' %}
-            <label>รหัสนักศึกษา</label>
-            <input type="text" name="student_id" value="{{ user.student_id }}">
+      <a
+        href="{% if request.user.role == 'student' %}{% url 'student_home' %}
+              {% elif request.user.role == 'teacher' %}{% url 'teacher_home' %}
+              {% else %}{% url 'admin_dashboard' %}{% endif %}"
+        style="display:inline-flex; align-items:center; text-decoration:none;"
+        title="ไปหน้า Home"
+      >
+        {% if request.user.profile_image and request.user.profile_image.name %}
+          <img class="profile-img" src="{{ request.user.profile_image.url }}" alt="profile">
+        {% else %}
+          <div class="profile-icon" aria-label="profile">
+            {{ request.user.first_name|default:request.user.username|slice:":1"|upper }}
+          </div>
         {% endif %}
+      </a>
+    </div>
+  </div>
 
-        <!-- อีเมล แค่แสดงอย่างเดียว ไม่ให้แก้ -->
-        <label>อีเมล (ไม่สามารถแก้ไขได้)</label>
-        <input type="email" value="{{ user.email }}" disabled>
+  <div class="wrap">
+    <div class="card">
+      <div class="header">
+        <div>
+          <h1>แก้ไขข้อมูลส่วนตัว</h1>
+          <div class="sub">แก้ไขข้อมูลพื้นฐาน + อัปโหลดรูปโปรไฟล์ (อีเมลแก้ไม่ได้)</div>
+        </div>
+        <div class="sub">
+          ถ้าต้องการเปลี่ยนรหัสผ่าน ไปที่หน้า <a href="{% url 'password_reset' %}" style="color:var(--blue); text-decoration:none; font-weight:700;">เปลี่ยนรหัสผ่าน</a>
+        </div>
+      </div>
 
-        <button class="btn-save" type="submit">บันทึก</button>
-    </form>
-</div>
+      <div class="content">
+        <form method="POST" enctype="multipart/form-data">
+          {% csrf_token %}
+
+          <!-- ===== Avatar ===== -->
+          <div class="avatar-box">
+            <div class="avatar-preview" id="avatarPreview">
+              {% if request.user.profile_image and request.user.profile_image.name %}
+                <img src="{{ request.user.profile_image.url }}" alt="avatar">
+              {% else %}
+                <div class="avatar-letter">
+                  {{ request.user.first_name|default:request.user.username|slice:":1"|upper }}
+                </div>
+              {% endif %}
+            </div>
+
+            <div class="avatar-meta">
+              <h3>รูปโปรไฟล์</h3>
+              <p>รองรับ .jpg / .png เลือกไฟล์แล้วจะพรีวิวทันที</p>
+
+              <div class="btnrow">
+                <button type="button" class="btn" onclick="document.getElementById('profileInput').click()">
+                  เลือกรูป
+                </button>
+                <button type="button" class="btn btn-ghost" id="clearPhotoBtn">
+                  ล้างพรีวิว
+                </button>
+              </div>
+
+              <input id="profileInput" type="file" name="profile_image" accept="image/*" style="display:none;">
+            </div>
+          </div>
+
+          <!-- ===== Fields ===== -->
+          <div class="grid">
+
+            <div class="field">
+              <label>ชื่อจริง</label>
+              <input class="input" type="text" name="first_name" value="{{ user.first_name|default:'' }}" required>
+            </div>
+
+            <div class="field">
+              <label>นามสกุล</label>
+              <input class="input" type="text" name="last_name" value="{{ user.last_name|default:'' }}" required>
+            </div>
+
+            <div class="field">
+              <label>Username</label>
+              <input class="input" type="text" name="username" value="{{ user.username|default:'' }}" required>
+            </div>
+
+            <div class="field">
+              <label>อีเมล (แก้ไม่ได้)</label>
+              <input class="input" type="email" value="{{ user.email|default:'' }}" disabled>
+              <div class="hint">อีเมลถูกล็อกเพื่อความปลอดภัย</div>
+            </div>
+
+            <div class="field">
+              <label>บทบาท</label>
+              <input class="input" type="text" value="{{ user.role }}" disabled>
+              <div class="hint">บทบาทเปลี่ยนไม่ได้จากหน้านี้</div>
+            </div>
+
+            <div class="field">
+              <label>รหัสนักศึกษา (เฉพาะนักศึกษา)</label>
+              {% if user.role == 'student' %}
+                <input class="input" type="text" name="student_id" value="{{ user.student_id|default:'' }}">
+              {% else %}
+                <input class="input" type="text" value="(เฉพาะนักศึกษา)" disabled>
+              {% endif %}
+            </div>
+
+            <div class="field">
+              <label>คณะ</label>
+              <select id="faculty" name="faculty" required>
+                <option value="">เลือกคณะ</option>
+                <option value="คณะวิทยาศาสตร์">คณะวิทยาศาสตร์</option>
+                <option value="คณะเกษตรศาสตร์">คณะเกษตรศาสตร์</option>
+                <option value="คณะวิศวกรรมศาสตร์">คณะวิศวกรรมศาสตร์</option>
+                <option value="คณะศิลปศาสตร์">คณะศิลปศาสตร์</option>
+                <option value="คณะบริหารศาสตร์">คณะบริหารศาสตร์</option>
+                <option value="คณะนิติศาสตร์">คณะนิติศาสตร์</option>
+                <option value="คณะรัฐศาสตร์">คณะรัฐศาสตร์</option>
+                <option value="คณะศึกษาศาสตร์">คณะศึกษาศาสตร์</option>
+                <option value="คณะเภสัชศาสตร์">คณะเภสัชศาสตร์</option>
+                <option value="คณะพยาบาลศาสตร์">คณะพยาบาลศาสตร์</option>
+                <option value="วิทยาลัยแพทยศาสตร์และการสาธารณสุข">วิทยาลัยแพทยศาสตร์และการสาธารณสุข</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label>สาขา</label>
+              <select id="major" name="major" required>
+                <option value="">เลือกสาขา</option>
+              </select>
+            </div>
+
+            <div class="field span2">
+              <div class="actions">
+                <button type="button" class="back"
+                        onclick="
+                          {% if request.user.role == 'student' %}
+                            window.location.href='{% url 'profile' %}';
+                          {% elif request.user.role == 'teacher' %}
+                            window.location.href='{% url 'profile' %}';
+                          {% else %}
+                            window.location.href='{% url 'profile' %}';
+                          {% endif %}
+                        ">
+                  ย้อนกลับ
+                </button>
+
+                <button class="btn save" type="submit">
+                  บันทึกการเปลี่ยนแปลง
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </form>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ===== major list (จาก register.html) =====
+    const majorData = {
+      "คณะวิทยาศาสตร์": [
+        "ฟิสิกส์ชีวการแพทย์", "ชีววิทยา", "จุลชีววิทยา", "เคมี",
+        "วิทยาการข้อมูลและนวัตกรรมซอฟต์แวร์",
+        "เทคโนโลยีสารสนเทศและการสื่อสาร",
+        "คณิตศาสตร์", "อาชีวอนามัยและความปลอดภัย",
+        "วิทยาศาสตร์สิ่งแวดล้อม",
+        "เทคโนโลยียางและพอลิเมอร์",
+        "นวัตกรรมเทคโนโลยีวัสดุ"
+      ],
+      "คณะเกษตรศาสตร์": ["เกษตรศาสตร์", "เทคโนโลยีการอาหาร", "เกษตรวิศว์อัจฉริยะ"],
+      "คณะวิศวกรรมศาสตร์": [
+        "วิศวกรรมเครื่องกล","วิศวกรรมอุตสาหการ","วิศวกรรมเคมี",
+        "วิศวกรรมโยธา","วิศวกรรมไฟฟ้า","วิศวกรรมสิ่งแวดล้อม",
+        "วิศวกรรมเมคคาทรอนิกส์และระบบอัตโนมัติ",
+        "วิศวกรรมปัญญาประดิษฐ์และการสั่งการ"
+      ],
+      "คณะศิลปศาสตร์": [
+        "ภาษาอังกฤษและการสื่อสาร","การจัดการการท่องเที่ยวและการบริการ",
+        "นวัตกรรมการพัฒนาสังคม","ภาษาจีนและการสื่อสาร",
+        "ภาษาไทยและการสื่อสาร","ภาษาญี่ปุ่นและการสื่อสาร",
+        "นิเทศศาสตร์","ภาษาอังกฤษเพื่อธุรกิจในยุคดิจิทัล","ประวัติศาสตร์"
+      ],
+      "คณะบริหารศาสตร์": [
+        "การจัดการธุรกิจ","การตลาด","การเงินและการลงทุน",
+        "นวัตกรรมการจัดการโรงแรมและการบริการ",
+        "การจัดการธุรกิจระหว่างประเทศ","บัญชี",
+        "การจัดการโลจิสติกส์และโซ่อุปทาน"
+      ],
+      "คณะนิติศาสตร์": ["นิติศาสตร์"],
+      "คณะรัฐศาสตร์": ["การปกครอง","รัฐประศาสนศาสตร์"],
+      "คณะศึกษาศาสตร์": ["ศึกษาศาสตร์"],
+      "คณะเภสัชศาสตร์": ["เภสัชศาสตร์"],
+      "คณะพยาบาลศาสตร์": ["พยาบาลศาสตร์"],
+      "วิทยาลัยแพทยศาสตร์และการสาธารณสุข": [
+        "แพทยศาสตร์","อนามัยสิ่งแวดล้อม","สาธารณสุขศาสตร์"
+      ]
+    };
+
+    const facultyEl = document.getElementById("faculty");
+    const majorEl = document.getElementById("major");
+
+    const currentFaculty = "{{ request.user.faculty|default:'' }}";
+    const currentMajor = "{{ request.user.major|default:'' }}";
+
+    // set faculty selected
+    if (currentFaculty) {
+      [...facultyEl.options].forEach(opt => {
+        if (opt.value === currentFaculty) opt.selected = true;
+      });
+    }
+
+    function fillMajors(faculty, selectedMajor=""){
+      majorEl.innerHTML = '<option value="">เลือกสาขา</option>';
+      if (majorData[faculty]) {
+        majorData[faculty].forEach(m => {
+          const opt = document.createElement("option");
+          opt.value = m;
+          opt.textContent = m;
+          if (selectedMajor && selectedMajor === m) opt.selected = true;
+          majorEl.appendChild(opt);
+        });
+      }
+    }
+
+    if (currentFaculty) fillMajors(currentFaculty, currentMajor);
+
+    facultyEl.addEventListener("change", function(){
+      fillMajors(this.value, "");
+    });
+
+    // ===== Avatar preview (กัน ValueError ด้วยการไม่เรียก .url ถ้าไม่มีไฟล์) =====
+    const input = document.getElementById("profileInput");
+    const avatarPreview = document.getElementById("avatarPreview");
+    const clearBtn = document.getElementById("clearPhotoBtn");
+
+    const oldImageUrl =
+      "{% if request.user.profile_image and request.user.profile_image.name %}{{ request.user.profile_image.url }}{% else %}{% endif %}";
+
+    const fallbackLetter =
+      "{{ request.user.first_name|default:request.user.username|slice:':1'|upper }}";
+
+    input.addEventListener("change", function(){
+      const file = this.files && this.files[0];
+      if (!file) return;
+      const url = URL.createObjectURL(file);
+      avatarPreview.innerHTML = `<img src="${url}" alt="preview">`;
+    });
+
+    clearBtn.addEventListener("click", function(){
+      input.value = "";
+      if (oldImageUrl && oldImageUrl.trim() !== "") {
+        avatarPreview.innerHTML = `<img src="${oldImageUrl}" alt="avatar">`;
+      } else {
+        avatarPreview.innerHTML = `<div class="avatar-letter">${fallbackLetter}</div>`;
+      }
+    });
+  </script>
 
 </body>
 </html>
