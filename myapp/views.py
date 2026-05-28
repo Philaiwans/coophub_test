@@ -261,7 +261,7 @@ def admin_dashboard(request):
     # -----------------------------
     search = request.GET.get("search", "").strip()
 
-    posts = CoopPost.objects.filter(status="approved")
+    posts = CoopPost.objects.filter(status__in=["approved", "expired"])
 
     if search:
         posts = posts.filter(
@@ -538,7 +538,7 @@ def teacher_home(request):
     salary_kind = request.GET.get("salary_kind", "all")  # all | paid | none | negotiable
 
     # --------- queryset หลัก ----------
-    posts = CoopPost.objects.filter(status="approved").select_related("owner")
+    posts = CoopPost.objects.filter(status__in=["approved", "expired"]).select_related("owner")
 
     # --------- search ----------
     if search:
@@ -586,7 +586,7 @@ def teacher_home(request):
 
     # รูปแบบการฝึก: ดึงจากโพสต์ที่มีจริง (ไม่ต้อง hardcode)
     work_type_choices = (
-        CoopPost.objects.filter(status="approved")
+        CoopPost.objects.filter(status__in=["approved", "expired"])
         .exclude(type_of_work__isnull=True)
         .exclude(type_of_work__exact="")
         .values_list("type_of_work", flat=True)
@@ -786,6 +786,15 @@ def post_approval_list(request):
     
     return render(request, 'post_approval_list.html', {"posts": posts, "user_obj": request.user})
 
+@login_required
+def expired_posts(request):
+    # อนุญาตเฉพาะครู/แอดมิน
+    if request.user.role not in ['teacher', 'admin'] and request.user.username != 'admin007':
+        return redirect('login')
+
+    posts = CoopPost.objects.filter(status='expired').order_by('-created_at')
+    return render(request, 'expired_posts.html', {"posts": posts, "user_obj": request.user})
+
 
 
 @login_required
@@ -861,6 +870,27 @@ def delete_post(request, post_id):
 
     messages.success(request, "ลบโพสต์แล้ว (เก็บในถังขยะ)")
     return redirect('admin_dashboard' if request.user.role == 'admin' else 'teacher_home')
+
+@login_required
+def toggle_expire_post(request, post_id):
+    post = get_object_or_404(CoopPost, id=post_id)
+
+    # อนุญาตเฉพาะอาจารย์หรือแอดมิน
+    if request.user.role not in ['teacher', 'admin'] and request.user.username != 'admin007':
+        return redirect('login')
+
+    if post.status == "approved":
+        post.status = "expired"
+        messages.success(request, f"ตั้งค่าโพสต์ของ {post.company} เป็นหมดอายุ/ปิดรับสมัครเรียบร้อยแล้ว")
+    elif post.status == "expired":
+        from django.utils import timezone
+        post.status = "approved"
+        post.created_at = timezone.now()
+        messages.success(request, f"เปิดรับสมัครโพสต์ของ {post.company} อีกครั้งเรียบร้อยแล้ว (ต่ออายุโพสต์ต่ออีก 3 เดือน)")
+
+    post.save()
+    next_url = request.META.get('HTTP_REFERER') or reverse('teacher_home')
+    return redirect(next_url)
 
 @login_required
 def trash_bin(request):

@@ -79,6 +79,8 @@ path('management-dashboard/', views.management_dashboard, name='management_dashb
     # Teacher approval page (fix)
     path('teacher-approval/', views.Teacher_approval, name='teacher_approval'),
     path('post/delete/<int:post_id>/', views.delete_post, name='delete_post'),
+    path('post/expire/<int:post_id>/', views.toggle_expire_post, name='toggle_expire_post'),
+    path('post/expired/', views.expired_posts, name='expired_posts'),
     path('trash/', views.trash_bin, name='trash_bin'),
     path('post/restore/<int:post_id>/', views.restore_post, name='restore_post'),
     path('trash/', views.trash_bin, name='trash_bin'),

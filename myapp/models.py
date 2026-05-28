@@ -66,6 +66,7 @@ class CoopPost(models.Model):
             ('pending', 'รออนุมัติ'),
             ('approved', 'ผ่าน'),
             ('rejected', 'ไม่ผ่าน'),
+            ('expired', 'หมดอายุ'),
             ('deleted', 'ลบแล้ว'),
         ],
         default='pending'
@@ -75,6 +76,38 @@ class CoopPost(models.Model):
 
     def __str__(self):
         return f"{self.company} - {self.owner.username}"
+
+    @classmethod
+    def auto_expire_posts(cls):
+        from django.utils import timezone
+        from datetime import timedelta
+        # 3 months is 90 days. Approved posts older than 90 days are updated to expired status.
+        limit_date = timezone.now() - timedelta(days=90)
+        cls.objects.filter(status="approved", created_at__lt=limit_date).update(status="expired")
+
+    @property
+    def days_until_expiration(self):
+        if not self.created_at:
+            return 90
+        
+        from django.utils import timezone
+        import datetime
+        
+        try:
+            now = timezone.now()
+            if timezone.is_naive(self.created_at):
+                now = timezone.make_naive(now)
+            else:
+                if timezone.is_naive(now):
+                    now = timezone.make_aware(now)
+                
+            expiration_date = self.created_at + datetime.timedelta(days=90)
+            if now >= expiration_date:
+                return 0
+            delta = expiration_date - now
+            return delta.days
+        except Exception:
+            return 90
 
 
 # ---------- รูปภาพประกอบเพิ่มเติม ----------

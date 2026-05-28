@@ -56,6 +56,30 @@
       cursor: pointer;
       font-size: 20px;
     }
+    .profile-container { position: relative; display: inline-block; }
+    .dropdown-menu {
+      position: absolute;
+      top: 50px;
+      right: 0;
+      width: 190px;
+      background: white;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      box-shadow: 0px 2px 8px rgba(0,0,0,0.15);
+      display: none;
+      z-index: 100;
+      overflow: hidden;
+    }
+    .dropdown-menu a {
+      display: block;
+      padding: 12px;
+      font-size: 14px;
+      text-decoration: none;
+      color: black;
+      border-bottom: 1px solid #e5e5e5;
+    }
+    .dropdown-menu a:hover { background: #f2f2f2; }
+    .dropdown-menu a:last-child { border-bottom: none; }
 
     /* ===== Chat card ===== */
     .wrap{ max-width:900px; margin:0 auto; padding:18px; }
@@ -193,20 +217,43 @@
         </a>
       {% endif %}
 
-      <!-- โปรไฟล์: กดแล้วไปหน้า Home ตาม role -->
-      <a
-        href="{% if request.user.role == 'student' %}{% url 'student_home' %}
-              {% elif request.user.role == 'teacher' %}{% url 'teacher_home' %}
-              {% else %}{% url 'admin_dashboard' %}{% endif %}"
-        style="display:inline-flex; align-items:center; text-decoration:none;"
-        title="ไปหน้า Home"
-      >
+      <!-- โปรไฟล์: กดแล้วขึ้น dropdown เมนูของแต่ละบทบาท -->
+      <div class="profile-container">
         {% if request.user.profile_image %}
-          <img class="profile-img" src="{{ request.user.profile_image.url }}" alt="profile">
+          <img class="profile-img" src="{{ request.user.profile_image.url }}" id="profileBtn" alt="profile">
         {% else %}
-          <div class="profile-icon" aria-label="profile">👤</div>
+          <div class="profile-icon" id="profileBtn" aria-label="profile">👤</div>
         {% endif %}
-      </a>
+
+        <div class="dropdown-menu" id="dropdownMenu">
+          <a href="{% url 'chat:room' 'coophub-community' %}">Community</a>
+          
+          {% if request.user.role == 'student' %}
+            <a href="{% url 'chat:room' 'chatbot-student' %}">Chatbot</a>
+          {% elif request.user.role == 'teacher' %}
+            <a href="{% url 'chat:room' 'chatbot-Teacher' %}">Chatbot</a>
+          {% endif %}
+          
+          <a href="{% url 'profile' %}">My Profile</a>
+          
+          {% if request.user.role == 'student' %}
+            <a href="{% url 'student_dashboard' %}">แดชบอร์ด</a>
+          {% elif request.user.role == 'teacher' %}
+            <a href="{% url 'post_approval_list' %}">อนุมัติโพสต์</a>
+            <a href="{% url 'member_list' %}">ดูรายชื่อนักศึกษาในระบบ</a>
+            <a href="{% url 'expired_posts' %}">โพสต์ที่หมดเซสชัน</a>
+            <a href="{% url 'management_dashboard' %}">แดชบอร์ด</a>
+          {% elif request.user.role == 'admin' or request.user.username == 'admin007' %}
+            <a href="{% url 'teacher_approval' %}">คำขอเข้าร่วม</a>
+            <a href="{% url 'member_list' %}">ดูรายชื่อสมาชิก</a>
+            <a href="{% url 'manage_accounts' %}">จัดการบัญชี</a>
+            <a href="{% url 'management_dashboard' %}">แดชบอร์ด</a>
+          {% endif %}
+          
+          <a href="{% url 'activity_history' %}">บันทึกกิจกรรม</a>
+          <a href="{% url 'logout' %}">ออกจากระบบ</a>
+        </div>
+      </div>
 
     </div>
   </div>
@@ -390,6 +437,22 @@
         fileInput.value = "";
       }
     });
+
+    // Dropdown Profile
+    const profileBtn = document.getElementById("profileBtn");
+    const dropdownMenu = document.getElementById("dropdownMenu");
+
+    if (profileBtn && dropdownMenu) {
+        profileBtn.onclick = () => {
+            dropdownMenu.style.display =
+                dropdownMenu.style.display === "block" ? "none" : "block";
+        };
+        document.addEventListener("click", function(event) {
+            if (!profileBtn.contains(event.target) && !dropdownMenu.contains(event.target)) {
+                dropdownMenu.style.display = "none";
+            }
+        });
+    }
   </script>
 
 </body>

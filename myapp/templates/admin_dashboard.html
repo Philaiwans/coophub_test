@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -64,7 +65,9 @@
             font-size: 20px;
         }
 
-        .profile-container { position: relative; }
+        .profile-container {
+            position: relative;
+        }
 
         .dropdown-menu {
             position: absolute;
@@ -74,7 +77,7 @@
             background: white;
             border-radius: 10px;
             border: 1px solid #ccc;
-            box-shadow: 0px 2px 8px rgba(0,0,0,0.15);
+            box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.15);
             display: none;
             z-index: 100;
         }
@@ -87,9 +90,11 @@
             color: black;
             border-bottom: 1px solid #e5e5e5;
         }
+
         .dropdown-menu a:hover {
             background: #f2f2f2;
         }
+
         .dropdown-menu a:last-child {
             border-bottom: none;
         }
@@ -104,7 +109,7 @@
             justify-content: space-between;
             gap: 20px;
             cursor: pointer;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
         }
 
         .post-image {
@@ -114,11 +119,27 @@
             border-radius: 15px;
         }
 
-        .delete-btn img {
-            width: 26px;
+        .delete-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            border: 1px solid #e5e5e5;
+            background: #fff;
             cursor: pointer;
+            text-decoration: none;
         }
 
+        .delete-btn:hover {
+            background: #f5f5f5;
+        }
+
+        .delete-btn img {
+            width: 20px;
+            height: 20px;
+        }
     </style>
 </head>
 
@@ -148,9 +169,9 @@
 
             <div class="profile-container">
                 {% if user_obj.profile_image %}
-                    <img class="profile-img" src="{{ user_obj.profile_image.url }}" id="profileBtn">
+                <img class="profile-img" src="{{ user_obj.profile_image.url }}" id="profileBtn">
                 {% else %}
-                    <div class="profile-icon" id="profileBtn"><i class="fi fi-rr-user"></i></div>
+                <div class="profile-icon" id="profileBtn"><i class="fi fi-rr-user"></i></div>
                 {% endif %}
 
                 <div class="dropdown-menu" id="dropdownMenu">
@@ -172,8 +193,7 @@
     <!-- Search -->
     <div style="padding: 30px;">
         <form method="GET" style="display:flex; justify-content:center; margin-bottom:25px;">
-            <input type="text" name="search" value="{{ search }}"
-                placeholder="กรอกคำค้นหา"
+            <input type="text" name="search" value="{{ search }}" placeholder="กรอกคำค้นหา"
                 style="width:60%; padding:12px; border-radius:20px; border:1px solid #ccc; font-size:16px;">
             <button style="padding:12px 25px; background:#2f80ed; color:white;
             border:none; border-radius:20px; margin-left:10px;">ค้นหา</button>
@@ -187,7 +207,14 @@
             <div class="post-card" onclick="window.location.href='{% url 'post_detail' p.id %}'">
 
                 <div style="flex:1;">
-                    <h3 style="margin:0; font-size:22px; font-weight:bold;">{{ p.company }}</h3>
+                    <h3 style="margin:0; font-size:22px; font-weight:bold;">
+                        {{ p.company }}
+                        {% if p.status == 'expired' %}
+                        <span
+                            style="font-size:14px; background:#fa313a; color:white; padding:4px 8px; border-radius:10px; margin-left:10px; vertical-align:middle;">หมดอายุ
+                            / ปิดรับสมัคร</span>
+                        {% endif %}
+                    </h3>
 
                     <p style="margin:4px 0;">จังหวัด: {{ p.province }}</p>
                     <p style="margin:4px 0;">เบี้ยเลี้ยง: {{ p.salary }}</p>
@@ -196,23 +223,26 @@
 
                     <p style="margin:4px 0;">ผู้โพสต์:
                         {{ p.owner.first_name }} {{ p.owner.last_name }}
-                        ({{ p.owner.student_id }})
+                        {% if p.owner.student_id %}({{ p.owner.student_id }}){% endif %}
                     </p>
 
                     <p style="margin:4px 0; color:gray;">
                         วันที่โพสต์: {{ p.created_at|date:"d/m/Y" }}
                     </p>
+                    {% if p.status == 'approved' %}
+                    <p style="margin:4px 0; color:#e28743; font-weight:500;">
+                        เหลือเวลาอีก {{ p.days_until_expiration }} วันจะหมดอายุ
+                    </p>
+                    {% endif %}
 
                     {% if user_obj.role == "teacher" or user_obj.role == "admin" or user_obj.username == "admin007" %}
                     <div style="display: flex; gap: 8px;">
-                        <a class="delete-btn"
-                           href="{% url 'edit_post' p.id %}"
-                           onclick="event.stopPropagation();" title="แก้ไขโพสต์">
+                        <a class="delete-btn" href="{% url 'edit_post' p.id %}" onclick="event.stopPropagation();"
+                            title="แก้ไขโพสต์">
                             <img src="https://img.icons8.com/ios-filled/50/000000/edit.png">
                         </a>
-                        <a class="delete-btn"
-                           href="{% url 'delete_post' p.id %}"
-                           onclick="event.stopPropagation();" title="ลบโพสต์">
+                        <a class="delete-btn" href="{% url 'delete_post' p.id %}" onclick="event.stopPropagation();"
+                            title="ลบโพสต์">
                             <img src="https://img.icons8.com/ios-glyphs/30/000000/trash.png">
                         </a>
                     </div>
@@ -245,7 +275,7 @@
                 dropdownMenu.style.display === "block" ? "none" : "block";
         };
 
-        document.addEventListener("click", function(event) {
+        document.addEventListener("click", function (event) {
             if (!profileBtn.contains(event.target) &&
                 !dropdownMenu.contains(event.target)) {
                 dropdownMenu.style.display = "none";
@@ -254,4 +284,5 @@
     </script>
 
 </body>
+
 </html>

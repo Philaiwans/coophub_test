@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -65,7 +66,10 @@
             font-size: 20px;
         }
 
-        .profile-container { position: relative; display: inline-block; }
+        .profile-container {
+            position: relative;
+            display: inline-block;
+        }
 
         .dropdown-menu {
             position: absolute;
@@ -75,7 +79,7 @@
             background: white;
             border-radius: 10px;
             border: 1px solid #ccc;
-            box-shadow: 0px 2px 8px rgba(0,0,0,0.15);
+            box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.15);
             display: none;
             z-index: 100;
         }
@@ -89,26 +93,31 @@
             border-bottom: 1px solid #e5e5e5;
         }
 
-        .dropdown-menu a:last-child { border-bottom: none; }
-        .dropdown-menu a:hover { background:#f2f2f2; }
+        .dropdown-menu a:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-menu a:hover {
+            background: #f2f2f2;
+        }
 
         /* Cards */
         .post-card {
-            background:white;
-            border:1px solid #e0e0e0;
-            border-radius:20px;
-            padding:20px;
-            display:flex;
-            gap:20px;
-            cursor:pointer;
-            box-shadow:0 2px 6px rgba(0,0,0,0.08);
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 20px;
+            padding: 20px;
+            display: flex;
+            gap: 20px;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
         }
 
         .bookmark-btn {
-            border:none;
-            background:none;
-            cursor:pointer;
-            padding:0;
+            border: none;
+            background: none;
+            cursor: pointer;
+            padding: 0;
         }
     </style>
 </head>
@@ -140,9 +149,9 @@
             <div class="profile-container">
 
                 {% if user_obj.profile_image %}
-                    <img class="profile-img" src="{{ user_obj.profile_image.url }}" id="profileBtn">
+                <img class="profile-img" src="{{ user_obj.profile_image.url }}" id="profileBtn">
                 {% else %}
-                    <div class="profile-icon" id="profileBtn"><i class="fi fi-rr-user"></i></div>
+                <div class="profile-icon" id="profileBtn"><i class="fi fi-rr-user"></i></div>
                 {% endif %}
 
                 <div class="dropdown-menu" id="dropdownMenu">
@@ -162,8 +171,7 @@
 
         <!-- Search -->
         <form method="GET" style="display:flex; justify-content:center; margin-bottom:25px;">
-            <input type="text" name="search" value="{{ search }}"
-                placeholder="กรอกคำค้นหา"
+            <input type="text" name="search" value="{{ search }}" placeholder="กรอกคำค้นหา"
                 style="width:60%; padding:12px; border-radius:20px; border:1px solid #ccc; font-size:16px;">
             <button style="padding:12px 25px; background:#2f80ed; color:white;
             border:none; border-radius:20px; margin-left:10px;">ค้นหา</button>
@@ -173,8 +181,7 @@
         <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:25px; padding:0 20px;">
 
             {% for p in posts %}
-            <div class="post-card"
-                 onclick="window.location.href='{% url 'post_detail' p.id %}'">
+            <div class="post-card" onclick="window.location.href='{% url 'post_detail' p.id %}'">
 
                 <div style="flex:1;">
                     <h3 style="margin:0; font-size:22px; font-weight:bold;">{{ p.company }}</h3>
@@ -187,14 +194,14 @@
                     <p style="margin:4px 0;">
                         ผู้โพสต์:
                         {% if p.owner.role == 'admin' %}
-                            แอดมิน
+                        แอดมิน
                         {% elif p.owner.role == 'teacher' %}
-                            {{ p.owner.first_name }} {{ p.owner.last_name }} (อาจารย์)
+                        {{ p.owner.first_name }} {{ p.owner.last_name }} (อาจารย์)
                         {% else %}
-                            {{ p.owner.first_name }} {{ p.owner.last_name }}
-                            {% if p.owner.student_id %}
-                                ({{ p.owner.student_id }})
-                            {% endif %}
+                        {{ p.owner.first_name }} {{ p.owner.last_name }}
+                        {% if p.owner.student_id %}
+                        ({{ p.owner.student_id }})
+                        {% endif %}
                         {% endif %}
                     </p>
 
@@ -202,29 +209,29 @@
                     <p style="margin:4px 0; color:gray;">
                         วันที่โพสต์: {{ p.created_at|date:"d/m/Y" }}
                     </p>
+                    <p style="margin:4px 0; color:#e28743; font-weight:500;">
+                        เหลือเวลาอีก {{ p.days_until_expiration }} วันจะหมดอายุ
+                    </p>
 
                     <!-- ปุ่ม Bookmark -->
-                    <form method="POST"
-                          action="{% url 'toggle_bookmark' p.id %}"
-                          style="margin-top:8px;"
-                          onclick="event.stopPropagation();">
+                    <form method="POST" action="{% url 'toggle_bookmark' p.id %}" style="margin-top:8px;"
+                        onclick="event.stopPropagation();">
                         {% csrf_token %}
                         <input type="hidden" name="next" value="{{ request.get_full_path }}">
                         <button type="submit" class="bookmark-btn">
                             {% if p.id in bookmarked_ids %}
-                                <!-- ถ้า bookmark แล้ว -->
-                                <img src="https://img.icons8.com/ios-filled/30/2f80ed/bookmark-ribbon.png" alt="Unbookmark">
+                            <!-- ถ้า bookmark แล้ว -->
+                            <img src="https://img.icons8.com/ios-filled/30/2f80ed/bookmark-ribbon.png" alt="Unbookmark">
                             {% else %}
-                                <!-- ยังไม่ bookmark -->
-                                <img src="https://img.icons8.com/ios/30/2f80ed/bookmark-ribbon.png" alt="Bookmark">
+                            <!-- ยังไม่ bookmark -->
+                            <img src="https://img.icons8.com/ios/30/2f80ed/bookmark-ribbon.png" alt="Bookmark">
                             {% endif %}
                         </button>
                     </form>
                 </div>
 
                 {% if p.image %}
-                <img src="{{ p.image.url }}"
-                     style="width:140px; height:140px; object-fit:cover; border-radius:15px;">
+                <img src="{{ p.image.url }}" style="width:140px; height:140px; object-fit:cover; border-radius:15px;">
                 {% endif %}
             </div>
 
@@ -247,7 +254,7 @@
                 dropdownMenu.style.display === "block" ? "none" : "block";
         }
 
-        document.addEventListener("click", function(event) {
+        document.addEventListener("click", function (event) {
             if (profileBtn &&
                 !profileBtn.contains(event.target) &&
                 !dropdownMenu.contains(event.target)) {
@@ -257,4 +264,5 @@
     </script>
 
 </body>
+
 </html>
