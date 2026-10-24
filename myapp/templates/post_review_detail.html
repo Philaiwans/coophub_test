@@ -222,11 +222,11 @@
       white-space:nowrap;
     }
     td{
-      font-size:15px;
-      font-weight:700;
-      color:#0f172a;
-      white-space:pre-wrap;
-      word-break:break-word;
+        font-size:15px;
+        font-weight:700;
+        color:#0f172a;
+        white-space:normal;
+        word-break:break-word;
     }
     tr:last-child th, tr:last-child td{ border-bottom:none; }
 
@@ -430,53 +430,93 @@
 
         <!-- ===== Details ===== -->
         <div>
+      
           <table>
-            <tr><th>ชื่อบริษัท</th><td>{{ post.company|default:"-" }}</td></tr>
-            <tr><th>จังหวัด</th><td>{{ post.province|default:"-" }}</td></tr>
-            <tr><th>ตำแหน่งที่เปิดรับ</th><td>{{ post.position|default:"-" }}</td></tr>
 
-            <!-- ✅ ใช้ field ที่มีจริง -->
-            <tr><th>เวลาทำงาน</th><td>{{ post.work_time|default:"-" }}</td></tr>
-            <tr><th>ช่วงฝึกงาน</th><td>{{ post.internship_period|default:"-" }}</td></tr>
+              <tr>
+                  <th>ชื่อบริษัท</th>
+                  <td>{{ post.company|default:"-" }}</td>
+              </tr>
 
-            <tr><th>เบี้ยเลี้ยง</th><td>{{ post.salary|default:"-" }}</td></tr>
-            <tr><th>ทักษะที่ใช้</th><td>{{ post.skills|default:"-" }}</td></tr>
-            <tr><th>เกรดขั้นต่ำ</th><td>{{ post.grade|default:"-" }}</td></tr>
-            <tr><th>ช่องทางติดต่อ</th><td>{{ post.contact|default:"-" }}</td></tr>
-            <tr><th>ประเภทการฝึกงาน</th><td>{{ post.type_of_work|default:"-" }}</td></tr>
+              <tr>
+                  <th>จังหวัด</th>
+                  <td>{{ post.province|default:"-" }}</td>
+              </tr>
 
-            <tr><th>ที่ตั้งบริษัท</th><td>{{ post.location|default:"-" }}</td></tr>
-            <tr><th>เช็คอิน</th><td>{{ post.checkin_location|default:"-" }}</td></tr>
+              <tr>
+                  <th>ตำแหน่งที่เปิดรับ</th>
+                  <td>{{ post.position|default:"-" }}</td>
+              </tr>
 
-            <tr>
-              <th>Portfolio</th>
-              <td>
-                {% if post.portfolio %}
-                  <a class="link" href="{{ post.portfolio }}" target="_blank" rel="noopener">เปิดลิงก์</a>
-                {% else %}
-                  -
-                {% endif %}
-              </td>
-            </tr>
+              <tr>
+                  <th>วันและเวลาทำงาน</th>
+                  <td>{{ post.work_time|default:"-" }}</td>
+              </tr>
 
-            <tr><th>รายละเอียด</th><td>{{ post.description|default:"-" }}</td></tr>
-            <tr><th>วันที่สร้าง</th><td>{{ post.created_at|date:"d/m/Y H:i" }}</td></tr>
+              <tr>
+                  <th>เบี้ยเลี้ยง</th>
+                  <td>{{ post.salary|default:"-" }}</td>
+              </tr>
+
+              <tr>
+                  <th>ทักษะที่ใช้</th>
+                  <td>{{ post.skills|default:"-" }}</td>
+              </tr>
+
+              <tr>
+                  <th>เกรดขั้นต่ำ</th>
+                  <td>{{ post.grade|default:"-" }}</td>
+              </tr>
+
+              <tr>
+                  <th>ช่องทางติดต่อ</th>
+                  <td>{{ post.contact|default:"-" }}</td>
+              </tr>
+
+              <tr>
+                  <th>ประเภทการฝึกงาน</th>
+                  <td>{{ post.type_of_work|default:"-" }}</td>
+              </tr>
+
+              <tr>
+                  <th>สวัสดิการ</th>
+                  <td>{% if post.welfare == "yes" %}มี{% elif post.welfare == "no" %}ไม่มี{% else %}-{% endif %}</td>
+              </tr>
+
+              {% if post.welfare == "yes" %}
+              <tr>
+                  <th>รายละเอียดสวัสดิการ</th>
+                  <td>{{ post.welfare_detail|default:"-" }}</td>
+              </tr>
+              {% endif %}
+
+              <tr>
+                  <th>ที่ตั้งบริษัท</th>
+                  <td>{{ post.location|default:"-" }}</td>
+              </tr>
+
+              <tr>
+                  <th>Google Maps</th>
+                  <td>
+                      {% if post.checkin_location %}
+                          <a class="link"
+                            href="{{ post.checkin_location }}"
+                            target="_blank"
+                            rel="noopener">
+                              {{ post.checkin_location }}
+                          </a>
+                      {% else %}
+                          -
+                      {% endif %}
+                  </td>
+              </tr>
+
+              <tr>
+                  <th>รายละเอียดเพิ่มเติม</th>
+                  <td>{{ post.description|default:"-" }}</td>
+              </tr>
+
           </table>
-
-          <!-- ===== Extra images gallery ===== -->
-          <div class="section-title">รูปประกอบเพิ่มเติม</div>
-
-          {% if post.extra_images.all %}
-            <div class="gallery">
-              {% for img in post.extra_images.all %}
-                <img class="gimg" src="{{ img.image.url }}" alt="extra">
-              {% empty %}
-                <div style="color:#64748b; font-weight:800;">ไม่มีรูปประกอบ</div>
-              {% endfor %}
-            </div>
-          {% else %}
-            <div style="color:#64748b; font-weight:800;">ไม่มีรูปประกอบ</div>
-          {% endif %}
 
           <!-- ===== Actions ===== -->
           <div class="actions">

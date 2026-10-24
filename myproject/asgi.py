@@ -1,54 +1,31 @@
-"""
-ASGI config for myproject project.
-
-It exposes the ASGI callable as a module-level variable named ``application``.
-
-For more information on this file, see
-https://docs.djangoproject.com/en/5.2/howto/deployment/asgi/
-"""
-
-"""import os
-
-from django.core.asgi import get_asgi_application
-
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'myproject.settings')
-
-application = get_asgi_application() """
-
 import os
+
 from django.core.asgi import get_asgi_application
 
-# ตั้งค่า Django settings ก่อนอื่น
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'myproject.settings')
+os.environ.setdefault(
+    "DJANGO_SETTINGS_MODULE",
+    "myproject.settings"
+)
+
 django_asgi_app = get_asgi_application()
 
-# import อื่นๆ หลังจากตั้งค่า Django แล้ว
 from channels.routing import ProtocolTypeRouter, URLRouter
 from channels.auth import AuthMiddlewareStack
 from channels.security.websocket import AllowedHostsOriginValidator
+
 import chat.routing
-import os
-from django.core.asgi import get_asgi_application
-from channels.routing import ProtocolTypeRouter, URLRouter
-from channels.auth import AuthMiddlewareStack
+import myapp.routing
+
 
 application = ProtocolTypeRouter({
     "http": django_asgi_app,
+
     "websocket": AllowedHostsOriginValidator(
         AuthMiddlewareStack(
             URLRouter(
                 chat.routing.websocket_urlpatterns
+                + myapp.routing.websocket_urlpatterns
             )
         )
-    ),
-})
-
-
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'myproject.settings')
-
-application = ProtocolTypeRouter({
-    "http": get_asgi_application(),
-    "websocket": AuthMiddlewareStack(
-        URLRouter(chat.routing.websocket_urlpatterns)
     ),
 })

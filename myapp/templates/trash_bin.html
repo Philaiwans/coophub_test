@@ -85,7 +85,11 @@
     .dropdown-menu a:last-child { border-bottom: none; }
 
     /* ===== Page ===== */
-    .wrap{ max-width:980px; margin:0 auto; padding:22px 18px 50px; }
+    .wrap{
+        max-width: 1450px;
+        margin: 0 auto;
+        padding: 22px 24px 50px;
+    }
 
     .top-row{
       display:flex;
@@ -109,111 +113,229 @@
 
     /* ปุ่มล้างถังขยะ (มินิมอล) */
     .danger-btn{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      background:#111827;
-      color:#fff;
-      border:none;
-      border-radius:12px;
-      padding:10px 14px;
-      font-size:14px;
-      font-weight:700;
-      cursor:pointer;
+        display:inline-flex;
+        align-items:center;
+        gap:8px;
+
+        background:#2f80ed;
+        color:#fff;
+
+        border:none;
+        border-radius:12px;
+        padding:10px 16px;
+
+        font-size:14px;
+        font-weight:700;
+
+        cursor:pointer;
+
+        box-shadow:0 2px 8px rgba(47,128,237,.25);
+        transition:all .15s ease;
+    }
+
+    .danger-btn:hover{
+        background:#1f6fd6;
+        transform:translateY(-1px);
+        box-shadow:0 4px 12px rgba(47,128,237,.30);
+    }
+
+    .danger-btn:active{
+        transform:translateY(0);
     }
     .danger-btn svg{ width:18px; height:18px; }
 
-    /* ===== Cards ===== */
+    /* ===== Cards : รูปแบบเดียวกับ Teacher Home ===== */
+
     .grid{
-      margin-top:12px;
-      display:grid;
-      grid-template-columns: 1fr;
-      gap:12px;
+        margin-top: 12px;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 26px;
+        align-items: start;
     }
 
-    .card{
-      background:#fff;
-      border:1px solid #eef0f4;
-      border-radius:16px;
-      padding:14px;
-      display:flex;
-      gap:14px;
-      align-items:center;
-      box-shadow:0 2px 10px rgba(0,0,0,.06);
+    .post-card{
+        background: white;
+        border: 1px solid #e0e0e0;
+        border-radius: 20px;
+        padding: 18px 20px;
+
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+
+        gap: 18px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+
+        position: relative;
+
+        transition: transform .15s ease,
+                    box-shadow .15s ease;
     }
 
-    .thumb{
-      width:140px;
-      height:96px;
-      border-radius:14px;
-      object-fit:cover;
-      background:#f3f4f6;
-      border:1px solid #eef0f4;
-      flex-shrink:0;
+    .post-card:hover{
+        transform: translateY(-2px);
+        box-shadow: 0 5px 14px rgba(0,0,0,0.10);
     }
 
-    .content{ flex:1; min-width:0; }
-    .company{
-      margin:0 0 6px 0;
-      font-size:18px;
-      font-weight:800;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
+    .post-left{
+        flex:1;
+        min-width:0;
     }
 
-    .meta{
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px 12px;
-      font-size:13px;
-      color:#374151;
-    }
-    .pill{
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
-      padding:6px 10px;
-      border-radius:999px;
-      background:#f7faff;
-      border:1px solid #e7ecff;
-      color:#1f2a55;
-      max-width:100%;
-    }
-    .pill b{ font-weight:800; }
-
-    .date{
-      margin-top:8px;
-      font-size:12px;
-      color:#9ca3af;
+    .post-company{
+        margin:0 0 8px 0;
+        font-size:22px;
+        font-weight:bold;
+        color:#000;
     }
 
-    /* Actions */
-    .actions{
-      display:flex;
-      flex-direction:column;
-      gap:10px;
-      align-items:flex-end;
-      flex-shrink:0;
+    .expired-badge{
+        display:inline-block;
+        font-size:14px;
+        font-weight:600;
+        background:#fa313a;
+        color:white;
+        padding:4px 8px;
+        border-radius:10px;
+        margin-left:10px;
+        vertical-align:middle;
+        white-space:nowrap;
     }
 
-    .icon-action{
-      width:40px;
-      height:40px;
-      border-radius:12px;
-      background:#fff;
-      border:1px solid #eef0f4;
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      cursor:pointer;
-      text-decoration:none;
-      box-shadow:0 2px 10px rgba(0,0,0,.05);
+    .expiration-text{
+        margin:4px 0 !important;
+        color:#2f80ed !important;
+        font-weight:600;
     }
-    .icon-action svg{ width:18px; height:18px; }
-    .icon-action:hover{ transform: translateY(-1px); }
 
-    .empty{
+    .expired-text{
+        margin:4px 0 !important;
+        color:#fa313a !important;
+        font-weight:600;
+    }
+
+    .post-left p{
+        margin:4px 0;
+        font-size:16px;
+        line-height:1.45;
+        color:#111;
+    }
+
+    .post-date{
+        color:gray !important;
+    }
+
+    .post-right{
+        width:160px;
+        display:flex;
+        flex-direction:column;
+        align-items:flex-end;
+        gap:10px;
+        flex-shrink:0;
+    }
+
+    /* ปุ่มกู้คืน */
+    .restore-btn{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+
+        width:36px;
+        height:36px;
+
+        border-radius:10px;
+        border:1px solid #e5e5e5;
+        background:#fff;
+
+        cursor:pointer;
+        text-decoration:none;
+
+        position:absolute;
+        right:20px;
+        bottom:18px;
+        z-index:5;
+
+        transition: background .15s ease,
+                    transform .15s ease;
+    }
+
+    .restore-btn:hover{
+        background:#f5f5f5;
+        transform:scale(1.05);
+    }
+
+    .restore-btn:hover{
+        background:#f5f5f5;
+    }
+
+    /* ไอคอนกู้คืน */
+    .restore-btn svg{
+        width:20px;
+        height:20px;
+    }
+
+    /* รูปโพสต์ */
+    .post-image{
+        width:140px;
+        height:140px;
+        object-fit:cover;
+        border-radius:15px;
+    }
+
+    /* กรณีไม่มีรูป */
+    .no-image{
+        width:140px;
+        height:140px;
+
+        border-radius:15px;
+        background:#f3f4f6;
+        border:1px solid #e5e7eb;
+
+        display:flex;
+        align-items:center;
+        justify-content:center;
+
+        overflow:hidden;
+    }
+
+    .no-image img{
+        width:55px;
+        height:55px;
+        opacity:.45;
+    }
+
+    @media (max-width:900px){
+
+        .grid{
+            grid-template-columns:1fr;
+        }
+
+        .post-card{
+            flex-direction:column;
+        }
+
+        .post-right{
+            width:100%;
+            flex-direction:row;
+            justify-content:space-between;
+            align-items:flex-start;
+        }
+    }
+
+    @media (max-width:640px){
+
+        .post-right{
+            flex-direction:column;
+            align-items:flex-end;
+        }
+
+        .post-image,
+        .no-image{
+            width:100%;
+            height:200px;
+        }
+    }
       background:#fff;
       border:1px dashed #dbe6ff;
       border-radius:16px;
@@ -333,7 +455,7 @@
         <form method="POST" action="{% url 'empty_trash' %}" style="margin:0;">
           {% csrf_token %}
           <button class="danger-btn" type="submit"
-                  onclick="return confirm('ต้องการลบถาวรทั้งหมดในถังขยะใช่ไหม?');">
+                  onclick="return confirm('คุณแน่ใจหรือไม่ว่าต้องการลบโพสต์ทั้งหมดในถังขยะอย่างถาวร?\n\n⚠️ เมื่อลบแล้วจะไม่สามารถกู้คืนโพสต์เหล่านี้ได้');"
             <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
               <path d="M3 6h18" stroke="white" stroke-width="2" stroke-linecap="round"/>
               <path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2" stroke="white" stroke-width="2" stroke-linecap="round"/>
@@ -348,41 +470,169 @@
     </div>
 
     <div class="grid">
-      {% for p in posts %}
-        <div class="card">
 
-          {% if p.image %}
-            <img class="thumb" src="{{ p.image.url }}" alt="post-image">
-          {% else %}
-            <img class="thumb" src="https://img.icons8.com/ios-filled/200/cccccc/image.png" alt="no-image">
-          {% endif %}
+        {% for p in posts %}
 
-          <div class="content">
-            <p class="company">{{ p.company }}</p>
+        <div class="post-card"
+            onclick="window.location.href='{% url 'post_detail' p.id %}'"
+            style="cursor:pointer;">
 
-            <div class="meta">
-              <span class="pill"><b>จังหวัด:</b> {{ p.province }}</span>
-              <span class="pill"><b>เบี้ยเลี้ยง:</b> {{ p.salary }}</span>
-              <span class="pill"><b>ตำแหน่ง:</b> {{ p.position }}</span>
+            <!-- =========================
+                ข้อมูลด้านซ้าย
+            ========================== -->
+            <div class="post-left">
+
+                <h3 class="post-company">
+                    {{ p.company }}
+
+                    {% if p.days_until_expiration <= 0 %}
+                        <span class="expired-badge">
+                            หมดอายุ / ปิดรับสมัคร
+                        </span>
+                    {% endif %}
+                </h3>
+
+                <p>
+                    จังหวัด: {{ p.province|default:"-" }}
+                </p>
+
+                <p>
+                    สวัสดิการ:
+                    {% if p.welfare_detail %}
+                        {{ p.welfare_detail }}
+                    {% else %}
+                        ไม่มี
+                    {% endif %}
+                </p>
+
+                <p>
+                    เบี้ยเลี้ยง: {{ p.salary|default:"-" }}
+                </p>
+
+                <p>
+                    ตำแหน่งที่ได้รับ: {{ p.position|default:"-" }}
+                </p>
+
+                <p>
+                    ทักษะที่ใช้: {{ p.skills|default:"-" }}
+                </p>
+
+                <p>
+                    เกรดขั้นต่ำ: {{ p.grade|default:"-" }}
+                </p>
+
+                <p>
+                    ประเภทการฝึกงาน: {{ p.type_of_work|default:"-" }}
+                </p>
+
+                <p>
+                    ที่ตั้งบริษัท:
+                    {% if p.location %}
+                        {{ p.location }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </p>
+
+                <p>
+                    ผู้โพสต์:
+                    {{ p.owner.first_name }}
+                    {{ p.owner.last_name }}
+
+                    {% if p.owner.student_id %}
+                        ({{ p.owner.student_id }})
+                    {% endif %}
+                </p>
+                {% if p.days_until_expiration > 0 %}
+                    <p class="expiration-text">
+                        เหลือเวลาอีก {{ p.days_until_expiration }} วันจะหมดอายุ
+                    </p>
+                {% else %}
+                    <p class="expired-text">
+                        โพสต์นี้หมดอายุแล้ว
+                    </p>
+                {% endif %}
+                <p class="post-date">
+                    วันที่โพสต์: {{ p.created_at|date:"d/m/Y" }}
+                </p>
+
             </div>
 
-            <div class="date">วันที่โพสต์: {{ p.created_at|date:"d/m/Y" }}</div>
-          </div>
 
-          <div class="actions">
-            <!-- Restore -->
-            <a class="icon-action" href="{% url 'restore_post' p.id %}" title="กู้คืน">
-              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                <path d="M7 7v4h4" stroke="#111827" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M7.4 11A7 7 0 1 1 7 12" stroke="#111827" stroke-width="2" stroke-linecap="round"/>
-              </svg>
-            </a>
-          </div>
+            <!-- =========================
+                ปุ่ม + รูปด้านขวา
+            ========================== -->
+            <div class="post-right">
+
+                <!-- ปุ่มกู้คืน -->
+                <a
+                    class="restore-btn"
+                    href="{% url 'restore_post' p.id %}"
+                    title="กู้คืนโพสต์"
+                    onclick="event.stopPropagation(); return confirm('ต้องการกู้คืนโพสต์นี้กลับไปแสดงใช่ไหม?');"
+                >
+
+                    <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                        aria-hidden="true"
+                    >
+                        <path
+                            d="M7 7v4h4"
+                            stroke="#111827"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        />
+
+                        <path
+                            d="M7.4 11A7 7 0 1 1 7 12"
+                            stroke="#111827"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                        />
+                    </svg>
+
+                </a>
+
+
+                <!-- รูปโพสต์ -->
+                {% if p.image %}
+
+                    <img
+                        class="post-image"
+                        src="{{ p.image.url }}"
+                        alt="{{ p.company }}"
+                    >
+
+                {% else %}
+
+                    <div class="no-image">
+
+                        <img
+                            src="https://img.icons8.com/ios-filled/100/cccccc/image.png"
+                            alt="no image"
+                        >
+
+                    </div>
+
+                {% endif %}
+
+            </div>
 
         </div>
-      {% empty %}
-        <div class="empty">ยังไม่มีโพสต์ที่ถูกลบ</div>
-      {% endfor %}
+
+
+        {% empty %}
+
+            <div class="empty">
+                ยังไม่มีโพสต์ที่ถูกลบ
+            </div>
+
+        {% endfor %}
+
+    </div>
     </div>
 
   </div>

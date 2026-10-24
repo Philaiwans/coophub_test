@@ -6,7 +6,8 @@
   <title>บันทึกกิจกรรม - CoopHub</title>
 
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap">
-
+  <link rel="stylesheet"
+        href="https://cdn-uicons.flaticon.com/3.0.0/uicons-regular-rounded/css/uicons-regular-rounded.css">
   <style>
     body{ margin:0; font-family:"Prompt", Arial, sans-serif; background:#f6f7fb; }
 
@@ -83,116 +84,570 @@
     .dropdown-menu a:hover { background: #f2f2f2; }
     .dropdown-menu a:last-child { border-bottom: none; }
 
+    /* ===== Activity History Page ===== */
+
+    body{
+        margin:0;
+        font-family:"Prompt", Arial, sans-serif;
+        background:#f3f4f7;
+    }
+
     /* ===== Page ===== */
-    .wrap{ max-width:980px; margin:0 auto; padding:18px; }
+    .wrap{
+        max-width:1520px;
+        margin:0 auto;
+        padding:36px 64px 50px;
+    }
+
     .topbar{
-      display:flex; align-items:center; justify-content:space-between;
-      margin: 10px 0 14px;
+        display:flex;
+        justify-content:space-between;
+        align-items:flex-start;
+        gap:20px;
+        margin-bottom:28px;
     }
-    .title{
-      margin:0;
-      font-size:24px;
-      font-weight:800;
-      color:#1a2a55;
+
+    .title-group{
+        display:flex;
+        flex-direction:column;
+        gap:14px;
     }
+
+    .history-title-box{
+        display:inline-block;
+        background:#1f4fb8;
+        color:#fff;
+        font-size:28px;
+        font-weight:700;
+        padding:16px 38px;
+        border-radius:18px;
+        line-height:1;
+        width:fit-content;
+        box-shadow:0 4px 10px rgba(31,79,184,.15);
+    }
+
     .subtitle{
-      margin:4px 0 0;
-      font-size:13px;
-      opacity:.75;
+        font-size:14px;
+        color:#6b7280;
+        margin-left:4px;
     }
 
+    /* ===== Add Post Button ===== */
     .btn-primary{
-      border:none;
-      background:#2f80ed;
-      color:#fff;
-      border-radius:14px;
-      height:44px;
-      padding:0 16px;
-      font-weight:700;
-      cursor:pointer;
-      box-shadow:0 2px 10px rgba(0,0,0,.08);
+        border:none;
+        background:#2f80ed;
+        color:#fff;
+        border-radius:16px;
+        padding:14px 24px;
+        font-size:15px;
+        font-weight:600;
+        font-family:"Prompt", sans-serif;
+        cursor:default;
+        box-shadow:0 4px 12px rgba(47,128,237,.18);
+        transition:.2s ease;
     }
 
-    .card{
-      background:#fff;
-      border-radius:16px;
-      box-shadow:0 2px 10px rgba(0,0,0,.06);
-      overflow:hidden;
-      border:1px solid #eef0f4;
+    .btn-primary:hover{
+        background:#226fd3;
+        transform:translateY(-1px);
     }
 
-    /* ===== List item ===== */
+    /* ========================================
+    ACTIVITY HISTORY CARD - NEW DESIGN
+    ======================================== */
+
+    .history-list{
+        display:flex;
+        flex-direction:column;
+        gap:22px;
+    }
+
     .item{
-      display:flex;
-      gap:14px;
-      padding:14px;
-      border-bottom:1px solid #eef0f4;
-      cursor:pointer;
-      align-items:center;
+        position:relative;
+        display:grid;
+        grid-template-columns:190px minmax(0, 1fr) 1px minmax(0, 1fr) 60px;
+        gap:28px;
+        align-items:center;
+
+        background:#ffffff;
+        border:1px solid #edf2f7;
+        border-radius:26px;
+        padding:38px 30px;
+
+        cursor:default;
+        transition:all .22s ease;
+
+        box-shadow:
+            0 8px 25px rgba(47,128,237,.05),
+            0 2px 8px rgba(15,23,42,.03);
     }
-    .item:last-child{ border-bottom:none; }
+
+        box-shadow:
+            0 8px 25px rgba(47,128,237,.05),
+            0 2px 8px rgba(15,23,42,.03);
+    }
+
+    .item:hover{
+        transform:translateY(-4px);
+        box-shadow:
+            0 18px 40px rgba(47,128,237,.10),
+            0 5px 15px rgba(15,23,42,.05);
+    }
+
+
+    /* ===============================
+    รูปบริษัท
+    ================================ */
+
+    .card-image-area{
+        display:flex;
+        align-items:flex-start;
+        justify-content:center;
+        align-self:start;
+    }
+
+    .thumb,
+    .thumb-placeholder{
+        width:150px;
+        height:150px;
+        border-radius:20px;
+        flex-shrink:0;
+    }
+
     .thumb{
-      width:74px;
-      height:74px;
-      border-radius:14px;
-      object-fit:cover;
-      background:#e9eefb;
-      border:1px solid #dfe6fb;
-      flex-shrink:0;
+        object-fit:cover;
+        background:#edf5ff;
     }
-    .content{ flex:1; min-width:0; }
+
+    .thumb-placeholder{
+        background:linear-gradient(145deg,#edf5ff,#f6f9ff);
+
+        display:flex;
+        align-items:center;
+        justify-content:center;
+    }
+
+    .thumb-placeholder .company-building-icon{
+        width:115px;
+        height:115px;
+        display:block;
+    }
+
+
+    /* ===============================
+    ฝั่งซ้าย
+    ================================ */
+
+    .card-left{
+        min-width:0;
+        align-self:stretch;
+    }
+
+    .company-row{
+        display:flex;
+        align-items:center;
+        flex-wrap:wrap;
+        gap:16px;
+        margin-bottom:18px;
+    }
+
     .company{
-      font-size:18px;
-      font-weight:800;
-      margin:0 0 6px 0;
-      color:#111;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
+        color:#10213f;
+        font-size:27px;
+        font-weight:700;
+        line-height:1.25;
     }
-    .meta{
-      font-size:14px;
-      color:#233;
-      margin:3px 0;
-      opacity:.9;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-    }
-    .date{
-      font-size:13px;
-      color:#666;
-      margin-top:6px;
-    }
+
+
+    /* ===============================
+    Status
+    ================================ */
 
     .status-pill{
-      display:inline-flex;
-      align-items:center;
-      padding:6px 10px;
-      border-radius:999px;
-      font-size:12px;
-      font-weight:700;
-      border:1px solid transparent;
-      margin-left:8px;
-      vertical-align:middle;
-    }
-    .st-pending{ background:#fff7e6; border-color:#ffe3b3; color:#a86b00; }
-    .st-approved{ background:#e9fff2; border-color:#bff1d1; color:#1f7a3a; }
-    .st-rejected{ background:#ffecec; border-color:#ffc9c9; color:#b42318; }
-    .st-expired{ background:#f2f4f8; border-color:#d2d6dc; color:#4a5568; }
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
 
+        padding:8px 18px;
+        border-radius:999px;
+
+        font-size:14px;
+        font-weight:600;
+        line-height:1;
+
+        border:1px solid transparent;
+    }
+
+    .st-pending{
+        background:#fff7e6;
+        border-color:#ffe0a6;
+        color:#a56500;
+    }
+
+    .st-approved{
+        background:#eaf9ef;
+        border-color:#bce8c9;
+        color:#15933b;
+    }
+
+    .st-rejected{
+        background:#fff0f0;
+        border-color:#ffcaca;
+        color:#d03434;
+    }
+
+    .st-expired{
+        background:#eef1f5;
+        border-color:#d8dee8;
+        color:#64748b;
+    }
+
+
+    /* ===============================
+    รายละเอียด
+    ================================ */
+
+    .left-details,
+    .right-details{
+        display:flex;
+        flex-direction:column;
+        gap:12px;
+    }
+
+    .detail-row{
+        display:grid;
+        grid-template-columns:46px 145px minmax(0,1fr);
+        align-items:center;
+        min-height:38px;
+
+        font-size:16px;
+        color:#52698f;
+    }
+
+    .right-details .detail-row{
+        grid-template-columns:46px 175px minmax(0,1fr);
+    }
+
+    .detail-icon{
+        width:38px;
+        height:38px;
+
+        display:flex;
+        align-items:center;
+        justify-content:center;
+
+        border-radius:12px;
+        background:#f1f5fb;
+        color:#38598c;
+
+        font-size:19px;
+    }
+
+    .detail-icon i{
+        display:flex;
+        align-items:center;
+        justify-content:center;
+    }
+
+    .detail-label{
+        color:#17294a;
+        font-weight:600;
+    }
+
+    .detail-value{
+        min-width:0;
+        color:#536b94;
+        word-break:break-word;
+    }
+
+
+    /* ===============================
+    เส้นกลาง
+    ================================ */
+
+    .card-divider{
+        width:1px;
+        height:100%;
+        min-height:300px;
+        background:#e5edf7;
+    }
+
+
+    /* ===============================
+    ฝั่งขวา
+    ================================ */
+
+    .card-right{
+        min-width:0;
+        align-self:stretch;
+
+        display:flex;
+        flex-direction:column;
+        justify-content:center;
+    }
+
+    .right-main{
+        display:flex;
+        flex-direction:column;
+        gap:12px;
+    }
+
+
+    /* วันที่โพสต์ */
+    .post-date{
+        display:flex;
+        align-items:center;
+        gap:16px;
+
+        margin-top:24px;
+        padding-top:22px;
+
+        border-top:1px solid #e4ebf5;
+
+        color:#536b94;
+        font-size:16px;
+    }
+
+    .post-date .detail-icon{
+        flex-shrink:0;
+    }
+
+
+    /* ===============================
+    Expiration box
+    ================================ */
+
+    .expiration-box{
+        margin-top:18px;
+
+        display:flex;
+        align-items:center;
+        gap:16px;
+
+        padding:15px 20px;
+
+        border-radius:18px;
+        background:linear-gradient(
+            90deg,
+            #edf5ff 0%,
+            #e5f1ff 100%
+        );
+
+        color:#1473e6;
+        font-size:17px;
+        font-weight:600;
+    }
+
+    .expiration-box i{
+        font-size:25px;
+    }
+
+    .expired-box{
+        background:#fff1f1;
+        color:#d13b3b;
+    }
+
+
+    /* ===============================
+    Arrow
+    ================================ */
+
+    .arrow{
+        width:54px;
+        height:54px;
+
+        border-radius:17px;
+
+        display:flex;
+        align-items:center;
+        justify-content:center;
+
+        align-self:center;
+
+        background:#edf5ff;
+        color:#1473e6;
+
+        font-size:34px;
+        font-weight:300;
+
+        cursor:pointer;
+
+        transition:.2s ease;
+    }
+
+    .arrow:hover{
+        background:#2f80ed;
+        color:white;
+        transform:translateX(4px);
+    }
+
+
+    /* ===============================
+    Responsive
+    ================================ */
+
+    @media(max-width:1100px){
+
+        .item{
+            grid-template-columns:130px minmax(0,1fr) 50px;
+            gap:20px;
+        }
+
+        .thumb,
+        .thumb-placeholder{
+            width:115px;
+            height:115px;
+        }
+
+        .thumb-placeholder svg{
+            width:60px;
+            height:60px;
+        }
+
+        .card-divider{
+            display:none;
+        }
+
+        .card-right{
+            grid-column:2;
+        }
+
+        .arrow{
+            grid-column:3;
+            grid-row:1 / span 2;
+        }
+    }
+
+
+    @media(max-width:700px){
+
+        .item{
+            display:flex;
+            align-items:flex-start;
+            padding:20px;
+        }
+
+        .card-image-area{
+            flex-shrink:0;
+        }
+
+        .thumb,
+        .thumb-placeholder{
+            width:90px;
+            height:90px;
+            border-radius:16px;
+        }
+
+        .thumb-placeholder svg{
+            width:48px;
+            height:48px;
+        }
+
+        .company{
+            font-size:19px;
+        }
+
+        .card-left{
+            flex:1;
+        }
+
+        .card-right{
+            display:none;
+        }
+
+        .arrow{
+            display:none;
+        }
+
+        .detail-row{
+            grid-template-columns:36px 110px minmax(0,1fr);
+            font-size:13px;
+        }
+
+        .detail-icon{
+            width:30px;
+            height:30px;
+            border-radius:9px;
+            font-size:15px;
+        }
+    }
+
+    /* ===== Empty ===== */
     .empty{
-      padding:28px;
-      text-align:center;
-      color:#666;
+        background:#f7f7f8;
+        border-radius:18px;
+        padding:40px 20px;
+        text-align:center;
+        color:#6b7280;
+        font-size:15px;
     }
 
-    @media (max-width:640px){
-      .topbar{ flex-direction:column; align-items:flex-start; gap:10px; }
-      .btn-primary{ width:100%; }
-      .thumb{ width:66px; height:66px; }
+    /* ===== Responsive ===== */
+    @media(max-width:900px){
+        .wrap{
+            padding:24px 18px 40px;
+        }
+
+        .topbar{
+            flex-direction:column;
+            align-items:stretch;
+        }
+
+        .btn-primary{
+            width:100%;
+        }
+
+        .history-title-box{
+            font-size:24px;
+            padding:14px 28px;
+        }
+    }
+
+    @media(max-width:640px){
+        .item{
+            gap:14px;
+            padding:16px;
+        }
+
+        .thumb,
+        .thumb-placeholder{
+            width:95px;
+            height:95px;
+            border-radius:14px;
+            background:#e9eefb;
+
+            display:flex;
+            align-items:center;
+            justify-content:center;
+
+            flex-shrink:0;
+        }
+
+        .thumb-placeholder svg{
+            width:38px;
+            height:38px;
+            fill:#6f87b5;
+        }
+
+        .company{
+            font-size:16px;
+        }
+
+        .details-grid{
+            grid-template-columns:1fr;
+            gap:5px;
+        }
+
+        .full-row{
+            grid-column:auto;
+        }
+
+        .arrow{
+            display:none;
+        }
     }
   </style>
+
 </head>
 
 <body>
@@ -286,50 +741,438 @@
 
   <!-- ===== Content ===== -->
   <div class="wrap">
-    <div class="topbar">
-      <div>
-        <h1 class="title">บันทึกกิจกรรม</h1>
-        <div class="subtitle">คลิกการ์ดเพื่อแก้ไขโพสต์</div>
+
+      <div class="topbar">
+
+          <div class="title-group">
+              <div class="history-title-box">
+                  บันทึกกิจกรรม
+              </div>
+
+              <div class="subtitle">
+                  ประวัติโพสต์และสถานะการตรวจสอบของคุณ
+              </div>
+          </div>
+
+          <button
+              class="btn-primary"
+              onclick="window.location.href='{% url 'create_post' %}'">
+              + เพิ่มโพสต์ใหม่
+          </button>
+
       </div>
 
-      <button class="btn-primary" onclick="window.location.href='{% url 'create_post' %}'">
-        + เพิ่มโพสต์ใหม่
-      </button>
-    </div>
 
-    <div class="card">
-      {% for p in posts %}
-        <div class="item" onclick="window.location.href='{% url 'edit_post' p.id %}'">
-          {% if p.image %}
-            <img class="thumb" src="{{ p.image.url }}" alt="thumb">
-          {% else %}
-            <div class="thumb"></div>
-          {% endif %}
+      <div class="history-list">
 
-          <div class="content">
-            <div class="company">
-              {{ p.company }}
-              {% if p.status == 'pending' %}
-                <span class="status-pill st-pending">รออนุมัติ</span>
-              {% elif p.status == 'approved' %}
-                <span class="status-pill st-approved">ผ่าน</span>
-              {% elif p.status == 'rejected' %}
-                <span class="status-pill st-rejected">ไม่ผ่าน</span>
-              {% elif p.status == 'expired' %}
-                <span class="status-pill st-expired">หมดอายุ</span>
-              {% endif %}
+          {% for p in posts %}
+
+        <div class="item">
+
+            <!-- =========================
+                รูปบริษัท
+            ========================== -->
+            <div class="card-image-area">
+
+                {% if p.image %}
+                    <img
+                        class="thumb"
+                        src="{{ p.image.url }}"
+                        alt="{{ p.company }}"
+                    >
+                {% else %}
+                    <div class="thumb-placeholder">
+                        <svg class="company-building-icon"
+                            viewBox="0 0 120 120"
+                            xmlns="http://www.w3.org/2000/svg"
+                            aria-hidden="true">
+
+                            <!-- อาคารสูงด้านหลัง -->
+                            <path d="
+                                M52 20
+                                L83 8
+                                L104 20
+                                L104 105
+                                L52 105
+                                Z
+                            " fill="#151515"/>
+
+                            <!-- อาคารกลาง -->
+                            <path d="
+                                M38 50
+                                L72 36
+                                L85 43
+                                L85 105
+                                L38 105
+                                Z
+                            " fill="#151515"/>
+
+                            <!-- อาคารซ้าย -->
+                            <path d="
+                                M13 65
+                                L39 53
+                                L52 60
+                                L52 105
+                                L13 105
+                                Z
+                            " fill="#151515"/>
+
+
+                            <!-- หน้าต่างอาคารสูง -->
+                            <g fill="#ffffff">
+                                <rect x="60" y="23" width="8" height="10" rx="1"/>
+                                <rect x="73" y="18" width="8" height="10" rx="1"/>
+                                <rect x="88" y="23" width="8" height="10" rx="1"/>
+
+                                <rect x="60" y="38" width="8" height="10" rx="1"/>
+                                <rect x="73" y="34" width="8" height="10" rx="1"/>
+                                <rect x="88" y="38" width="8" height="10" rx="1"/>
+
+                                <rect x="60" y="53" width="8" height="10" rx="1"/>
+                                <rect x="73" y="49" width="8" height="10" rx="1"/>
+                                <rect x="88" y="53" width="8" height="10" rx="1"/>
+
+                                <rect x="88" y="68" width="8" height="10" rx="1"/>
+                            </g>
+
+
+                            <!-- หน้าต่างอาคารกลาง -->
+                            <g fill="#ffffff">
+                                <rect x="46" y="61" width="8" height="9" rx="1"/>
+                                <rect x="59" y="56" width="8" height="9" rx="1"/>
+                                <rect x="72" y="61" width="8" height="9" rx="1"/>
+
+                                <rect x="46" y="75" width="8" height="9" rx="1"/>
+                                <rect x="59" y="70" width="8" height="9" rx="1"/>
+                                <rect x="72" y="75" width="8" height="9" rx="1"/>
+                            </g>
+
+
+                            <!-- หน้าต่างอาคารซ้าย -->
+                            <g fill="#ffffff">
+                                <rect x="20" y="70" width="7" height="8" rx="1"/>
+                                <rect x="32" y="65" width="7" height="8" rx="1"/>
+
+                                <rect x="20" y="83" width="7" height="8" rx="1"/>
+                                <rect x="32" y="78" width="7" height="8" rx="1"/>
+                            </g>
+
+
+                            <!-- ประตู -->
+                            <g fill="#ffffff">
+                                <rect x="25" y="91" width="13" height="14" rx="1"/>
+                                <rect x="58" y="89" width="14" height="16" rx="1"/>
+                                <rect x="89" y="86" width="10" height="19" rx="1"/>
+                            </g>
+
+                        </svg>
+                    </div>
+                {% endif %}
+
             </div>
 
-            <div class="meta">ตำแหน่ง: {{ p.position }}</div>
-            <div class="meta">จังหวัด: {{ p.province }}</div>
 
-            <div class="date">วันที่โพสต์: {{ p.created_at|date:"d/m/Y H:i" }} น.</div>
-          </div>
+            <!-- =========================
+                ฝั่งซ้าย
+            ========================== -->
+            <div class="card-left">
+
+                <div class="company-row">
+
+                    <div class="company">
+                        {{ p.company }}
+                    </div>
+
+                    {% if p.status == 'pending' %}
+                        <span class="status-pill st-pending">
+                            รออนุมัติ
+                        </span>
+
+                    {% elif p.status == 'approved' %}
+                        <span class="status-pill st-approved">
+                            ✓ ผ่าน
+                        </span>
+
+                    {% elif p.status == 'rejected' %}
+                        <span class="status-pill st-rejected">
+                            ✕ ไม่ผ่าน
+                        </span>
+
+                    {% elif p.status == 'expired' %}
+                        <span class="status-pill st-expired">
+                            หมดอายุ
+                        </span>
+                    {% endif %}
+
+                </div>
+
+
+                <div class="left-details">
+
+                    <!-- ตำแหน่ง -->
+                    <div class="detail-row">
+
+                        <div class="detail-icon">
+                            <i class="fi fi-rr-briefcase"></i>
+                        </div>
+
+                        <div class="detail-label">
+                            ตำแหน่ง:
+                        </div>
+
+                        <div class="detail-value">
+                            {{ p.position|default:"-" }}
+                        </div>
+
+                    </div>
+
+
+                    <!-- เบี้ยเลี้ยง -->
+                    <div class="detail-row">
+
+                        <div class="detail-icon">
+                            <i class="fi fi-rr-coins"></i>
+                        </div>
+
+                        <div class="detail-label">
+                            เบี้ยเลี้ยง:
+                        </div>
+
+                        <div class="detail-value">
+
+                            {% if p.salary %}
+                                {{ p.salary }} บาท
+                            {% else %}
+                                ไม่มี
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- เกรด -->
+                    <div class="detail-row">
+
+                        <div class="detail-icon">
+                            <i class="fi fi-rr-chart-histogram"></i>
+                        </div>
+
+                        <div class="detail-label">
+                            เกรดขั้นต่ำ:
+                        </div>
+
+                        <div class="detail-value">
+                            {{ p.grade|default:"-" }}
+                        </div>
+
+                    </div>
+
+
+                    <!-- ที่ตั้ง -->
+                    <div class="detail-row">
+
+                        <div class="detail-icon">
+                            <i class="fi fi-rr-building"></i>
+                        </div>
+
+                        <div class="detail-label">
+                            ที่ตั้งบริษัท:
+                        </div>
+
+                        <div class="detail-value">
+                            {{ p.location|default:"-" }}
+                        </div>
+
+                    </div>
+
+
+                    <!-- สวัสดิการ -->
+                    <div class="detail-row">
+
+                        <div class="detail-icon">
+                            <i class="fi fi-rr-gift"></i>
+                        </div>
+
+                        <div class="detail-label">
+                            สวัสดิการ:
+                        </div>
+
+                        <div class="detail-value">
+
+                            {% if p.welfare == 'yes' %}
+
+                                {% if p.welfare_detail %}
+                                    {{ p.welfare_detail }}
+                                {% else %}
+                                    มี
+                                {% endif %}
+
+                            {% else %}
+                                ไม่มี
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- ทักษะ -->
+                    <div class="detail-row">
+
+                        <div class="detail-icon">
+                            <i class="fi fi-rr-document"></i>
+                        </div>
+
+                        <div class="detail-label">
+                            ทักษะที่ใช้:
+                        </div>
+
+                        <div class="detail-value">
+                            {{ p.skills|default:"-" }}
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- เส้นแบ่ง -->
+            <div class="card-divider"></div>
+
+
+            <!-- =========================
+                ฝั่งขวา
+            ========================== -->
+            <div class="card-right">
+
+                <div class="right-main">
+
+                    <!-- จังหวัด -->
+                    <div class="right-details">
+
+                        <div class="detail-row">
+
+                            <div class="detail-icon">
+                                <i class="fi fi-rr-marker"></i>
+                            </div>
+
+                            <div class="detail-label">
+                                จังหวัด:
+                            </div>
+
+                            <div class="detail-value">
+                                {{ p.province|default:"-" }}
+                            </div>
+
+                        </div>
+
+
+                        <!-- ประเภทฝึกงาน -->
+                        <div class="detail-row">
+
+                            <div class="detail-icon">
+                                <i class="fi fi-rr-briefcase"></i>
+                            </div>
+
+                            <div class="detail-label">
+                                ประเภทการฝึกงาน:
+                            </div>
+
+                            <div class="detail-value">
+                                {{ p.type_of_work|default:"-" }}
+                            </div>
+
+                        </div>
+
+
+                        <!-- วันทำงาน -->
+                        <div class="detail-row">
+
+                            <div class="detail-icon">
+                                <i class="fi fi-rr-clock-three"></i>
+                            </div>
+
+                            <div class="detail-label">
+                                วันที่ทำงาน:
+                            </div>
+
+                            <div class="detail-value">
+                                {{ p.work_time|default:"-" }}
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- วันที่โพสต์ -->
+                    <div class="post-date">
+
+                        <div class="detail-icon">
+                            <i class="fi fi-rr-calendar"></i>
+                        </div>
+
+                        <div>
+                            โพสต์เมื่อ
+                            {{ p.created_at|date:"d/m/Y H:i" }} น.
+                        </div>
+
+                    </div>
+
+
+                    <!-- วันหมดอายุ -->
+                    {% if p.status == 'approved' %}
+
+                        <div class="expiration-box">
+
+                            <i class="fi fi-rr-clock"></i>
+
+                            <span>
+                                เหลือเวลาอีก {{ p.days_until_expiration }} วันจะหมดอายุ
+                            </span>
+
+                        </div>
+
+                    {% elif p.status == 'expired' %}
+
+                        <div class="expiration-box expired-box">
+
+                            <i class="fi fi-rr-clock"></i>
+
+                            <span>
+                                โพสต์นี้หมดอายุแล้ว
+                            </span>
+
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            <!-- ปุ่มไปหน้าแก้ไขโพสต์ -->
+            <div class="arrow"
+                onclick="window.location.href='{% url 'edit_post' p.id %}'"
+                title="แก้ไขโพสต์">
+                ›
+            </div>
+
         </div>
-      {% empty %}
-        <div class="empty">ยังไม่มีประวัติการโพสต์</div>
-      {% endfor %}
-    </div>
+          {% empty %}
+
+          <div class="empty">
+              ยังไม่มีประวัติการโพสต์
+          </div>
+
+          {% endfor %}
+
+      </div>
+
   </div>
 
   <script>

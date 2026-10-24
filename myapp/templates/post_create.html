@@ -257,6 +257,32 @@
       .upload-box{ width: 100%; height: auto; }
       .preview-grid{ grid-template-columns: repeat(2, 1fr); }
     }
+
+    /* ===== วันทำงาน จัดเรียงแนวนอน ===== */
+
+    .work-day-row{
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        gap:20px;
+        width:100%;
+    }
+
+    .work-day-item{
+        width:100%;
+    }
+
+    .sub-label{
+        display:block;
+        font-weight:600;
+        margin-bottom:6px;
+    }
+
+
+    /* input เฉพาะตัวเลข */
+    .numeric-input{
+        text-align:left;
+    }
+
   </style>
 
   <script>
@@ -265,6 +291,22 @@
       let box = document.getElementById("salaryAmountBox");
       box.style.display = (type === "มี") ? "block" : "none";
     }
+
+  function toggleWelfare() {
+
+      const type =
+          document.getElementById("welfareType").value;
+
+
+      const box =
+          document.getElementById("welfareDetailBox");
+
+
+      box.style.display =
+          (type === "yes")
+          ? "block"
+          : "none";
+  }
 
     function addPosition() {
       const container = document.getElementById("positions-container");
@@ -414,7 +456,7 @@
 
           <div class="input-box">
             <label>ชื่อบริษัท *</label>
-            <input type="text" name="company" required>
+            <input type="text" name="company" placeholder="กรอกชื่อบริษัท" required >
           </div>
 
           <div class="input-box">
@@ -441,59 +483,117 @@
           </div>
 
           <div class="input-box">
-            <label>วันทำงาน *</label>
-            <select name="work_day" required>
-              <option>จันทร์–จันทร์</option>
-              <option>จันทร์–อังคาร</option>
-              <option>จันทร์–พุธ</option>
-              <option>จันทร์–พฤหัสบดี</option>
-              <option>จันทร์–ศุกร์</option>
-              <option>จันทร์–เสาร์</option>
-              <option>จันทร์–อาทิตย์</option>
-              <option>อังคาร–จันทร์</option>
-              <option>อังคาร–อังคาร</option>
-              <option>อังคาร–พุธ</option>
-              <option>อังคาร–พฤหัสบดี</option>
-              <option>อังคาร–ศุกร์</option>
-              <option>อังคาร–เสาร์</option>
-              <option>อังคาร–อาทิตย์</option>
-              <option>พุธ–จันทร์</option>
-              <option>พุธ–อังคาร</option>
-              <option>พุธ–พุธ</option>
-              <option>พุธ–พฤหัสบดี</option>
-              <option>พุธ–ศุกร์</option>
-              <option>พุธ–เสาร์</option>
-              <option>พุธ–อาทิตย์</option>
-              <option>พฤหัสบดี–จันทร์</option>
-              <option>พฤหัสบดี–อังคาร</option>
-              <option>พฤหัสบดี–พุธ</option>
-              <option>พฤหัสบดี–พฤหัสบดี</option>
-              <option>พฤหัสบดี–ศุกร์</option>
-              <option>พฤหัสบดี–เสาร์</option>
-              <option>พฤหัสบดี–อาทิตย์</option>
-              <option>ศุกร์–จันทร์</option>
-              <option>ศุกร์–อังคาร</option>
-              <option>ศุกร์–พุธ</option>
-              <option>ศุกร์–พฤหัสบดี</option>
-              <option>ศุกร์–ศุกร์</option>
-              <option>ศุกร์–เสาร์</option>
-              <option>ศุกร์–อาทิตย์</option>
-              <option>เสาร์–จันทร์</option>
-              <option>เสาร์–อังคาร</option>
-              <option>เสาร์–พุธ</option>
-              <option>เสาร์–พฤหัสบดี</option>
-              <option>เสาร์–ศุกร์</option>
-              <option>เสาร์–เสาร์</option>
-              <option>เสาร์–อาทิตย์</option>
-              <option>อาทิตย์–จันทร์</option>
-              <option>อาทิตย์–อังคาร</option>
-              <option>อาทิตย์–พุธ</option>
-              <option>อาทิตย์–พฤหัสบดี</option>
-              <option>อาทิตย์–ศุกร์</option>
-              <option>อาทิตย์–เสาร์</option>
-              <option>อาทิตย์–อาทิตย์</option>
+            <div class="input-box" style="grid-column:1 / span 2;">
 
-            </select>
+            <label>วันทำงาน *</label>
+
+            <div class="work-day-row">
+
+                <div class="work-day-item">
+
+                    <span class="sub-label">
+                        วันเริ่ม
+                    </span>
+
+                    <select name="work_day_start" required>
+
+                        <option value="">
+                            เลือกวันเริ่ม
+                        </option>
+
+                        <option value="จันทร์">
+                            จันทร์
+                        </option>
+
+                        <option value="อังคาร">
+                            อังคาร
+                        </option>
+
+                        <option value="พุธ">
+                            พุธ
+                        </option>
+
+                        <option value="พฤหัสบดี">
+                            พฤหัสบดี
+                        </option>
+
+                        <option value="ศุกร์">
+                            ศุกร์
+                        </option>
+
+                        <option value="เสาร์">
+                            เสาร์
+                        </option>
+
+                        <option value="อาทิตย์">
+                            อาทิตย์
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+
+                <div class="work-day-item">
+
+                    <span class="sub-label">
+                        วันสิ้นสุด
+                    </span>
+
+
+                    <select name="work_day_end" required>
+
+
+                        <option value="">
+                            เลือกวันสิ้นสุด
+                        </option>
+
+
+                        <option value="จันทร์">
+                            จันทร์
+                        </option>
+
+
+                        <option value="อังคาร">
+                            อังคาร
+                        </option>
+
+
+                        <option value="พุธ">
+                            พุธ
+                        </option>
+
+
+                        <option value="พฤหัสบดี">
+                            พฤหัสบดี
+                        </option>
+
+
+                        <option value="ศุกร์">
+                            ศุกร์
+                        </option>
+
+
+                        <option value="เสาร์">
+                            เสาร์
+                        </option>
+
+
+                        <option value="อาทิตย์">
+                            อาทิตย์
+                        </option>
+
+
+                    </select>
+
+
+                </div>
+
+
+            </div>
+
+            </div>
           </div>
 
           <div class="input-box">
@@ -507,16 +607,6 @@
           </div>
 
           <div class="input-box">
-            <label>วันที่เริ่มฝึก *</label>
-            <input type="date" name="start_date" required>
-          </div>
-
-          <div class="input-box">
-            <label>วันที่สิ้นสุด *</label>
-            <input type="date" name="end_date" required>
-          </div>
-
-          <div class="input-box">
             <label>เบี้ยเลี้ยง *</label>
             <select name="salary_type" id="salaryType" onchange="toggleSalary()">
               <option>ไม่มี</option>
@@ -527,17 +617,37 @@
 
           <div class="input-box" id="salaryAmountBox" style="display:none;">
             <label>จำนวนเบี้ยเลี้ยง (บาท)</label>
-            <input type="number" name="salary_amount" min="0" placeholder="เช่น 300">
+            <input
+                type="text"
+                name="salary_amount"
+                inputmode="decimal"
+                placeholder="ระบุจำนวน"
+                oninput="
+                    this.value = this.value
+                        .replace(/[^0-9.,]/g, '')
+                        .replace(/(\..*)\./g, '$1');
+                "
+            >
           </div>
 
           <div class="input-box">
             <label>ทักษะที่ใช้ *</label>
-            <input type="text" name="skills" placeholder="HTML, Python, Figma">
+            <input type="text" name="skills" placeholder="เช่น HTML, Python, Figma">
           </div>
 
           <div class="input-box">
-            <label>เกรดขั้นต่ำ</label>
-            <input type="text" name="grade">
+              <label>เกรดขั้นต่ำ</label>
+              <input
+                  type="text"
+                  name="grade"
+                  inputmode="decimal"
+                  placeholder="เช่น 2.50"
+                  oninput="
+                      this.value = this.value
+                          .replace(/[^0-9.]/g, '')
+                          .replace(/(\..*)\./g, '$1');
+                  "
+              >
           </div>
 
           <div class="input-box">
@@ -554,9 +664,99 @@
             </select>
           </div>
 
-          <div class="input-box" style="grid-column: 1 / span 2;">
-            <label>ที่ตั้งบริษัท *</label>
-            <textarea name="location" required></textarea>
+          <!-- สวัสดิการ -->
+
+          <div class="input-box">
+
+          <label>
+          สวัสดิการ *
+          </label>
+
+
+          <select 
+              name="welfare"
+              id="welfareType"
+              onchange="toggleWelfare()"
+              required
+          >
+
+          <option value="">
+          เลือกสวัสดิการ
+          </option>
+
+
+          <option 
+          value="yes"
+          {% if post.welfare == "yes" %}selected{% endif %}
+          >
+          มี
+          </option>
+
+
+          <option 
+          value="no"
+          {% if post.welfare == "no" %}selected{% endif %}
+          >
+          ไม่มี
+          </option>
+
+
+          </select>
+
+
+          </div>
+
+
+
+          <!-- รายละเอียดสวัสดิการ -->
+
+          <div 
+          class="input-box"
+          id="welfareDetailBox"
+          style="display:none;"
+          >
+
+
+          <label>
+          รายละเอียดสวัสดิการ
+          </label>
+
+
+          <textarea
+
+          name="welfare_detail"
+
+          placeholder="เช่น มีอาหารกลางวันฟรี ประกันอุบัติเหตุ รถรับส่ง ชุดยูนิฟอร์ม "
+
+          >{{ post.welfare_detail|default:'' }}</textarea>
+
+
+          </div>
+
+
+          <div class="input-box" style="grid-column:1 / span 2;">
+
+          <label>ที่ตั้งบริษัท *</label>
+
+          <textarea 
+          name="location"
+          placeholder="กรอกตำแหน่งที่ตั้งของบริษัท"
+          required></textarea>
+
+          </div>
+
+
+          <div class="input-box" style="grid-column:1 / span 2;">
+
+          <label>
+          ลิงก์ Google Maps (ถ้ามี)
+          </label>
+
+          <input
+          type="url"
+          name="checkin_location"
+          placeholder="เช่น https://maps.app.goo.gl/xxxxx">
+
           </div>
 
         </div>

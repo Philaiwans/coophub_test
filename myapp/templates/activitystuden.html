@@ -324,6 +324,113 @@
             </p>
         {% endif %}
 
+        <!-- ================================= -->
+        <!-- โพสต์ที่อาจารย์ตีกลับให้แก้ไข -->
+        <!-- ================================= -->
+
+        {% if rejected_posts %}
+
+        <div style="
+            margin:35px 0 15px;
+            font-size:22px;
+            font-weight:700;
+            color:#ff1744;
+        ">
+            โพสต์ที่ต้องแก้ไข
+        </div>
+
+
+
+        {% for p in rejected_posts %}
+
+        <a class="link-post" href="{% url 'post_detail' p.id %}">
+
+        <div class="card">
+
+
+        <div class="card-left">
+
+
+        {% if p.owner.profile_image %}
+
+        <img class="avatar"
+        src="{{ p.owner.profile_image.url }}">
+
+        {% else %}
+
+        <img class="avatar"
+        src="https://img.icons8.com/ios-filled/100/808080/user.png">
+
+        {% endif %}
+
+
+
+        <div>
+
+        <div class="card-title">
+        {{ p.company }}
+        </div>
+
+
+        <div class="card-sub"
+        style="color:#ff1744;font-weight:bold;">
+
+        ✕ อาจารย์ส่งกลับให้แก้ไข
+
+        </div>
+
+
+
+        {% if p.last_approver %}
+
+        <div class="card-sub">
+
+        โดยอาจารย์
+        {{ p.last_approver.first_name }}
+        {{ p.last_approver.last_name }}
+
+        </div>
+
+        {% endif %}
+
+
+
+        <div class="card-time">
+
+        ตีกลับเมื่อ :
+
+        {{ p.rejected_at|date:"d/m/Y H:i" }}
+
+        </div>
+
+
+        </div>
+
+
+        </div>
+
+
+
+        <div>
+
+        <div class="status-circle status-rejected">
+
+        ✕
+
+        </div>
+
+        </div>
+
+
+        </div>
+
+        </a>
+
+
+        {% endfor %}
+
+        {% endif %}
+
     {# ---------- TAB ความคิดเห็น ---------- #}
     {% elif current_tab == 'comment' %}
 

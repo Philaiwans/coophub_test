@@ -54,11 +54,34 @@
       min-width:0;
     }
     .avatar{
-      width:56px; height:56px;
-      border-radius:10px;
+      width:56px;
+      height:56px;
+      border-radius:12px;
       object-fit:cover;
-      background:#f0f0f0;
-      border:1px solid #e5e5e5;
+      background:#f3f4f6;
+      border:1px solid #d8dadd;
+      flex:0 0 auto;
+    }
+
+    .avatar-fallback{
+      width:56px;
+      height:56px;
+      border-radius:12px;
+      background:#f3f4f6;
+      border:1px solid #d8dadd;
+
+      display:flex;
+      align-items:center;
+      justify-content:center;
+
+      flex:0 0 auto;
+      overflow:hidden;
+    }
+
+    .avatar-fallback svg{
+      width:50px;
+      height:50px;
+      display:block;
     }
     .info{ min-width:0; }
     .name{ font-weight:700; margin:0; font-size:16px; }
@@ -101,19 +124,57 @@
       {% endfor %}
     {% endif %}
 
-    <form class="search-row" method="GET">
-      <input type="text" name="q" value="{{ q }}" placeholder="ค้นหาชื่อ/username/email" />
-      <button type="submit">ค้นหา</button>
-    </form>
+    <div class="search-row">
+      <input
+        type="text"
+        id="liveSearch"
+        placeholder="ค้นหาชื่อ / รหัสนักศึกษา / username / email / role"
+        autocomplete="off"
+      />
+    </div>
 
     {% for u in users %}
-      <div class="user-card">
+      <div class="user-card"
+          data-search="{{ u.first_name }} {{ u.last_name }} {{ u.student_id|default:'' }} {{ u.username }} {{ u.email }} {{ u.role }}">
 
         <div class="left">
           {% if u.profile_image %}
             <img class="avatar" src="{{ u.profile_image.url }}" alt="profile">
           {% else %}
-            <img class="avatar" src="https://img.icons8.com/ios-filled/100/cccccc/user-male-circle.png" alt="profile">
+            <div class="avatar-fallback" aria-label="no-avatar">
+              <svg viewBox="0 0 64 64"
+                  xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true">
+
+                <!-- วงกลมด้านใน -->
+                <circle
+                  cx="32"
+                  cy="32"
+                  r="27"
+                  fill="#f5f5f5"
+                  stroke="#d0d0d0"
+                  stroke-width="2"
+                />
+
+                <!-- ศีรษะ -->
+                <circle
+                  cx="32"
+                  cy="24"
+                  r="10"
+                  fill="#c9c9c9"
+                />
+
+                <!-- ลำตัว -->
+                <path
+                  d="M15 52
+                    C17 40, 23 34, 32 34
+                    C41 34, 47 40, 49 52
+                    Z"
+                  fill="#c9c9c9"
+                />
+
+              </svg>
+            </div>
           {% endif %}
 
           <div class="info">
@@ -143,7 +204,50 @@
     {% empty %}
       <p style="text-align:center; color:#777; margin-top:24px;">ไม่พบผู้ใช้งาน</p>
     {% endfor %}
+
+    <p id="noSearchResult"
+      style="display:none; text-align:center; color:#777; margin-top:24px;">
+      ไม่พบผู้ใช้งานที่ตรงกับคำค้นหา
+    </p>
   </div>
+
+  <script>
+  document.addEventListener("DOMContentLoaded", function () {
+
+    const searchInput = document.getElementById("liveSearch");
+    const userCards = document.querySelectorAll(".user-card");
+    const noResult = document.getElementById("noSearchResult");
+
+    searchInput.addEventListener("input", function () {
+
+      const keyword = this.value
+        .toLowerCase()
+        .trim();
+
+      let found = 0;
+
+      userCards.forEach(function(card) {
+
+        const searchText = (card.dataset.search || "")
+          .toLowerCase();
+
+        if (searchText.includes(keyword)) {
+          card.style.display = "flex";
+          found++;
+        } else {
+          card.style.display = "none";
+        }
+
+      });
+
+      if (noResult) {
+        noResult.style.display = found === 0 ? "block" : "none";
+      }
+
+    });
+
+  });
+  </script>
 
 </body>
 </html>

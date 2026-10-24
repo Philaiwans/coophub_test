@@ -468,11 +468,15 @@
         <div class="chat-container">
           <h3 style="margin:0 0 10px 0;">ความคิดเห็น</h3>
 
-          {% for c in comments %}
+          <div id="commentList">
 
+              {% for c in comments %}
             {% if c.user.id == user.id %}
               <!-- ขวา (คอมเมนต์ของเราเอง) -->
-              <div class="comment-row comment-right-row">
+              <div
+                  class="comment-row comment-right-row"
+                  data-comment-id="{{ c.id }}"
+              >
                 <div class="comment-right">
                   <div class="comment-meta">
                     {{ c.user.first_name }} {{ c.user.last_name }}
@@ -498,7 +502,10 @@
 
             {% else %}
               <!-- ซ้าย (คอมเมนต์ของคนอื่น) -->
-              <div class="comment-row">
+              <div
+                  class="comment-row"
+                  data-comment-id="{{ c.id }}"
+              >
                 {% if c.user.profile_image %}
                   <img class="comment-profile" src="{{ c.user.profile_image.url }}" alt="user">
                 {% else %}
@@ -524,15 +531,33 @@
             {% endif %}
 
           {% empty %}
-            <p class="muted">ยังไม่มีความคิดเห็น</p>
+
+              <p
+                  class="muted"
+                  id="noCommentText"
+              >
+                  ยังไม่มีความคิดเห็น
+              </p>
+
           {% endfor %}
 
+          </div>
+
           <!-- ส่งคอมเมนต์ -->
-          <form class="comment-form" method="POST" action="{% url 'add_comment' post.id %}">
-            {% csrf_token %}
-            <textarea name="comment" placeholder="แสดงความคิดเห็น..." required></textarea>
-            <button type="submit">➤</button>
-          </form>
+          <div class="comment-form">
+              <textarea
+                  id="commentInput"
+                  placeholder="แสดงความคิดเห็น..."
+                  required
+              ></textarea>
+
+              <button
+                  type="button"
+                  id="commentSendBtn"
+              >
+                  ➤
+              </button>
+          </div>
 
         </div>
 
@@ -541,20 +566,287 @@
   </div>
 
   <script>
-    const profileBtn = document.getElementById("profileBtn");
-    const dropdownMenu = document.getElementById("dropdownMenu");
+      /* ===== PROFILE DROPDOWN ===== */
 
-    if (profileBtn && dropdownMenu) {
-        profileBtn.onclick = () => {
-            dropdownMenu.style.display =
-                dropdownMenu.style.display === "block" ? "none" : "block";
-        };
-        document.addEventListener("click", function(event) {
-            if (!profileBtn.contains(event.target) && !dropdownMenu.contains(event.target)) {
-                dropdownMenu.style.display = "none";
-            }
-        });
-    }
+      const profileBtn = document.getElementById("profileBtn");
+      const dropdownMenu = document.getElementById("dropdownMenu");
+
+      if (profileBtn && dropdownMenu) {
+          profileBtn.onclick = () => {
+              dropdownMenu.style.display =
+                  dropdownMenu.style.display === "block"
+                      ? "none"
+                      : "block";
+          };
+
+          document.addEventListener("click", function(event) {
+              if (
+                  !profileBtn.contains(event.target) &&
+                  !dropdownMenu.contains(event.target)
+              ) {
+                  dropdownMenu.style.display = "none";
+              }
+          });
+      }
+
+
+      /* ===== REALTIME COMMENTS ===== */
+
+      const postId = "{{ post.id }}";
+      const currentUserId = Number("{{ request.user.id }}");
+
+      const wsProtocol =
+          window.location.protocol === "https:"
+              ? "wss"
+              : "ws";
+
+      const socketUrl =
+          `${wsProtocol}://${window.location.host}/ws/post/${postId}/comments/`;
+
+      const commentSocket = new WebSocket(socketUrl);
+
+
+      commentSocket.onopen = function() {
+          console.log("✅ WebSocket connected");
+      };
+
+
+      commentSocket.onerror = function(error) {
+          console.error("❌ WebSocket error", error);
+      };
+
+
+      commentSocket.onclose = function(event) {
+          console.log(
+              "⚠️ WebSocket disconnected",
+              event.code
+          );
+      };
+
+
+      commentSocket.onmessage = function(event) {
+
+          console.log("📩 รับข้อมูลจาก WebSocket:", event.data);
+
+          const data = JSON.parse(event.data);
+
+          addCommentToPage(data);
+      };
+
+
+      const commentInput =
+          document.getElementById("commentInput");
+
+      const commentSendBtn =
+          document.getElementById("commentSendBtn");
+
+
+      function sendComment() {
+
+          const message =
+              commentInput.value.trim();
+
+          if (!message) {
+              return;
+          }
+
+          if (
+              commentSocket.readyState
+              !== WebSocket.OPEN
+          ) {
+              alert(
+                  "ระบบความคิดเห็นยังไม่ได้เชื่อมต่อ"
+              );
+              return;
+          }
+
+          console.log("📤 กำลังส่ง:", message);
+
+          commentSocket.send(
+              JSON.stringify({
+                  message: message
+              })
+          );
+
+          commentInput.value = "";
+          commentInput.focus();
+      }
+
+
+      commentSendBtn.addEventListener(
+          "click",
+          sendComment
+      );
+
+
+      commentInput.addEventListener(
+          "keydown",
+          function(event) {
+
+              if (
+                  event.key === "Enter"
+                  &&
+                  !event.shiftKey
+              ) {
+                  event.preventDefault();
+                  sendComment();
+              }
+          }
+      );
+
+
+      function addCommentToPage(data) {
+
+          const list =
+              document.getElementById("commentList");
+
+          const noComment =
+              document.getElementById("noCommentText");
+
+          if (noComment) {
+              noComment.remove();
+          }
+
+
+          if (
+              document.querySelector(
+                  `[data-comment-id="${data.comment_id}"]`
+              )
+          ) {
+              return;
+          }
+
+
+          const isMe =
+              Number(data.user_id)
+              === currentUserId;
+
+
+          let roleText = "";
+
+          if (data.role === "teacher") {
+              roleText = "(อาจารย์)";
+          }
+          else if (
+              data.role === "student"
+              &&
+              data.student_id
+          ) {
+              roleText =
+                  `(${escapeHtml(data.student_id)})`;
+          }
+          else if (data.role === "admin") {
+              roleText = "(Admin)";
+          }
+
+
+          const defaultAvatar =
+              "https://img.icons8.com/ios-filled/100/2f80ed/user-male-circle.png";
+
+          const profileImage =
+              data.profile_image
+                  ? data.profile_image
+                  : defaultAvatar;
+
+
+          const firstName =
+              escapeHtml(data.first_name || "");
+
+          const lastName =
+              escapeHtml(data.last_name || "");
+
+          const message =
+              escapeHtml(data.message || "");
+
+          const createdAt =
+              escapeHtml(data.created_at || "");
+
+
+          const row =
+              document.createElement("div");
+
+          row.dataset.commentId =
+              data.comment_id;
+
+
+          if (isMe) {
+
+              row.className =
+                  "comment-row comment-right-row";
+
+              row.innerHTML = `
+                  <div class="comment-right">
+
+                      <div class="comment-bubble">
+                          ${message}
+                      </div>
+
+                      <div class="comment-meta">
+                          ${firstName}
+                          ${lastName}
+                          ${roleText}
+                          —
+                          ${createdAt}
+                      </div>
+
+                  </div>
+
+                  <img
+                      class="comment-profile"
+                      src="${escapeHtml(profileImage)}"
+                      alt="profile"
+                  >
+              `;
+
+          } else {
+
+              row.className =
+                  "comment-row";
+
+              row.innerHTML = `
+                  <img
+                      class="comment-profile"
+                      src="${escapeHtml(profileImage)}"
+                      alt="profile"
+                  >
+
+                  <div class="comment-left">
+
+                      <div class="comment-bubble">
+                          ${message}
+                      </div>
+
+                      <div class="comment-meta">
+                          ${firstName}
+                          ${lastName}
+                          ${roleText}
+                          —
+                          ${createdAt}
+                      </div>
+
+                  </div>
+              `;
+          }
+
+
+          list.appendChild(row);
+
+          row.scrollIntoView({
+              behavior: "smooth",
+              block: "nearest"
+          });
+      }
+
+
+      function escapeHtml(value) {
+          const div =
+              document.createElement("div");
+
+          div.textContent =
+              value ?? "";
+
+          return div.innerHTML;
+      }
   </script>
 </body>
 </html>

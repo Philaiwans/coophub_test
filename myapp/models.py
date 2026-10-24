@@ -34,8 +34,15 @@ class CoopPost(models.Model):
     work_time = models.CharField(max_length=255)      # "จันทร์-ศุกร์ 09:00 - 17:00"
     internship_period = models.CharField(max_length=255)  # "2025-01-01 ถึง 2025-05-31"
 
+    # ที่ตั้งบริษัท
+    location = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        help_text="ที่ตั้งบริษัท"
+    )
+
     # ที่ตั้ง + เช็คอิน
-    location = models.TextField()
     checkin_location = models.CharField(              # ⭐ ลิงก์หรือข้อมูลเช็คอิน
         max_length=255,
         blank=True,
@@ -48,6 +55,20 @@ class CoopPost(models.Model):
     grade = models.CharField(max_length=20, blank=True, null=True)
     contact = models.CharField(max_length=255)
     type_of_work = models.CharField(max_length=255)   # On-site / Online / Hybrid
+
+    # สวัสดิการ
+    welfare = models.CharField(
+        max_length=10,
+        choices=[
+            ('yes', 'มี'),
+            ('no', 'ไม่มี'),
+        ],
+        default='no'
+    )
+    welfare_detail = models.TextField(
+        blank=True,
+        null=True
+    )
 
     # ลิงก์ / ไฟล์ประกอบ
     portfolio = models.URLField(blank=True, null=True)
@@ -72,6 +93,11 @@ class CoopPost(models.Model):
         default='pending'
     )
 
+    rejected_at = models.DateTimeField(
+        blank=True,
+        null=True
+    )
+    
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -147,6 +173,7 @@ class Bookmark(models.Model):
     def __str__(self):
         return f"{self.user.username} -> {self.post.company}"
 class PostView(models.Model):
+
     post = models.ForeignKey(
         CoopPost,
         on_delete=models.CASCADE,

@@ -56,7 +56,7 @@ urlpatterns = [
     path('student/dashboard/', views.student_dashboard, name='student_dashboard'),  # ⭐ ใหม่
     path('teacher/', views.teacher_home, name='teacher_home'),
     path('admin-dashboard/', views.admin_dashboard, name='admin_dashboard'),
-path('management-dashboard/', views.management_dashboard, name='management_dashboard'),
+    path('management-dashboard/', views.management_dashboard, name='management_dashboard'),
     # Profile
     path('profile/', views.profile_view, name='profile'),
     path('profile/edit/', views.edit_profile, name='edit_profile'),
@@ -105,4 +105,7 @@ path('management-dashboard/', views.management_dashboard, name='management_dashb
    
     path("accounts/manage/", views.manage_accounts, name="manage_accounts"),
     path("accounts/delete/<int:user_id>/", views.delete_user, name="delete_user"),
+
+    # ⭐ Live Search ทุก Role
+    path('live-search/', views.live_search_posts, name='live_search_posts'),
 ]

@@ -185,6 +185,25 @@
       .bubble{ max-width:85%; }
       .chatbox{ height:70vh; }
     }
+
+    .manual-btn{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        padding:10px 16px;
+        border-radius:10px;
+        background:#2f80ed;
+        color:#fff;
+        text-decoration:none;
+        font-weight:600;
+        transition:.2s;
+    }
+
+    .manual-btn:hover{
+        background:#1f6fd1;
+        transform:translateY(-1px);
+        box-shadow:0 4px 10px rgba(47,128,237,.25);
+    }
   </style>
 </head>
 
@@ -283,7 +302,7 @@
       <div id="chat" class="chatbox"></div>
 
       <div class="inputbar">
-        <input id="msg" placeholder="พิมพ์ข้อความ... (เช่น สวัสดี / เกรดขั้นต่ำ / วิธีสมัคร)" autocomplete="off"/>
+        <input id="msg" placeholder="พิมพ์ข้อความ... (เช่น สวัสดี / เกรดขั้นต่ำ / คู่มือสหกิจศึกษา)" autocomplete="off"/>
         <button id="sendBtn" onclick="sendMsg()">ส่ง</button>
       </div>
     </div>
@@ -304,27 +323,54 @@
     const statusText = document.getElementById("statusText");
 
     function appendMessage(sender, text) {
-      const wrapper = document.createElement("div");
-      wrapper.className = "msg " + (sender === "me" ? "me" : "bot");
+        const wrapper = document.createElement("div");
+        wrapper.className = "msg " + (sender === "me" ? "me" : "bot");
 
-      const bubble = document.createElement("div");
-      bubble.className = "bubble";
-      bubble.textContent = text;
+        const bubble = document.createElement("div");
+        bubble.className = "bubble";
 
-      const meta = document.createElement("div");
-      meta.className = "meta";
-      meta.textContent = (sender === "me") ? "คุณ" : "CoopHub Bot";
+        // ถ้าข้อความจาก Bot มีลิงก์คู่มือ
+        if (
+            sender === "bot" &&
+            text.includes("/media/documents/cooperative_education_manual.pdf")
+        ) {
+            const title = document.createElement("div");
+            title.textContent = "📘 คู่มือสหกิจศึกษา";
+            title.style.marginBottom = "10px";
+            title.style.fontWeight = "600";
 
-      const container = document.createElement("div");
-      container.appendChild(bubble);
-      container.appendChild(meta);
+            const description = document.createElement("div");
+            description.textContent = "สามารถเปิดคู่มือสหกิจศึกษาได้ที่นี่ครับ";
+            description.style.marginBottom = "12px";
 
-      wrapper.appendChild(container);
-      chatEl.appendChild(wrapper);
+            const link = document.createElement("a");
+            link.href = "/media/documents/cooperative_education_manual.pdf";
+            link.target = "_blank";
+            link.rel = "noopener noreferrer";
+            link.className = "manual-btn";
+            link.textContent = "เปิดคู่มือสหกิจศึกษา";
 
-      chatEl.scrollTop = chatEl.scrollHeight;
+            bubble.appendChild(title);
+            bubble.appendChild(description);
+            bubble.appendChild(link);
+
+        } else {
+            bubble.textContent = text;
+        }
+
+        const meta = document.createElement("div");
+        meta.className = "meta";
+        meta.textContent = (sender === "me") ? "คุณ" : "CoopHub Bot";
+
+        const container = document.createElement("div");
+        container.appendChild(bubble);
+        container.appendChild(meta);
+
+        wrapper.appendChild(container);
+        chatEl.appendChild(wrapper);
+
+        chatEl.scrollTop = chatEl.scrollHeight;
     }
-
     function setStatus(html){
       statusText.innerHTML = "สถานะ: <b>" + html + "</b>";
     }

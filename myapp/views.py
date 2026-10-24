@@ -233,12 +233,19 @@ def teacher_home(request):
 
 @login_required
 def admin_dashboard(request):
+
+    # =====================================================
+    # ตรวจสอบสิทธิ์ ADMIN
+    # =====================================================
+
     if request.user.role != 'admin' and request.user.username != 'admin007':
         return redirect('login')
 
-    # -----------------------------
-    # 1) ฟีเจอร์อนุมัติอาจารย์
-    # -----------------------------
+
+    # =====================================================
+    # 1) ระบบอนุมัติอาจารย์
+    # =====================================================
+
     pending_teachers = CustomUser.objects.filter(
         role='teacher',
         approved=False,
@@ -246,45 +253,275 @@ def admin_dashboard(request):
     )
 
     approve_id = request.GET.get('approve')
+
     if approve_id:
+
         try:
-            t = CustomUser.objects.get(id=approve_id, role='teacher')
+
+            t = CustomUser.objects.get(
+                id=approve_id,
+                role='teacher'
+            )
+
             t.approved = True
             t.save()
-            messages.success(request, f"อนุมัติ {t.first_name} {t.last_name} สำเร็จ")
+
+            messages.success(
+                request,
+                f"อนุมัติ {t.first_name} {t.last_name} สำเร็จ"
+            )
+
             return redirect('admin_dashboard')
+
         except CustomUser.DoesNotExist:
-            messages.error(request, "ไม่พบอาจารย์")
 
-    # -----------------------------
-    # 2) ดึงโพสต์ทั้งหมดเพื่อแสดงในฟีด
-    # -----------------------------
-    search = request.GET.get("search", "").strip()
+            messages.error(
+                request,
+                "ไม่พบอาจารย์"
+            )
 
-    posts = CoopPost.objects.filter(status__in=["approved", "expired"])
+
+    # =====================================================
+    # 2) รับค่า Search + Filter
+    # =====================================================
+
+    search = request.GET.get(
+        "search",
+        ""
+    ).strip()
+
+    order = request.GET.get(
+        "order",
+        "new"
+    )
+
+    province = request.GET.get(
+        "province",
+        "all"
+    )
+
+    work_type = request.GET.get(
+        "work_type",
+        "all"
+    )
+
+    salary_kind = request.GET.get(
+        "salary_kind",
+        "all"
+    )
+
+    welfare = request.GET.get(
+        "welfare",
+        "all"
+    )
+
+
+    # =====================================================
+    # 3) Queryset หลัก
+    # =====================================================
+
+    posts = CoopPost.objects.filter(
+        status__in=[
+            "approved",
+            "expired"
+        ]
+    ).select_related("owner")
+
+
+    # =====================================================
+    # 4) Search
+    # =====================================================
 
     if search:
+
         posts = posts.filter(
-            Q(company__icontains=search) |
-            Q(position__icontains=search) |
-            Q(province__icontains=search) |
-            Q(owner__first_name__icontains=search) |
+
+            Q(company__icontains=search)
+
+            |
+
+            Q(position__icontains=search)
+
+            |
+
+            Q(province__icontains=search)
+
+            |
+
+            Q(skills__icontains=search)
+
+            |
+
+            Q(location__icontains=search)
+
+            |
+
+            Q(checkin_location__icontains=search)
+
+            |
+
+            Q(type_of_work__icontains=search)
+
+            |
+
+            Q(owner__first_name__icontains=search)
+
+            |
+
             Q(owner__last_name__icontains=search)
+
+            |
+
+            Q(owner__student_id__icontains=search)
+
         )
 
-    posts = posts.order_by('-created_at')
 
-    # -----------------------------
-    # ส่งไปยัง Template
-    # -----------------------------
-    return render(request, 'admin_dashboard.html', {
-        "user_obj": request.user,
-        "posts": posts,
-        "pending_teachers": pending_teachers,
-        "search": search,
-    })
+    # =====================================================
+    # 5) FILTER จังหวัด
+    # =====================================================
+
+    if province != "all":
+
+        posts = posts.filter(
+            province=province
+        )
 
 
+    # =====================================================
+    # 6) FILTER รูปแบบการฝึก
+    # =====================================================
+
+    if work_type != "all":
+
+        posts = posts.filter(
+            type_of_work=work_type
+        )
+
+
+    # =====================================================
+    # 7) FILTER เบี้ยเลี้ยง
+    # =====================================================
+
+    if salary_kind == "paid":
+
+        posts = posts.filter(
+            salary__icontains="บาท"
+        )
+
+    elif salary_kind == "none":
+
+        posts = posts.filter(
+            salary__icontains="ไม่มี"
+        )
+
+    elif salary_kind == "negotiable":
+
+        posts = posts.filter(
+            salary__icontains="ตามตกลง"
+        )
+
+
+    # =====================================================
+    # 8) FILTER สวัสดิการ
+    # =====================================================
+
+    if welfare == "yes":
+
+        posts = posts.filter(
+            welfare="yes"
+        )
+
+    elif welfare == "no":
+
+        posts = posts.filter(
+            welfare="no"
+        )
+
+
+    # =====================================================
+    # 9) เรียงลำดับ
+    # =====================================================
+
+    if order == "old":
+
+        posts = posts.order_by(
+            "created_at"
+        )
+
+    else:
+
+        posts = posts.order_by(
+            "-created_at"
+        )
+
+
+    # =====================================================
+    # 10) จังหวัดสำหรับ Dropdown
+    # =====================================================
+
+    provinces = PROVINCES
+
+
+    # =====================================================
+    # 11) รูปแบบการฝึกสำหรับ Dropdown
+    # =====================================================
+    work_type_choices = (
+        CoopPost.objects
+        .filter(status="approved")
+        .exclude(type_of_work__isnull=True)
+        .exclude(type_of_work__exact="")
+        .values_list("type_of_work", flat=True)
+        .distinct()
+        .order_by("type_of_work")
+    )
+
+
+    # =====================================================
+    # 12) ส่งข้อมูลไป admin_dashboard.html
+    # =====================================================
+
+    return render(
+        request,
+        'admin_dashboard.html',
+        {
+
+            "user_obj":
+                request.user,
+
+            "posts":
+                posts,
+
+            "pending_teachers":
+                pending_teachers,
+
+            "search":
+                search,
+
+            # Filter
+            "order":
+                order,
+
+            "province":
+                province,
+
+            "work_type":
+                work_type,
+
+            "salary_kind":
+                salary_kind,
+
+            "welfare":
+                welfare,
+
+            # Dropdown
+            "provinces":
+                provinces,
+
+            "work_type_choices":
+                work_type_choices,
+        }
+    )
 
 
 @login_required
@@ -292,41 +529,93 @@ def profile_view(request):
     return render(request, 'profile.html', {'user': request.user})
 
 
-# myapp/views.py
 @login_required
 def edit_profile(request):
     user = request.user
 
     if request.method == "POST":
-        # อนุญาตให้แก้ไขพวกข้อมูลทั่วไป
-        user.username = request.POST.get("username", user.username).strip()
-        user.first_name = request.POST.get("first_name", user.first_name).strip()
-        user.last_name = request.POST.get("last_name", user.last_name).strip()
-        user.faculty = request.POST.get("faculty", user.faculty).strip()
-        user.major = request.POST.get("major", user.major).strip()
 
-        # เฉพาะ student เท่านั้นที่มีรหัสนักศึกษา
+        # ===== ข้อมูลทั่วไป =====
+        user.username = request.POST.get(
+            "username",
+            user.username
+        ).strip()
+
+        user.first_name = request.POST.get(
+            "first_name",
+            user.first_name
+        ).strip()
+
+        user.last_name = request.POST.get(
+            "last_name",
+            user.last_name
+        ).strip()
+
+        # =====================================================
+        # คณะ / สาขา
+        # =====================================================
+
+        if user.role == "admin" or user.username == "admin007":
+
+            # แอดมินไม่จำเป็นต้องมีคณะและสาขา
+            user.faculty = (
+                request.POST.get("faculty", "").strip() or None
+            )
+
+            user.major = (
+                request.POST.get("major", "").strip() or None
+            )
+
+        else:
+
+            # student / teacher ใช้ค่าจากฟอร์มตามปกติ
+            user.faculty = request.POST.get(
+                "faculty",
+                ""
+            ).strip()
+
+            user.major = request.POST.get(
+                "major",
+                ""
+            ).strip()
+
+        # ===== รหัสนักศึกษา =====
         if user.role == "student":
-            user.student_id = request.POST.get("student_id", user.student_id).strip()
+            user.student_id = request.POST.get(
+                "student_id",
+                user.student_id or ""
+            ).strip()
 
-        # ❌ ไม่อนุญาตให้แก้ email จากหน้านี้ (จะใช้ระบบเปลี่ยนรหัสผ่านแทน)
-        # ข้าม user.email ไปเลย
+        # ===== Email =====
+        # ไม่อนุญาตให้แก้อีเมลจากหน้านี้
 
-        # อัปโหลดรูปโปรไฟล์
+        # ===== รูปโปรไฟล์ =====
         if request.FILES.get("profile_image"):
             user.profile_image = request.FILES["profile_image"]
 
         user.save()
-        messages.success(request, "อัปเดตข้อมูลเรียบร้อยแล้ว")
+
+        messages.success(
+            request,
+            "อัปเดตข้อมูลเรียบร้อยแล้ว"
+        )
+
         return redirect("profile")
 
-    return render(request, "edit_profile.html", {"user": user})
+    return render(
+        request,
+        "edit_profile.html",
+        {
+            "user": user
+        }
+    )
 
 
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.utils import timezone
 from .models import (
     CoopPost, Comment, CustomUser,
     CoopPostImage, Bookmark, Notification,
@@ -338,38 +627,255 @@ from .models import (
 
 from django.db.models import Q   # 👈 เพิ่มบรรทัดนี้ด้านบนของ views.py
 
+
 @login_required
 def student_home(request):
+
     if request.user.role != 'student':
         return redirect('login')
 
+    # ==========================================
+    # รับค่าจาก Search + Filter
+    # ==========================================
     search = request.GET.get("search", "").strip()
 
-    posts = CoopPost.objects.filter(status="approved")
+    order = request.GET.get("order", "new")
 
-    if search:
-        posts = posts.filter(
-            Q(company__icontains=search) |
-            Q(position__icontains=search) |
-            Q(province__icontains=search) |
-            Q(owner__first_name__icontains=search) |
-            Q(owner__last_name__icontains=search)
-        )
-
-    posts = posts.order_by('-created_at')
-
-    # ✅ ดึง post ที่ user คนนี้ bookmark ไว้
-    bookmarked_ids = set(
-        Bookmark.objects.filter(user=request.user).values_list('post_id', flat=True)
+    province = request.GET.get(
+        "province",
+        "all"
     )
 
-    return render(request, 'student_home.html', {
-        "user_obj": request.user,
-        "posts": posts,
-        "search": search,
-        "bookmarked_ids": bookmarked_ids,   # ส่งไป template
-    })
+    work_type = request.GET.get(
+        "work_type",
+        "all"
+    )
 
+    salary_kind = request.GET.get(
+        "salary_kind",
+        "all"
+    )
+
+    welfare = request.GET.get(
+        "welfare",
+        "all"
+    )
+
+    # ==========================================
+    # โพสต์ที่นักศึกษามองเห็น
+    # ==========================================
+    posts = CoopPost.objects.filter(
+        status="approved"
+    ).select_related("owner")
+
+    # ==========================================
+    # Search
+    # ==========================================
+    if search:
+
+        posts = posts.filter(
+
+            Q(company__icontains=search)
+
+            |
+
+            Q(position__icontains=search)
+
+            |
+
+            Q(province__icontains=search)
+
+            |
+
+            Q(skills__icontains=search)
+
+            |
+
+            Q(location__icontains=search)
+
+            |
+
+            Q(checkin_location__icontains=search)
+
+            |
+
+            Q(type_of_work__icontains=search)
+
+            |
+
+            Q(owner__first_name__icontains=search)
+
+            |
+
+            Q(owner__last_name__icontains=search)
+
+        )
+
+    # ==========================================
+    # จังหวัด
+    # ==========================================
+    if province != "all":
+
+        posts = posts.filter(
+            province=province
+        )
+
+    # ==========================================
+    # รูปแบบการฝึก
+    # ==========================================
+    if work_type != "all":
+
+        posts = posts.filter(
+            type_of_work=work_type
+        )
+
+    # ==========================================
+    # เบี้ยเลี้ยง
+    # ==========================================
+    if salary_kind == "paid":
+
+        posts = posts.filter(
+            salary__icontains="บาท"
+        )
+
+    elif salary_kind == "none":
+
+        posts = posts.filter(
+            salary__icontains="ไม่มี"
+        )
+
+    elif salary_kind == "negotiable":
+
+        posts = posts.filter(
+            salary__icontains="ตามตกลง"
+        )
+
+    # ==========================================
+    # สวัสดิการ
+    # ==========================================
+    if welfare == "yes":
+
+        posts = posts.filter(
+            welfare="yes"
+        )
+
+    elif welfare == "no":
+
+        posts = posts.filter(
+            welfare="no"
+        )
+
+    # ==========================================
+    # เรียงลำดับ
+    # ==========================================
+    if order == "old":
+
+        posts = posts.order_by(
+            "created_at"
+        )
+
+    else:
+
+        posts = posts.order_by(
+            "-created_at"
+        )
+
+    # ==========================================
+    # จังหวัดสำหรับ Dropdown
+    # ใช้ 77 จังหวัดเดียวกับ Teacher
+    # ==========================================
+    provinces = PROVINCES
+
+    # ==========================================
+    # รูปแบบการฝึกสำหรับ Dropdown
+    # ==========================================
+    work_type_choices = (
+
+        CoopPost.objects
+        .filter(status="approved")
+
+        .exclude(
+            type_of_work__isnull=True
+        )
+
+        .exclude(
+            type_of_work__exact=""
+        )
+
+        .values_list(
+            "type_of_work",
+            flat=True
+        )
+
+        .distinct()
+
+        .order_by(
+            "type_of_work"
+        )
+    )
+
+    # ==========================================
+    # Bookmark ของนักศึกษา
+    # ==========================================
+    bookmarked_ids = set(
+
+        Bookmark.objects.filter(
+            user=request.user
+        )
+
+        .values_list(
+            "post_id",
+            flat=True
+        )
+
+    )
+
+    # ==========================================
+    # ส่งข้อมูลไป student_home.html
+    # ==========================================
+    return render(
+        request,
+        "student_home.html",
+        {
+
+            "user_obj":
+                request.user,
+
+            "posts":
+                posts,
+
+            "search":
+                search,
+
+            # เก็บค่าฟิลเตอร์ไว้
+            "order":
+                order,
+
+            "province":
+                province,
+
+            "work_type":
+                work_type,
+
+            "salary_kind":
+                salary_kind,
+
+            "welfare":
+                welfare,
+
+            # Dropdown
+            "provinces":
+                provinces,
+
+            "work_type_choices":
+                work_type_choices,
+
+            # Bookmark
+            "bookmarked_ids":
+                bookmarked_ids,
+
+        }
+    )
 
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
@@ -397,7 +903,16 @@ def create_post(request):
 
     if request.method == "POST":
 
-        work_time = f"{request.POST.get('work_day')} {request.POST.get('time_start')} - {request.POST.get('time_end')}"
+        work_day_start = request.POST.get('work_day_start', '').strip()
+        work_day_end = request.POST.get('work_day_end', '').strip()
+
+        time_start = request.POST.get('time_start', '').strip()
+        time_end = request.POST.get('time_end', '').strip()
+
+        work_time = (
+            f"{work_day_start}–{work_day_end} "
+            f"{time_start} - {time_end}"
+        )
         internship_period = f"{request.POST.get('start_date')} ถึง {request.POST.get('end_date')}"
 
         salary_type = request.POST.get('salary_type')
@@ -415,7 +930,9 @@ def create_post(request):
         portfolio = request.POST.get("portfolio") or ""
         extra_link = request.POST.get("extra_link") or ""
         checkin_location = request.POST.get("checkin_location") or ""
-
+        location = request.POST.get("location") or ""
+        welfare = request.POST.get("welfare")
+        welfare_detail = request.POST.get("welfare_detail") or ""
         post = CoopPost(
             owner=request.user,
             company=request.POST.get('company'),
@@ -424,7 +941,7 @@ def create_post(request):
             position=positions_str,
             work_time=work_time,
             internship_period=internship_period,
-            location=request.POST.get('location'),
+            location=location,
             checkin_location=checkin_location,
             skills=request.POST.get('skills'),
             grade=request.POST.get('grade'),
@@ -433,6 +950,8 @@ def create_post(request):
             description=request.POST.get('description'),
             portfolio=portfolio,
             extra_link=extra_link,
+            welfare=welfare,
+            welfare_detail=welfare_detail,
         )
 
         if request.FILES.get('image'):
@@ -536,9 +1055,12 @@ def teacher_home(request):
     work_type = request.GET.get("work_type", "all")      # all | <type_of_work>
     position = request.GET.get("position", "all")        # all | <ตำแหน่ง>
     salary_kind = request.GET.get("salary_kind", "all")  # all | paid | none | negotiable
-
+    welfare = request.GET.get("welfare", "all")
+    
     # --------- queryset หลัก ----------
-    posts = CoopPost.objects.filter(status__in=["approved", "expired"]).select_related("owner")
+    posts = CoopPost.objects.filter(
+        status="approved"
+    ).select_related("owner")
 
     # --------- search ----------
     if search:
@@ -573,6 +1095,13 @@ def teacher_home(request):
         posts = posts.filter(salary__icontains="ไม่มี")
     elif salary_kind == "negotiable":
         posts = posts.filter(salary__icontains="ตามตกลง")
+    # -------
+    # -- filter: welfare (สวัสดิการ) ----------
+    if welfare == "yes":
+        posts = posts.filter(welfare="yes")
+
+    elif welfare == "no":
+        posts = posts.filter(welfare="no")
 
     # --------- ordering ----------
     if order == "old":
@@ -586,7 +1115,7 @@ def teacher_home(request):
 
     # รูปแบบการฝึก: ดึงจากโพสต์ที่มีจริง (ไม่ต้อง hardcode)
     work_type_choices = (
-        CoopPost.objects.filter(status__in=["approved", "expired"])
+        CoopPost.objects.filter(status="approved")
         .exclude(type_of_work__isnull=True)
         .exclude(type_of_work__exact="")
         .values_list("type_of_work", flat=True)
@@ -609,6 +1138,7 @@ def teacher_home(request):
         "work_type": work_type,
         "position": position,
         "salary_kind": salary_kind,
+        "welfare": welfare,
 
         # choices สำหรับ dropdown
         "provinces": provinces,
@@ -674,6 +1204,10 @@ def reject_post(request, post_id):
         return redirect('login')
 
     post.status = "rejected"
+
+    # ⭐ เก็บเวลาที่อาจารย์ตีกลับ
+    post.rejected_at = timezone.now()
+
     post.save()
 
     # ประวัติการอนุมัติ (ไม่ผ่าน)
@@ -1048,7 +1582,11 @@ def activity_student_view(request):
                 owner=request.user
             ).exclude(status='deleted').order_by('-created_at')
         )
-
+            # โพสต์ที่ถูกตีกลับ
+        rejected_posts = CoopPost.objects.filter(
+            owner=request.user,
+            status="rejected"
+            ).order_by('-rejected_at')
         # หาอาจารย์คนล่าสุดที่อนุมัติ / ไม่อนุมัติจาก Notification
         for p in posts:
             latest_noti = Notification.objects.filter(
@@ -1064,6 +1602,8 @@ def activity_student_view(request):
             'current_tab': tab,
             'notifications': [],
             'posts': posts,
+                # ⭐ ส่งโพสต์ตีกลับไปหน้า HTML
+            'rejected_posts': rejected_posts,
         })
 
     # ---------- แท็บ แจ้งเตือน (ค่าเริ่มต้น) ----------
@@ -1106,15 +1646,29 @@ def edit_post(request, post_id):
         request.user.username != 'admin007'):
         return redirect('login')
 
-    # แยกค่าจาก field เดิม เพื่อนำไปเติมในฟอร์ม
-    # work_time เช่น "จันทร์ - ศุกร์ 09:00 - 17:00"
-    work_day = ""
+    # แยกวันและเวลา จาก work_time
+    work_day_start = ""
+    work_day_end = ""
     time_start = ""
     time_end = ""
+
     if post.work_time:
         try:
-            work_day, times = post.work_time.split(' ', 1)
-            time_start, time_end = times.split(' - ')
+            days, times = post.work_time.split(' ', 1)
+
+            # รองรับทั้ง – และ -
+            if "–" in days:
+                work_day_start, work_day_end = days.split("–", 1)
+
+            elif "-" in days:
+                work_day_start, work_day_end = days.split("-", 1)
+
+            else:
+                work_day_start = days
+                work_day_end = days
+
+            time_start, time_end = times.split(' - ', 1)
+
         except ValueError:
             pass
 
@@ -1132,8 +1686,16 @@ def edit_post(request, post_id):
 
     if request.method == "POST":
         # ------- ดึงค่าจากฟอร์มเหมือน create_post -------
-        work_time = f"{request.POST.get('work_day')} {request.POST.get('time_start')} - {request.POST.get('time_end')}"
-        internship_period = f"{request.POST.get('start_date')} ถึง {request.POST.get('end_date')}"
+        work_day_start = request.POST.get('work_day_start','').strip()
+
+        work_day_end = request.POST.get('work_day_end','').strip()
+
+
+        work_time = (
+            f"{work_day_start}–{work_day_end} "
+            f"{request.POST.get('time_start')} - {request.POST.get('time_end')}"
+        )
+        internship_period = ""
 
         salary_type = request.POST.get('salary_type')
         salary_amount = request.POST.get('salary_amount')
@@ -1150,7 +1712,7 @@ def edit_post(request, post_id):
         portfolio = request.POST.get("portfolio") or ""
         extra_link = request.POST.get("extra_link") or ""
         checkin_location = request.POST.get("checkin_location") or ""
-
+        location = request.POST.get("location") or ""
         # อัปเดต field ต่าง ๆ
         post.company = request.POST.get('company')
         post.province = request.POST.get('province')
@@ -1158,7 +1720,7 @@ def edit_post(request, post_id):
         post.position = positions_str
         post.work_time = work_time
         post.internship_period = internship_period
-        post.location = request.POST.get('location')
+        post.location = location
         post.checkin_location = checkin_location
         post.skills = request.POST.get('skills')
         post.grade = request.POST.get('grade')
@@ -1167,6 +1729,10 @@ def edit_post(request, post_id):
         post.description = request.POST.get('description')
         post.portfolio = portfolio
         post.extra_link = extra_link
+        post.welfare = request.POST.get('welfare')
+        post.welfare_detail = request.POST.get(
+            'welfare_detail'
+        )
 
         # ถ้ามีอัปโหลดรูปใหม่ ให้แทนที่รูปเดิม
         if request.FILES.get('image'):
@@ -1181,25 +1747,99 @@ def edit_post(request, post_id):
 
         post.save()
 
-        # ถ้ามีอัปโหลดรูปประกอบใหม่ ๆ ให้เพิ่มเข้าไป (ไม่ลบของเก่า)
-        extra_images = request.FILES.getlist('extra_images')
-        for img in extra_images:
-            CoopPostImage.objects.create(post=post, image=img)
 
-        messages.success(request, "แก้ไขโพสต์เรียบร้อยแล้ว")
-        return redirect('post_detail', post_id=post.id)
+        # ถ้ามีอัปโหลดรูปประกอบใหม่ ๆ ให้เพิ่มเข้าไป
+        extra_images = request.FILES.getlist('extra_images')
+
+        for img in extra_images:
+            CoopPostImage.objects.create(
+                post=post,
+                image=img
+            )
+
+
+        # ==================================================
+        # ⭐ สำคัญ
+        # ถ้านักศึกษาแก้ไขโพสต์
+        # ให้กลับเข้าสู่ขั้นตอนตรวจสอบใหม่
+        # ==================================================
+
+        if request.user.role == "student":
+
+            # เปลี่ยนสถานะกลับเป็นรอตรวจสอบ
+            post.status = "pending"
+
+            post.save()
+
+
+            # ----------------------------------------------
+            # ส่งแจ้งเตือนอาจารย์เฉพาะสาขาเดียวกัน
+            # ----------------------------------------------
+
+            teachers = CustomUser.objects.filter(
+                role="teacher",
+                major=request.user.major,
+                approved=True,
+                is_active=True
+            )
+
+
+            for teacher in teachers:
+
+                Notification.objects.create(
+
+                    user=teacher,
+
+                    actor=request.user,
+
+                    post=post,
+
+                    noti_type="review",
+
+                    message=(
+                        f"{request.user.first_name} "
+                        f"แก้ไขโพสต์ {post.company} "
+                        "กรุณาตรวจสอบใหม่อีกครั้ง"
+                    )
+                )
+
+        else:
+
+            post.save()
+
+
+
+        messages.success(
+            request,
+            "แก้ไขโพสต์เรียบร้อยแล้ว ส่งให้อาจารย์ตรวจสอบใหม่"
+        )
+
+
+        return redirect(
+            'post_detail',
+            post_id=post.id
+        )
 
     # ----- ถ้าเป็น GET ให้เปิดฟอร์มพร้อมข้อมูลเดิม -----
+
     return render(request, 'post_edit.html', {
+
         "user": request.user,
+
         "post": post,
+
         "provinces": PROVINCES,
+
         "positions": positions,
-        "work_day": work_day,
+
+        "work_day_start": work_day_start,
+
+        "work_day_end": work_day_end,
+
         "time_start": time_start,
+
         "time_end": time_end,
-        "start_date": start_date,
-        "end_date": end_date,
+
     })
 
 # myapp/views.py (ต่อจาก import ด้านบนมีแล้ว: CoopPost, Comment, Bookmark, Notification ...)
@@ -1499,3 +2139,212 @@ def delete_user(request, user_id):
     target.delete()
     messages.success(request, "ลบผู้ใช้งานสำเร็จ")
     return redirect("manage_accounts")
+
+# =====================================================
+# Live Search
+# =====================================================
+
+from django.http import JsonResponse
+
+
+@login_required
+def live_search_posts(request):
+
+    q = request.GET.get("q", "").strip()
+    user = request.user
+
+
+    # ---------------------------------------------
+    # เลือกโพสต์ตาม role
+    # ---------------------------------------------
+
+    if user.role == "student":
+
+        posts = CoopPost.objects.filter(
+            status="approved"
+        ).select_related("owner")
+
+
+    elif user.role == "teacher":
+
+        posts = CoopPost.objects.filter(
+            status="approved"
+        ).select_related("owner")
+
+
+    elif user.role == "admin" or user.username == "admin007":
+
+        posts = CoopPost.objects.filter(
+            status="approved"
+        ).select_related("owner")
+
+    else:
+
+        return JsonResponse(
+            {
+                "success": False,
+                "message": "ไม่มีสิทธิ์ใช้งาน",
+            },
+            status=403
+        )
+
+
+    # ---------------------------------------------
+    # ค้นหา
+    # ---------------------------------------------
+
+    if q:
+
+        posts = posts.filter(
+
+            Q(company__icontains=q)
+            |
+            Q(position__icontains=q)
+            |
+            Q(province__icontains=q)
+            |
+            Q(skills__icontains=q)
+            |
+            Q(checkin_location__icontains=q)
+            |
+            Q(type_of_work__icontains=q)
+            |
+            Q(owner__first_name__icontains=q)
+            |
+            Q(owner__last_name__icontains=q)
+            |
+            Q(owner__student_id__icontains=q)
+
+        )
+
+
+    posts = posts.order_by("-created_at")
+
+
+    # ---------------------------------------------
+    # Bookmark นักศึกษา
+    # ---------------------------------------------
+
+    bookmarked_ids = set()
+
+    if user.role == "student":
+
+        bookmarked_ids = set(
+
+            Bookmark.objects.filter(
+                user=user
+            ).values_list(
+                "post_id",
+                flat=True
+            )
+
+        )
+
+
+    # ---------------------------------------------
+    # JSON
+    # ---------------------------------------------
+
+    data = []
+
+    for p in posts:
+
+        image_url = ""
+
+        if p.image:
+
+            try:
+                image_url = p.image.url
+
+            except ValueError:
+                image_url = ""
+
+
+        # ชื่อผู้โพสต์
+        if p.owner.role == "admin":
+
+            owner_display = "แอดมิน"
+
+
+        elif p.owner.role == "teacher":
+
+            owner_display = (
+                f"{p.owner.first_name} "
+                f"{p.owner.last_name} (อาจารย์)"
+            ).strip()
+
+
+        else:
+
+            owner_display = (
+                f"{p.owner.first_name} "
+                f"{p.owner.last_name}"
+            ).strip()
+
+            if p.owner.student_id:
+
+                owner_display += (
+                    f" ({p.owner.student_id})"
+                )
+
+
+        data.append(
+            {
+                "id": p.id,
+
+                "company": p.company or "",
+
+                "province": p.province or "",
+
+            "salary": p.salary or "",
+
+            "welfare_detail": (
+                p.welfare_detail
+                if p.welfare == "yes" and p.welfare_detail
+                else "ไม่มี"
+            ),
+
+            "position": p.position or "",
+
+            "skills": p.skills or "",
+
+                "grade": p.grade or "-",
+
+                "type_of_work": p.type_of_work or "",
+
+                "checkin_location": p.checkin_location or "",
+
+                "location": p.location or "",
+
+                "owner_display": owner_display,
+
+                "created_at":
+                    p.created_at.strftime("%d/%m/%Y"),
+
+                "status": p.status,
+
+                "days_until_expiration": (
+                    p.days_until_expiration
+                    if p.status == "approved"
+                    else 0
+                ),
+
+                "image_url": image_url,
+
+                "bookmarked":
+                    p.id in bookmarked_ids,
+            }
+        )
+
+
+    return JsonResponse(
+        {
+            "success": True,
+
+            "role": user.role,
+
+            "count": len(data),
+
+            "posts": data,
+        }
+    )

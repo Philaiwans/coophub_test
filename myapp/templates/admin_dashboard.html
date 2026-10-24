@@ -105,11 +105,64 @@
             border: 1px solid #e0e0e0;
             border-radius: 20px;
             padding: 20px;
+
             display: flex;
             justify-content: space-between;
             gap: 20px;
+
             cursor: pointer;
+
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+
+            transition:
+                transform .15s ease,
+                box-shadow .15s ease;
+        }
+
+        .post-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 14px rgba(0, 0, 0, 0.10);
+        }
+
+        .post-left{
+            flex:1;
+            min-width:0;
+        }
+
+        .post-right{
+            width:160px;
+            display:flex;
+            flex-direction:column;
+            align-items:flex-end;
+            justify-content:space-between;
+            gap:10px;
+            flex-shrink:0;
+        }
+
+        .post-actions{
+            display:flex;
+            gap:8px;
+            margin-top:auto;
+        }
+
+        .post-image{
+            width:140px;
+            height:140px;
+            object-fit:cover;
+            border-radius:15px;
+        }
+
+        @media (max-width:900px){
+
+            .post-card{
+                flex-direction:column;
+            }
+
+            .post-right{
+                width:100%;
+                flex-direction:row;
+                justify-content:flex-end;
+            }
         }
 
         .post-image {
@@ -140,6 +193,128 @@
             width: 20px;
             height: 20px;
         }
+
+        /* =====================================================
+        ADMIN SEARCH + FILTER
+        ===================================================== */
+
+        .filter-card {
+            background: #f7f9ff;
+            border: 1px solid #dbe6ff;
+            border-radius: 16px;
+            padding: 24px;
+        }
+
+        .filter-grid {
+            display: flex;
+            gap: 22px;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-item {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            min-width: 190px;
+            flex: 1;
+            max-width: 220px;
+        }
+
+        .filter-item label {
+            text-align: center;
+            font-size: 16px;
+            color: #222;
+            font-weight: 400;
+        }
+
+        .filter-item select {
+            width: 100%;
+            padding: 12px 16px;
+
+            border-radius: 14px;
+            border: 1px solid #bfc3cc;
+
+            background: #ffffff;
+
+            font-family: "Prompt", Arial, sans-serif;
+            font-size: 15px;
+
+            cursor: pointer;
+        }
+
+        .btn {
+            padding: 12px 28px;
+
+            border: none;
+            border-radius: 22px;
+
+            cursor: pointer;
+
+            font-family: "Prompt", Arial, sans-serif;
+            font-size: 15px;
+
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: #2f80ed;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2473d4;
+        }
+
+        .btn-soft {
+            background: #eaeaea;
+            color: #111;
+
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .btn-soft:hover {
+            background: #dddddd;
+        }
+
+        .search-input {
+            width: 55%;
+            padding: 12px 16px;
+
+            border-radius: 20px;
+            border: 1px solid #ccc;
+
+            font-family: "Prompt", Arial, sans-serif;
+            font-size: 16px;
+        }
+
+        .search-input:focus,
+        .filter-item select:focus {
+            outline: none;
+            border-color: #2f80ed;
+            box-shadow: 0 0 0 3px rgba(47, 128, 237, 0.10);
+        }
+
+
+        /* Responsive */
+
+        @media (max-width: 900px) {
+
+            .search-input {
+                width: 100%;
+            }
+
+            .filter-item {
+                width: 100%;
+                max-width: none;
+            }
+
+}
+        
+
     </style>
 </head>
 
@@ -190,70 +365,435 @@
     </div>
 
 
-    <!-- Search -->
+    <!-- ===================================================== -->
+    <!-- Search + Filter ADMIN -->
+    <!-- ===================================================== -->
+
     <div style="padding: 30px;">
-        <form method="GET" style="display:flex; justify-content:center; margin-bottom:25px;">
-            <input type="text" name="search" value="{{ search }}" placeholder="กรอกคำค้นหา"
-                style="width:60%; padding:12px; border-radius:20px; border:1px solid #ccc; font-size:16px;">
-            <button style="padding:12px 25px; background:#2f80ed; color:white;
-            border:none; border-radius:20px; margin-left:10px;">ค้นหา</button>
-        </form>
 
-        <!-- Post Feed -->
-        <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:25px; padding:0 20px;">
+        <form
+            method="GET"
+            style="
+                display:flex;
+                flex-direction:column;
+                align-items:center;
+                gap:14px;
+                margin-bottom:25px;
+                width:100%;
+            "
+        >
 
-            {% for p in posts %}
+            <!-- ========================= -->
+            <!-- Search -->
+            <!-- ========================= -->
 
-            <div class="post-card" onclick="window.location.href='{% url 'post_detail' p.id %}'">
+            <div style="
+                display:flex;
+                justify-content:center;
+                width:100%;
+                gap:10px;
+                flex-wrap:wrap;
+            ">
 
-                <div style="flex:1;">
-                    <h3 style="margin:0; font-size:22px; font-weight:bold;">
-                        {{ p.company }}
-                        {% if p.status == 'expired' %}
-                        <span
-                            style="font-size:14px; background:#fa313a; color:white; padding:4px 8px; border-radius:10px; margin-left:10px; vertical-align:middle;">หมดอายุ
-                            / ปิดรับสมัคร</span>
-                        {% endif %}
-                    </h3>
+                <input
+                    class="search-input"
+                    id="liveSearchInput"
+                    type="text"
+                    name="search"
+                    value="{{ search }}"
+                    placeholder="กรอกคำค้นหา"
+                    autocomplete="off"
+                >
 
-                    <p style="margin:4px 0;">จังหวัด: {{ p.province }}</p>
-                    <p style="margin:4px 0;">เบี้ยเลี้ยง: {{ p.salary }}</p>
-                    <p style="margin:4px 0;">ตำแหน่งที่ได้รับ: {{ p.position }}</p>
-                    <p style="margin:4px 0;">ที่ตั้งบริษัท: {{ p.location }}</p>
+                <button
+                    class="btn btn-primary"
+                    type="submit"
+                >
+                    ค้นหา
+                </button>
 
-                    <p style="margin:4px 0;">ผู้โพสต์:
-                        {{ p.owner.first_name }} {{ p.owner.last_name }}
-                        {% if p.owner.student_id %}({{ p.owner.student_id }}){% endif %}
-                    </p>
 
-                    <p style="margin:4px 0; color:gray;">
-                        วันที่โพสต์: {{ p.created_at|date:"d/m/Y" }}
-                    </p>
-                    {% if p.status == 'approved' %}
-                    <p style="margin:4px 0; color:#e28743; font-weight:500;">
-                        เหลือเวลาอีก {{ p.days_until_expiration }} วันจะหมดอายุ
-                    </p>
-                    {% endif %}
+                <button
+                    class="btn btn-primary"
+                    type="button"
+                    id="toggleFilterBtn"
+                    style="
+                        display:flex;
+                        align-items:center;
+                        gap:8px;
+                    "
+                >
 
-                    {% if user_obj.role == "teacher" or user_obj.role == "admin" or user_obj.username == "admin007" %}
-                    <div style="display: flex; gap: 8px;">
-                        <a class="delete-btn" href="{% url 'edit_post' p.id %}" onclick="event.stopPropagation();"
-                            title="แก้ไขโพสต์">
-                            <img src="https://img.icons8.com/ios-filled/50/000000/edit.png">
-                        </a>
-                        <a class="delete-btn" href="{% url 'delete_post' p.id %}" onclick="event.stopPropagation();"
-                            title="ลบโพสต์">
-                            <img src="https://img.icons8.com/ios-glyphs/30/000000/trash.png">
-                        </a>
-                    </div>
-                    {% endif %}
-                </div>
+                    <span style="font-size:18px;">
+                        ☰
+                    </span>
 
-                {% if p.image %}
-                <img class="post-image" src="{{ p.image.url }}">
-                {% endif %}
+                    ปรับแต่งการค้นหา
+
+                </button>
 
             </div>
+
+
+            <!-- ================================================= -->
+            <!-- Filter Panel -->
+            <!-- ================================================= -->
+
+            <div
+                id="filterPanel"
+                style="
+                    display:none;
+                    width:100%;
+                    max-width:1375px;
+                    margin-top:8px;
+                "
+            >
+
+                <div class="filter-card">
+
+                    <div class="filter-grid">
+
+
+                        <!-- เรียงลำดับ -->
+
+                        <div class="filter-item">
+
+                            <label>
+                                เรียงลำดับจาก
+                            </label>
+
+                            <select name="order">
+
+                                <option
+                                    value="new"
+                                    {% if order == "new" %}selected{% endif %}
+                                >
+                                    ใหม่สุด
+                                </option>
+
+                                <option
+                                    value="old"
+                                    {% if order == "old" %}selected{% endif %}
+                                >
+                                    เก่าสุด
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- จังหวัด -->
+
+                        <div class="filter-item">
+
+                            <label>
+                                จังหวัด
+                            </label>
+
+                            <select name="province">
+
+                                <option
+                                    value="all"
+                                    {% if province == "all" %}selected{% endif %}
+                                >
+                                    ทั้งหมด
+                                </option>
+
+                                {% for pv in provinces %}
+
+                                <option
+                                    value="{{ pv }}"
+                                    {% if province == pv %}selected{% endif %}
+                                >
+                                    {{ pv }}
+                                </option>
+
+                                {% endfor %}
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- รูปแบบการฝึก -->
+
+                        <div class="filter-item">
+
+                            <label>
+                                รูปแบบการฝึก
+                            </label>
+
+                            <select name="work_type">
+
+                                <option
+                                    value="all"
+                                    {% if work_type == "all" %}selected{% endif %}
+                                >
+                                    ทั้งหมด
+                                </option>
+
+                                {% for wt in work_type_choices %}
+
+                                <option
+                                    value="{{ wt }}"
+                                    {% if work_type == wt %}selected{% endif %}
+                                >
+                                    {{ wt }}
+                                </option>
+
+                                {% endfor %}
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- เบี้ยเลี้ยง -->
+
+                        <div class="filter-item">
+
+                            <label>
+                                เบี้ยเลี้ยง
+                            </label>
+
+                            <select name="salary_kind">
+
+                                <option
+                                    value="all"
+                                    {% if salary_kind == "all" %}selected{% endif %}
+                                >
+                                    ทั้งหมด
+                                </option>
+
+                                <option
+                                    value="paid"
+                                    {% if salary_kind == "paid" %}selected{% endif %}
+                                >
+                                    มีเบี้ยเลี้ยง
+                                </option>
+
+                                <option
+                                    value="none"
+                                    {% if salary_kind == "none" %}selected{% endif %}
+                                >
+                                    ไม่มี
+                                </option>
+
+                                <option
+                                    value="negotiable"
+                                    {% if salary_kind == "negotiable" %}selected{% endif %}
+                                >
+                                    ตามตกลง
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- สวัสดิการ -->
+
+                        <div class="filter-item">
+
+                            <label>
+                                สวัสดิการ
+                            </label>
+
+                            <select name="welfare">
+
+                                <option
+                                    value="all"
+                                    {% if welfare == "all" %}selected{% endif %}
+                                >
+                                    ทั้งหมด
+                                </option>
+
+                                <option
+                                    value="yes"
+                                    {% if welfare == "yes" %}selected{% endif %}
+                                >
+                                    มี
+                                </option>
+
+                                <option
+                                    value="no"
+                                    {% if welfare == "no" %}selected{% endif %}
+                                >
+                                    ไม่มี
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ปุ่ม -->
+
+                <div
+                    style="
+                        display:flex;
+                        justify-content:center;
+                        gap:10px;
+                        margin-top:18px;
+                        flex-wrap:wrap;
+                    "
+                >
+
+                    <button
+                        class="btn btn-primary"
+                        type="submit"
+                    >
+                        ใช้ฟิลเตอร์
+                    </button>
+
+
+                    <a
+                        class="btn btn-soft"
+                        href="{% url 'admin_dashboard' %}"
+                    >
+                        ล้างค่า
+                    </a>
+
+                </div>
+
+            </div>
+
+        </form>
+
+
+        <!-- Post Feed -->
+        <div
+            id="postContainer"
+            style="
+                display:grid;
+                grid-template-columns:repeat(2, 1fr);
+                gap:25px;
+                padding:0 20px;
+            "
+        >
+
+        {% for p in posts %}
+
+        <div class="post-card"
+            onclick="window.location.href='{% url 'post_detail' p.id %}'">
+
+            <div class="post-left">
+
+                <h3 style="margin:0; font-size:22px; font-weight:bold;">
+                    {{ p.company }}
+                </h3>
+
+                <p style="margin:4px 0;">
+                    จังหวัด: {{ p.province }}
+                </p>
+
+                <p style="margin:4px 0;">
+                    สวัสดิการ:
+                    {% if p.welfare == "yes" %}
+                        {{ p.welfare_detail|default:"มี" }}
+                    {% else %}
+                        ไม่มี
+                    {% endif %}
+                </p>
+
+                <p style="margin:4px 0;">
+                    เบี้ยเลี้ยง: {{ p.salary|default:"-" }}
+                </p>
+
+                <p style="margin:4px 0;">
+                    ตำแหน่งที่ได้รับ: {{ p.position|default:"-" }}
+                </p>
+
+                <p style="margin:4px 0;">
+                    ทักษะที่ใช้: {{ p.skills|default:"-" }}
+                </p>
+
+                <p style="margin:4px 0;">
+                    เกรดขั้นต่ำ: {{ p.grade|default:"-" }}
+                </p>
+
+                <p style="margin:4px 0;">
+                    ประเภทการฝึกงาน: {{ p.type_of_work|default:"-" }}
+                </p>
+
+                <p style="margin:4px 0;">
+                    ที่ตั้งบริษัท: {{ p.location|default:"-" }}
+                </p>
+
+                <p style="margin:4px 0;">
+                    ผู้โพสต์:
+
+                    {% if p.owner.role == 'admin' %}
+                        แอดมิน
+
+                    {% elif p.owner.role == 'teacher' %}
+                        {{ p.owner.first_name }}
+                        {{ p.owner.last_name }}
+                        (อาจารย์)
+
+                    {% else %}
+                        {{ p.owner.first_name }}
+                        {{ p.owner.last_name }}
+
+                        {% if p.owner.student_id %}
+                            ({{ p.owner.student_id }})
+                        {% endif %}
+                    {% endif %}
+                </p>
+
+                <p style="margin:4px 0; color:gray;">
+                    วันที่โพสต์: {{ p.created_at|date:"d/m/Y" }}
+                </p>
+
+                <p style="
+                    margin:4px 0;
+                    color:#2f80ed;
+                    font-weight:600;
+                ">
+                    เหลือเวลาอีก {{ p.days_until_expiration }} วันจะหมดอายุ
+                </p>
+
+            </div>
+
+
+            <div class="post-right">
+
+                <!-- รูปด้านขวาบน -->
+                {% if p.image %}
+                    <img
+                        class="post-image"
+                        src="{{ p.image.url }}"
+                        alt="post image"
+                    >
+                {% endif %}
+
+
+                <!-- ปุ่มด้านขวาล่าง -->
+                <div class="post-actions">
+
+                    <a
+                        class="delete-btn"
+                        href="{% url 'edit_post' p.id %}"
+                        onclick="event.stopPropagation();"
+                        title="แก้ไขโพสต์"
+                    >
+                        <img
+                            src="https://img.icons8.com/ios-filled/50/000000/edit.png"
+                            alt="edit"
+                        >
+                    </a>
+
+
+                </div>
+
+            </div>
+
+        </div>
 
             {% empty %}
             <p style="grid-column:1/3; text-align:center; font-size:20px; color:gray; margin-top:40px;">
@@ -281,6 +821,351 @@
                 dropdownMenu.style.display = "none";
             }
         });
+
+        // =====================================================
+        // ⭐ ADMIN FILTER PANEL
+        // =====================================================
+
+        const toggleFilterBtn =
+            document.getElementById("toggleFilterBtn");
+
+        const filterPanel =
+            document.getElementById("filterPanel");
+
+
+        if (toggleFilterBtn && filterPanel) {
+
+            toggleFilterBtn.addEventListener(
+                "click",
+                function () {
+
+                    if (
+                        filterPanel.style.display === "none" ||
+                        filterPanel.style.display === ""
+                    ) {
+
+                        filterPanel.style.display = "block";
+
+                    } else {
+
+                        filterPanel.style.display = "none";
+
+                    }
+
+                }
+            );
+
+        }
+
+
+        // =====================================================
+        // ⭐ ถ้าเคยเลือก Filter
+        // ให้เปิดกล่อง Filter อัตโนมัติ
+        // =====================================================
+
+        const adminHasFilter =
+
+            ("{{ order|default:'new' }}" !== "new")
+
+            ||
+
+            ("{{ province|default:'all' }}" !== "all")
+
+            ||
+
+            ("{{ work_type|default:'all' }}" !== "all")
+
+            ||
+
+            ("{{ salary_kind|default:'all' }}" !== "all")
+
+            ||
+
+            ("{{ welfare|default:'all' }}" !== "all");
+
+
+        if (adminHasFilter && filterPanel) {
+
+            filterPanel.style.display = "block";
+
+        }
+
+// =====================================================
+// ⭐ ADMIN LIVE SEARCH
+// =====================================================
+
+const liveSearchInput =
+    document.getElementById("liveSearchInput");
+
+const postContainer =
+    document.getElementById("postContainer");
+
+
+let searchTimer = null;
+
+let searchController = null;
+
+
+function escapeHtml(value) {
+
+    const div =
+        document.createElement("div");
+
+    div.textContent =
+        value ?? "";
+
+    return div.innerHTML;
+}
+
+
+function createAdminPostCard(post) {
+
+    let imageHtml = "";
+
+    if (post.image_url) {
+
+        imageHtml = `
+            <img
+                class="post-image"
+                src="${escapeHtml(post.image_url)}"
+                alt="post image"
+            >
+        `;
+    }
+
+
+    return `
+
+        <div
+            class="post-card"
+            onclick="window.location.href='/post/${post.id}/'"
+        >
+
+            <div class="post-left">
+
+                <h3 style="
+                    margin:0;
+                    font-size:22px;
+                    font-weight:bold;
+                ">
+                    ${escapeHtml(post.company)}
+                </h3>
+
+
+                <p style="margin:4px 0;">
+                    จังหวัด:
+                    ${escapeHtml(post.province || "-")}
+                </p>
+
+
+                <p style="margin:4px 0;">
+                    สวัสดิการ:
+                    ${escapeHtml(post.welfare_detail || "ไม่มี")}
+                </p>
+
+
+                <p style="margin:4px 0;">
+                    เบี้ยเลี้ยง:
+                    ${escapeHtml(post.salary || "-")}
+                </p>
+
+
+                <p style="margin:4px 0;">
+                    ตำแหน่งที่ได้รับ:
+                    ${escapeHtml(post.position || "-")}
+                </p>
+
+
+                <p style="margin:4px 0;">
+                    ทักษะที่ใช้:
+                    ${escapeHtml(post.skills || "-")}
+                </p>
+
+
+                <p style="margin:4px 0;">
+                    เกรดขั้นต่ำ:
+                    ${escapeHtml(post.grade || "-")}
+                </p>
+
+
+                <p style="margin:4px 0;">
+                    ประเภทการฝึกงาน:
+                    ${escapeHtml(post.type_of_work || "-")}
+                </p>
+
+
+                <p style="margin:4px 0;">
+                    ที่ตั้งบริษัท:
+                    ${escapeHtml(post.location || "-")}
+                </p>
+
+
+                <p style="margin:4px 0;">
+                    ผู้โพสต์:
+                    ${escapeHtml(post.owner_display)}
+                </p>
+
+
+                <p style="
+                    margin:4px 0;
+                    color:gray;
+                ">
+                    วันที่โพสต์:
+                    ${escapeHtml(post.created_at)}
+                </p>
+
+
+                <p style="
+                    margin:4px 0;
+                    color:#2f80ed;
+                    font-weight:600;
+                ">
+                    เหลือเวลาอีก
+                    ${post.days_until_expiration}
+                    วันจะหมดอายุ
+                </p>
+
+            </div>
+
+
+            <div class="post-right">
+
+                ${imageHtml}
+
+
+                <div class="post-actions">
+
+                    <a
+                        class="delete-btn"
+                        href="/post/edit/${post.id}/"
+                        onclick="event.stopPropagation();"
+                        title="แก้ไขโพสต์"
+                    >
+
+                        <img
+                            src="https://img.icons8.com/ios-filled/50/000000/edit.png"
+                            alt="edit"
+                        >
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+    `;
+}
+
+
+async function performAdminLiveSearch() {
+
+    const keyword =
+        liveSearchInput.value.trim();
+
+
+    if (searchController) {
+
+        searchController.abort();
+
+    }
+
+
+    searchController =
+        new AbortController();
+
+
+    try {
+
+        const response = await fetch(
+
+            `{% url 'live_search_posts' %}?q=${encodeURIComponent(keyword)}`,
+
+            {
+
+                method: "GET",
+
+                headers: {
+
+                    "X-Requested-With":
+                        "XMLHttpRequest"
+
+                },
+
+                signal:
+                    searchController.signal
+
+            }
+
+        );
+
+
+        const data =
+            await response.json();
+
+
+        if (!data.posts ||
+            data.posts.length === 0) {
+
+            postContainer.innerHTML = `
+
+                <p style="
+                    grid-column:1/3;
+                    text-align:center;
+                    font-size:20px;
+                    color:gray;
+                    margin-top:40px;
+                ">
+
+                    ไม่พบข้อมูลโพสต์
+
+                </p>
+
+            `;
+
+            return;
+        }
+
+
+        postContainer.innerHTML =
+
+            data.posts
+                .map(createAdminPostCard)
+                .join("");
+
+
+    }
+
+    catch (error) {
+
+        if (error.name !== "AbortError") {
+
+            console.error(
+                "Live Search Error:",
+                error
+            );
+
+        }
+
+    }
+
+}
+
+
+liveSearchInput.addEventListener(
+    "input",
+    function () {
+
+        clearTimeout(searchTimer);
+
+        searchTimer =
+            setTimeout(
+                performAdminLiveSearch,
+                250
+            );
+
+    }
+);
     </script>
 
 </body>

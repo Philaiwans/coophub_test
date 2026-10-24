@@ -441,7 +441,8 @@
 
             <div class="field">
               <label>คณะ</label>
-              <select id="faculty" name="faculty" required>
+              <select id="faculty" name="faculty"
+                      {% if user.role != 'admin' and user.username != 'admin007' %}required{% endif %}>
                 <option value="">เลือกคณะ</option>
                 <option value="คณะวิทยาศาสตร์">คณะวิทยาศาสตร์</option>
                 <option value="คณะเกษตรศาสตร์">คณะเกษตรศาสตร์</option>
@@ -459,7 +460,8 @@
 
             <div class="field">
               <label>สาขา</label>
-              <select id="major" name="major" required>
+              <select id="major" name="major"
+                      {% if user.role != 'admin' and user.username != 'admin007' %}required{% endif %}>
                 <option value="">เลือกสาขา</option>
               </select>
             </div>

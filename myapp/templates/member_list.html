@@ -139,19 +139,25 @@
       flex:0 0 auto;
     }
     .avatar-fallback{
-      width:62px;
-      height:62px;
-      border-radius:14px;
-      background:#e5e7eb;
-      border:1px solid #e6eaf2;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-size:22px;
-      color:#64748b;
-      font-weight:900;
-      flex:0 0 auto;
-      user-select:none;
+        width:62px;
+        height:62px;
+        border-radius:14px;
+        background:#f3f4f6;
+        border:1px solid #d8dadd;
+
+        display:flex;
+        align-items:center;
+        justify-content:center;
+
+        flex:0 0 auto;
+        overflow:hidden;
+        user-select:none;
+    }
+
+    .avatar-fallback svg{
+        width:54px;
+        height:54px;
+        display:block;
     }
 
     .member-text{
@@ -318,7 +324,39 @@
           {% if student.profile_image %}
             <img class="student-avatar" src="{{ student.profile_image.url }}" alt="avatar">
           {% else %}
-            <div class="avatar-fallback" aria-label="no-avatar">👤</div>
+              <div class="avatar-fallback" aria-label="no-avatar">
+                  <svg viewBox="0 0 64 64"
+                      xmlns="http://www.w3.org/2000/svg"
+                      aria-hidden="true">
+
+                      <!-- วงกลมรอบนอก -->
+                      <circle
+                          cx="32"
+                          cy="32"
+                          r="28"
+                          fill="#f5f5f5"
+                          stroke="#d0d0d0"
+                          stroke-width="2"
+                      />
+
+                      <!-- ศีรษะ -->
+                      <circle
+                          cx="32"
+                          cy="24"
+                          r="10"
+                          fill="#c9c9c9"
+                      />
+
+                      <!-- ลำตัว -->
+                      <path
+                          d="M15 52
+                            C17 40, 23 34, 32 34
+                            C41 34, 47 40, 49 52
+                            Z"
+                          fill="#c9c9c9"
+                      />
+                  </svg>
+              </div>
           {% endif %}
 
           <div class="member-text">
